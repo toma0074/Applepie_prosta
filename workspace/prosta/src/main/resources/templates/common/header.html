@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+	<link rel="icon" th:href="@{../images/favicon.ico}" type="image/x-icon">
+</head>
+
+<body>
+	<th:block id="header" th:fragment="layout-header">
+		<div class="header-container">
+			<div class="title" > <img th:src="@{/images/prosta.jpg}" alt="logo" class="logo"> </div>
+			<div th:if="${session.user != null}" class="user_info">
+				<!-- ログイン中のユーザ名の表示をこの下に記述してください -->
+				ようこそ、<span th:text = "${session.user.userName}"></span>さん
+				<span class="btn"><a th:href="@{/logout}">ログアウト</a></span>
+			</div>
+		</div>
+	</th:block>
+</body>
+
+</html>

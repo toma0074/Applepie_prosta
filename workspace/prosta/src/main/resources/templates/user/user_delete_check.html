@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_5block :: layout(~{::body/content()})}">
+	
+<head>
+	<meta charset="UTF-8">
+	<title>ユーザー削除</title>
+</head>
+
+<br>
+<body class="admin user_deletet">
+<h3>ユーザー削除確認</h3>
+	<form th:action="@{/user/delete/complete}" method ="post" th:object="${customerForm}">
+		
+		<p class="center" th:text="${flag}"></p>
+		<p class="center" th:text="*{userName} + 'さん'"></p>
+		
+		<input type="hidden" name="userId" th:value="${customerForm.userId}">
+		<div class="inputform">
+			
+		<div class="inputselect">
+		<input type="submit" value="確定" />
+		</div>
+	</form>
+		<div class="inputselect">
+		<form th:action="@{/user/list}" method="GET"}>
+		<input type="submit" value="戻る" />
+		</div>
+		</div>
+	</form>
+		
+</body>
+</html>

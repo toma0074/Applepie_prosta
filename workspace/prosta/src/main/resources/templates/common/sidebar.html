@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+</head>
+
+<body>
+	<aside th:fragment="layout-sidebar"
+		th:class="${session.user == null or session.user.permission == 1} ? ${'search'} : ${'admin_menu'}">
+		<div class="side-inner">
+		<div class="title">MENU</div>
+
+		<div>
+			<ul style="list-style:none; padding-left:0;">
+				<li class="sbt"><a th:href="@{/mypage}"><span>MyPage</span></a></li>
+				<li class="sbt"><a th:href="@{/test/category}"><span>カテゴリ別問題</span></a></li>
+				<li class="sbt"><a th:href="@{/test/diagnostic}"><span>苦手範囲特定問題</span></a></li>
+				<li class="sbt" th:if="${session.user.permission == 2}"><a th:href="@{/user/list}"><span>ユーザー一覧</span></a></li>
+				<li class="sbt"><a th:href="@{/question}"><span>問題検索</span></a></li>
+			</ul>
+			<div class="search">
+				<div  th:text="問題文あいまい検索"></div>
+				<form th:action="@{/question/list/text}" method="get" >
+					
+				<div class="input">
+				<input type="text" name="questionText" class="qt"/>
+
+				<input type="submit" value="検索" />
+				</div>
+				</form>
+				
+				<div  th:text="カテゴリ検索"></div>
+				<form th:action="@{/question/list/category}" method="get" >
+						<div class="input">
+							<select class="category" th:name="category">
+								<option th:value="1">Java</option>
+								<option th:value="2">Spring</option>
+								<option th:value="3">HTML</option>
+								<option th:value="4">SQL</option>
+							</select>
+							<input type="submit" value="検索" />
+						</div>
+					</form>
+					
+				<div  th:text="難易度検索"></div>
+				<form th:action="@{/question/list/difficulty}" method="get" >
+					<div class="input">
+						<select class="difficulty" th:name="difficulty" style="color: #FFB11B;">
+							<option th:value="1">★☆☆</option>
+							<option th:value="2">★★☆</option>
+							<option th:value="3">★★★</option>
+						</select>
+						<input type="submit" value="検索" />
+					</div>
+				</form>
+				
+				<th:block th:if="${session.user.permission==2}">
+				<div  th:text="削除検索"></div>
+				<form th:action="@{/question/list/delete}" method="get" >
+					<div class="input">
+						<select  class="category" th:name="questionDelete">
+							<option th:value="0">表示</option>
+							<option th:value="1">非表示</option>
+						</select>
+						<input type="submit" value="検索" />
+					</div>
+				</form>
+				</th:block>
+			</div>
+		</div>
+		</div>
+	</aside>
+</body>
+
+</html>

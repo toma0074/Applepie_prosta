@@ -1,0 +1,258 @@
+@charset "UTF-8";
+
+@font-face {
+    font-family: 'MODI';
+    src: url('../fonts/Senobi-Gothic-Bold.ttf') format('truetype');
+}
+/* ---- Googleフォントの読み込み ---- */
+@import url('https://fonts.googleapis.com/css?family=Abel|Abril+Fatface|Alegreya|Arima+Madurai|Dancing+Script|Dosis|Merriweather|Oleo+Script|Overlock|PT+Serif|Pacifico|Playball|Playfair+Display|Share|Unica+One|Vibur');
+
+/* ---- 全体ルール ---- */
+* {
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+body {
+    background-image: url('../images/learn.jpg');
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: "MODI", sans-serif;
+}
+
+/* ---- ヘッダー ---- */
+.site-header {
+    width: 90%;
+    margin:0 auto;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 2); 
+}
+
+.site-header .header-inner {
+    width: 90%;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.header_logo_img {
+    height: 30px;     
+    width: auto;
+    vertical-align: middle; /* ロゴが上下の真ん中に来るようにする */
+}
+/* ---- メインコンテンツ（中央配置） ---- */
+.main-content {
+    flex: 1; 
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    width: 100%;
+}
+
+/* ---- ロゴと著作権 ---- */
+.logo {
+    font-family: 'MODI', sans-serif;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 24px;
+    transition:.2s;
+}
+
+.logo:hover {
+    opacity: 0.6;
+}
+
+.copyright {
+    font-size: 12px;
+    margin-top: 10px;
+    font-family: sans-serif;
+}
+
+/* ---- フォーム外枠 ---- */
+form {
+    width: 420px;
+    height: auto;
+    border-radius: 5px;
+    margin: 1% auto;
+    box-shadow: 0 9px 50px hsla(20, 67%, 75%, 0.31);
+    padding:25px 30px;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+form .con {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* ---- メッセージエリア ---- */
+.head-form {
+    margin: 10px auto 20px auto;
+    text-align: center;
+}
+
+.head-form h2 {
+    font-size: 220%;
+    margin-bottom: 7px;
+    color: #3e403f;
+    text-shadow: 2px 2px 4px rgb(255, 255, 255);
+}
+
+.head-form p {
+    line-height: 1.5;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    color: #3e403f;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgb(255, 255, 255);
+}
+
+/* ---- 入力欄のグループ（横並びの隙間を消す魔法） ---- */
+.input-group {
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.input-flex{
+	display: flex;          /* 中身を横一列にピタッと並べる */
+	justify-content: center;  /* 中央に寄せる */
+    align-items: center;      /* 上下の高さを中央で揃える */
+	width: 100%;
+	
+}
+/* 各パーツの高さを 42px に完全統一 */
+
+/* 1. 左側のアイコンボックス */
+.input-item {
+    background: #fff;
+/*    color: #333;*/
+    width: 40px;             /* 横幅を固定 */
+    height: 48px;            /* 高さを42pxに設定 */
+    display: flex;
+    align-items: center;     /* アイコンを縦中央に */
+    justify-content: center; /* アイコンを横中央に */
+    border-radius: 5px 0px 0px 5px; /* 左側だけ丸める */
+}
+
+/* 2. 入力欄の共通設定 */
+input[class="form-input"] {
+    height: 48px;            /* 高さを42pxに設定 */
+    padding: 0 15px;
+    font-size: 16px;
+    color: #5E6472;
+    outline: none;
+    border: none;
+    transition: 0.2s linear;
+    font-family: "MODI", sans-serif;
+}
+
+/* ===================================================
+   ★ずれないため、入力欄の横幅をIDで強力固定
+=================================================== */
+
+/* 1. ユーザー名入力欄（ID: txt-input）の幅を240pxに固定 */
+#txt-input {
+    width: 240px !important; /* !important をつけることで、古いCSSの邪魔を完全にシャットアウトします */
+    border-radius: 0px 5px 5px 0px;
+}
+
+/* 2. パスワード入力欄（ID: pwd）の幅を200pxに固定 */
+#pwd {
+    width: 200px !important; /* typeがtextになってもpasswordになっても、絶対に200pxをキープ */
+    border-radius: 0px;      /* 右側に目のアイコンが合体するので角は丸めない */
+}
+
+/* 3. 右側の目のアイコン */
+#eye {
+    background: #fff;
+    color: #333;
+    width: 40px;             /* 横幅を固定 */
+    height: 48px;            /* 高さを42pxに設定 */
+    display: flex;
+    align-items: center;     /* 目のマークを縦中央に */
+    justify-content: center; /* 目のマークを横中央に */
+    border-radius: 0px 5px 5px 0px; /* 右側だけ丸める */
+    cursor: pointer;
+}
+
+/* 入力欄に変化が起きたとき */
+input:focus {
+    transform: translateX(-2px);
+    border-radius: 5px;
+}
+
+/* ---- エラーメッセージ ---- */
+.error-text {
+   color: #cc0000;
+    font-size: 14px;
+    text-align: center;
+    width: 280px;
+    margin: 5px 5px 5px 5px;
+}
+
+/* ---- ボタン設定 ---- */
+button {
+    color: #252537;
+    width: 280px;
+    height: 50px;
+    background: #fff;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.05em;
+    font-size: 16px;
+    transition: all 0.2s linear;
+    font-family: "MODI", sans-serif;
+}
+
+/* Log In ボタン */
+button.log-in {
+    margin: 0 auto 30px auto; /* 下（Sign Upとの間）に30px開ける */
+    display: block;
+}
+
+/* 下部ボタンエリア */
+.other {
+    display: flex;
+    justify-content: center; 
+    width: 100%;
+}
+
+/* Sign Up ボタン */
+.sign-up {
+    background: #B8F2E6;
+    margin: 0 auto 30px auto;
+    display: block;
+}
+
+/* ボタンのホバーアニメーション */
+button:hover {
+    animation: ani9 0.4s ease-in-out infinite alternate;
+}
+
+/* ---- フッター ---- */
+footer {
+    width: 90%;
+    padding: 10px 0;
+    margin:0 auto;
+    border-top: 1px solid rgba(255, 255, 255, 2); 
+    text-align: center;
+    color: #ffffff;
+}
+
+@keyframes ani9 {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(4px); }
+}

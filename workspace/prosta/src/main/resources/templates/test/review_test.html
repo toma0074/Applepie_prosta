@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_3block :: layout(~{::body/content()})}">
+
+<head>
+	<title>問題確認画面</title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="test_category_check">
+	<h3>問題確認画面</h3>
+	<div class="test_ans">
+		<form class="center_list" th:action="@{/test/result}" method="post" th:object="${session.ans}" id="question-table">
+
+			<div class="form_group"  th:each="a,count:${session.ans}">
+				
+				<div class="question_row">
+					<span class="label" th:text="'問題'+ ${count.count} + '：'"></span>
+					<span th:text="${a.questionText}"></span>
+				</div>
+			
+				<div class="ans_row">
+					<sapn class="label">選んだ選択肢：</sapn>
+					<label class="option_item">
+					<div  th:if="${a.ansOption==1}" th:text="${a.optionA}"></div>
+					<div  th:if="${a.ansOption==2}" th:text="${a.optionB}"></div>
+					<div  th:if="${a.ansOption==3}" th:text="${a.optionC}"></div>
+					<div  th:if="${a.ansOption==4}" th:text="わからない"></div>
+					</label>
+				</div>
+			</div>
+			
+			<div id="pagination-container" style="display: flex; gap: 5px; justify-content: center; margin-top: 5px;"></div>
+			
+			<div class="inputform">
+<!--				<div class="label"></div>-->
+				<div class="inputselect">
+					<input type="submit" value="送信" />
+				</div>
+			
+		</form>
+		
+		<form th:action="@{/test/back}" method="post">
+<!--				<div class="label"></div>-->
+				<div class="inputselect">
+					<input type="submit" value="戻る" />
+				</div>
+				
+				</div>
+				</div>
+		</form>
+		
+	</div>
+	
+	<script>
+		
+		document.addEventListener('DOMContentLoaded', function() {
+	  const rowsPerPage = 3;
+	  const table = document.getElementById('question-table');
+	  if (!table) return;
+	
+	  const rows = table.querySelectorAll('.form_group');
+	  const pageCount = Math.ceil(rows.length / rowsPerPage);
+	  const container = document.getElementById('pagination-container');
+	  if (pageCount <= 1) return;
+	  let currentPage = 1;
+	
+	  function showPage(page) {
+	    currentPage = page;
+	    const start = (page - 1) * rowsPerPage;
+	    const end = start + rowsPerPage;
+	    
+	    Array.from(rows).forEach((row, i) => row.style.display = (i >= start && i < end) ? '' : 'none');
+	    document.getElementById('p-prev').disabled = (currentPage === 1);
+	    document.getElementById('p-next').disabled = (currentPage === pageCount);
+	  }
+	  const prevButton = document.createElement('button');
+	  prevButton.id = 'p-prev';
+	  prevButton.type='button';
+	  prevButton.innerText = '前へ';
+	  prevButton.className = 'p-btm';
+	  prevButton.addEventListener('click', () => {
+	    if (currentPage > 1) showPage(currentPage - 1);
+	  });
+	
+	  const nextButton = document.createElement('button');
+	  nextButton.id = 'p-next';
+	  nextButton.type='button';
+	  nextButton.innerText = '次へ';
+	  nextButton.className = 'p-btm';
+	  nextButton.addEventListener('click', () => {
+	    if (currentPage < pageCount) showPage(currentPage + 1);
+	  });
+	
+	  container.appendChild(prevButton);
+	  container.appendChild(nextButton);
+	
+	  showPage(1);
+	});
+		
+	</script>	
+
+</body>
+
+</html>
