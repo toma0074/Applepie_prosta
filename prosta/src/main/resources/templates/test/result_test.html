@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_3block :: layout(~{::body/content()})}">
+
+<head>
+	<title>問題解答画面</title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="test_category_result">
+	<h3>問題解答画面</h3>
+	<div class="test_ans">
+		<form th:action="@{/mypage}" method="get"  id="question-table">
+
+			<div class="form_group"  th:each="ans,count:${ans}">
+				
+				<div class="question_row">
+					<span class="label" th:text="'問題'+ ${count.count} + '：'"></span>
+					<span th:text="${ans.questionText}"></span>
+				</div>
+				<div class="ans_row">
+					<span class="label">選んだ選択肢：</span>
+					
+					<span  th:if="${ans.ansOption == 1}">A</span>
+					<span  th:if="${ans.ansOption == 2}">B</span>
+					<span  th:if="${ans.ansOption == 3}">C</span>
+					<span  th:if="${ans.ansOption == 4}">わからない</span>
+				</div>
+				
+				
+				
+				<div class="ans_row">
+					<span class="label">正解：</span>	
+					
+					<span  th:if="${ans.correctOption == 1}">A</span>
+					<span  th:if="${ans.correctOption == 2}">B</span>
+					<span  th:if="${ans.correctOption == 3}">C</span>
+				</div>
+			</div>
+			
+			<div id="pagination-container" style="display: flex; gap: 5px; justify-content: center; margin-top: 5px;"></div>
+			
+<!--			<p class="label">-->
+				<div th:text="'正答数' + ${ca} + '/' + ${qc} "></div>
+					
+				<th:block th:if="${session.testFlag == null}">
+					<p th:if="${cateCount[0] != 0}" th:text="${'Java : ' + cateCorrect[0] + '/' + cateCount[0]}"></p>
+					<p th:if="${cateCount[1] != 0}" th:text="${'Spring : ' + cateCorrect[1] + '/' + cateCount[1]}"></p>
+					<p th:if="${cateCount[2] != 0}" th:text="${'HTML : ' + cateCorrect[2] + '/' + cateCount[2]}"></p>
+					<p th:if="${cateCount[3] != 0}" th:text="${'SQL : ' + cateCorrect[3] + '/' + cateCount[3]}"></p>
+				</th:block>
+<!--			</p>-->
+			
+			<div class="inputform">
+<!--				<div class="label"></div>-->
+				<div class="inputselect">
+					<input type="submit" value="マイページに戻る" />
+				</div>
+			</div>
+
+		</form>
+	</div>			
+	<script>
+		
+		document.addEventListener('DOMContentLoaded', function() {
+	  const rowsPerPage = 3;
+	  const table = document.getElementById('question-table');
+	  if (!table) return;
+	
+	  const rows = table.querySelectorAll('.form_group');
+	  const pageCount = Math.ceil(rows.length / rowsPerPage);
+	  const container = document.getElementById('pagination-container');
+	  if (pageCount <= 1) return;
+	  let currentPage = 1;
+	
+	  function showPage(page) {
+	    currentPage = page;
+	    const start = (page - 1) * rowsPerPage;
+	    const end = start + rowsPerPage;
+	    
+	    Array.from(rows).forEach((row, i) => row.style.display = (i >= start && i < end) ? '' : 'none');
+	    document.getElementById('p-prev').disabled = (currentPage === 1);
+	    document.getElementById('p-next').disabled = (currentPage === pageCount);
+	  }
+	  const prevButton = document.createElement('button');
+	  prevButton.id = 'p-prev';
+	  prevButton.type='button';
+	  prevButton.innerText = '前へ';
+	  prevButton.className = 'p-btm';
+	  prevButton.addEventListener('click', () => {
+	    if (currentPage > 1) showPage(currentPage - 1);
+	  });
+	
+	  const nextButton = document.createElement('button');
+	  nextButton.id = 'p-next';
+	  nextButton.type='button';
+	  nextButton.innerText = '次へ';
+	  nextButton.className = 'p-btm';
+	  nextButton.addEventListener('click', () => {
+	    if (currentPage < pageCount) showPage(currentPage + 1);
+	  });
+	
+	  container.appendChild(prevButton);
+	  container.appendChild(nextButton);
+	
+	  showPage(1);
+	});
+		
+	</script>
+	
+</body>
+</html>

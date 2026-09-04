@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_3block :: layout(~{::body/content()})}">
+
+<head>
+	<title>問題解答画面</title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="test_category_input">
+	
+	<h3>問題解答画面</h3>
+	<div class="test_ans">
+		<form th:action="@{/test/check}" method="post" th:object="${answerListForm}">
+				
+			<p class="error">
+					<div  th:each="error,status:*{results}">
+						<div th:if="${#fields.hasErrors('results[' + status.index + '].ansOption')}">
+							<span th:text="'第' + ${status.count} + '問目を入力してください'" class="error"></span><br/>
+						</div>
+					</div>
+			</p>
+			
+			<div id="question-table">
+
+			<div class="form_group"  th:each="q,count:${session.question}">
+				
+
+				<div class="question_row">
+					<span class="label" th:text="'問題'+ ${count.count} + ':'"></span>
+					<span  th:text="${q.questionText}"></span>
+				</div>
+				
+				<div class="ans_row">
+					<span class="label">選択肢：</span>
+					
+						
+					<label class="option_item">
+				    A<input type="radio" th:name="'results[' + ${count.index} + '].ansOption'" value="1" th:text="${q.questionOption.optionA}" th:checked="${session.ans[count.index].ansOption==1}"/>
+				    </label>
+				    <label class="option_item">
+				    B<input type="radio" th:name="'results[' + ${count.index} + '].ansOption'" value="2" th:text="${q.questionOption.optionB}" th:checked="${session.ans[count.index].ansOption==2}"/>
+				    </label>
+				    <label class="option_item">
+				    C<input type="radio" th:name="'results[' + ${count.index} + '].ansOption'" value="3" th:text="${q.questionOption.optionC}" th:checked="${session.ans[count.index].ansOption==3}"/>
+				    </label>
+				    <label class="option_item">
+				    D<input type="radio" th:name="'results[' + ${count.index} + '].ansOption'" value="4" th:text="わからない" th:checked="${session.ans[count.index].ansOption==4}"/>
+				    </label>
+				   
+				</div>
+				    
+				    <input type="hidden" th:name="'results[' + ${count.index} + '].questionId'" th:value="${q.questionId}"/>
+				    <input type="hidden" th:name="'results[' + ${count.index} + '].category'" th:value="${q.category}"/>
+					<input type="hidden" th:name="'results[' + ${count.index} + '].correctOption'" th:value="${q.questionOption.correctOption}"/>
+					<input type="hidden" th:name="'results[' + ${count.index} + '].questionText'" th:value="${q.questionText}"/>
+					<input type="hidden" th:name="'results[' + ${count.index} + '].optionA'" th:value="${q.questionOption.optionA}"/>
+					<input type="hidden" th:name="'results[' + ${count.index} + '].optionB'" th:value="${q.questionOption.optionB}"/>
+					<input type="hidden" th:name="'results[' + ${count.index} + '].optionC'" th:value="${q.questionOption.optionC}"/>
+				</div>
+			</div>
+				
+				<div id="pagination-container" style="display: flex; gap: 5px; justify-content: center; margin-top: 5px;"></div>
+<!--				<div class="label"></div>-->
+				<div class="inputform">
+				<div class="inputselect">
+					<input type="submit" value="確認" />
+				</div>
+				</div>
+		</form>
+		
+	</div>
+	
+	<script>
+		
+		document.addEventListener('DOMContentLoaded', function() {
+	  const rowsPerPage = 3;
+	  const table = document.getElementById('question-table');
+	  if (!table) return;
+	
+	  const rows = table.querySelectorAll('.form_group');
+	  const pageCount = Math.ceil(rows.length / rowsPerPage);
+	  const container = document.getElementById('pagination-container');
+	  if (pageCount <= 1) return;
+	  let currentPage = 1;
+	
+	  function showPage(page) {
+	    currentPage = page;
+	    const start = (page - 1) * rowsPerPage;
+	    const end = start + rowsPerPage;
+	    
+	    Array.from(rows).forEach((row, i) => row.style.display = (i >= start && i < end) ? '' : 'none');
+	    document.getElementById('p-prev').disabled = (currentPage === 1);
+	    document.getElementById('p-next').disabled = (currentPage === pageCount);
+	  }
+	  const prevButton = document.createElement('button');
+	  prevButton.id = 'p-prev';
+	  prevButton.type='button';
+	  prevButton.innerText = '前へ';
+	  prevButton.className = 'p-btm';
+	  prevButton.addEventListener('click', () => {
+	    if (currentPage > 1) showPage(currentPage - 1);
+	  });
+	
+	  const nextButton = document.createElement('button');
+	  nextButton.id = 'p-next';
+	  nextButton.type='button';
+	  nextButton.innerText = '次へ';
+	  nextButton.className = 'p-btm';
+	  nextButton.addEventListener('click', () => {
+	    if (currentPage < pageCount) showPage(currentPage + 1);
+	  });
+	
+	  container.appendChild(prevButton);
+	  container.appendChild(nextButton);
+	
+	  showPage(1);
+	});
+		
+	</script>	
+	
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+       th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PROSTA | MyPage</title>
+</head>
+<body>
+	<main class="suku">
+	<h3>My Page</h3>
+
+		<p class="btn"><a th:href="@{/user/update/input}">ユーザー更新</a></p>
+		
+	
+		
+			<div class="center" >解答履歴</div>
+			<div id="pagination-container" style="display: flex; gap: 5px; justify-content: center; margin: 5px;"></div>
+		
+		<table id="ans-table" class="my_table" th:if="!${#lists.isEmpty(answerlist)}">
+			
+			<form th:action="@{/mypage}" method="get">
+				<select class="mypage_sort" name="sort" onchange="this.form.submit()" style="margin:0 45px;">
+					<option th:value="1">新しい順</option>
+					<option th:value="2" th:selected="${sort==2}">古い順</option>
+				</select>
+			</form>
+		<thead>
+		<tr>
+			<th class="category">カテゴリー</th>
+			<th class="questionId">問題</th>
+			<th class="ansOption">選択履歴</th>
+			<th class="correctOption">正解選択肢</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="ans:${answerlist}">
+			<td class="center" th:switch="${ans.question.category}" >
+				<span th:case="1">Java</span>
+				<span th:case="2">Spring</span>
+				<span th:case="3">HTML</span>
+				<span th:case="4">SQL</span>
+        	</td>
+        	<td th:text="${ans.question.questionText}"></td>
+        	<td class="center" th:switch="${ans.ansOption}" >
+				<span th:case="1">A</span>
+				<span th:case="2">B</span>
+				<span th:case="3">C</span>
+				<span th:case="4">わからない</span>
+        	</td>
+        	<td class="center" th:switch="${ans.correctOption}">
+				<span th:case="1">A</span>
+				<span th:case="2">B</span>
+				<span th:case="3">C</span>
+			</td>
+		</tr>
+		</tbody>
+		</div>
+		</table>
+		
+		<p class="center" th:if="${#lists.isEmpty(answerlist)}">履歴がありません。</p>
+	</main>
+	<script>
+	document.addEventListener('DOMContentLoaded', function() {
+	  const rowsPerPage = 6;
+	  const table = document.getElementById('ans-table');
+	  if (!table) return;
+	
+	  const rows = table.querySelectorAll('tbody tr');
+	  const pageCount = Math.ceil(rows.length / rowsPerPage);
+	  const container = document.getElementById('pagination-container');
+	  if (pageCount <= 1) return;
+	  let currentPage = 1;
+	
+	  function showPage(page) {
+	    currentPage = page;
+	    const start = (page - 1) * rowsPerPage;
+	    const end = start + rowsPerPage;
+	    
+	    Array.from(rows).forEach((row, i) => row.style.display = (i >= start && i < end) ? '' : 'none');
+	    document.getElementById('p-prev').disabled = (currentPage === 1);
+	    document.getElementById('p-next').disabled = (currentPage === pageCount);
+	  }
+	  const prevButton = document.createElement('button');
+	  prevButton.id = 'p-prev';
+	  prevButton.type='button';
+	  prevButton.innerText = '前へ';
+	  prevButton.className = 'p-btm';
+	  prevButton.addEventListener('click', () => {
+	    if (currentPage > 1) showPage(currentPage - 1);
+	  });
+	
+	  const nextButton = document.createElement('button');
+	  nextButton.id = 'p-next';
+	  nextButton.type='button';
+	  nextButton.innerText = '次へ';
+	  nextButton.className = 'p-btm';
+	  nextButton.addEventListener('click', () => {
+	    if (currentPage < pageCount) showPage(currentPage + 1);
+	  });
+	
+	  container.appendChild(prevButton);
+	  container.appendChild(nextButton);
+	
+	  showPage(1);
+	});
+	</script>
+</bodyclass>
+</html>
+
+	

@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>ユーザー情報更新</title>
+</head>
+
+<body>
+	<h3>ユーザー情報更新完了</h3>
+	
+	<form th:if="${pm==1}" th:action="@{/mypage}">
+		<p class="center">更新を完了しました。</p>
+		<div class="inputform">
+		<div class="inputselect">
+			<input type="submit" value="マイページ" />
+		</div>
+		</div>
+	</form>
+	<form th:if="${pm==2}" th:action="@{/user/list}">
+		<p class="center">更新を完了しました。</p>
+			<div class="inputform">
+			<div class="inputselect">
+			<input type="submit" value="ユーザー一覧" />
+			</div>
+			</div>
+	</form>
+	
+</body>
+</html>

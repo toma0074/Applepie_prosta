@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+
+<head>
+	<title>検索結果一覧</title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="admin user_list">
+	
+	<div class="forms">
+			<p class="label">検索：「
+			<strong th:text="${QuestionResult}" ></strong>
+			」
+			</p>
+		</div>
+	<div th:if="${session.user.permission==2}">
+		<p class="btn"><a th:href="@{/question/regist/input}">新規問題登録</a></p>
+	</div>
+	<div id="pagination-container" style="display: flex; gap: 5px; justify-content: center; margin-top: 5px;"></div>
+	<th:block th:if="${#lists.isEmpty(Questions)}">
+		<div class="message">
+			<p class="back_to_top_message">該当する問題は存在しません。</p>
+			<p class="btn"><a th:href = "@{/question}">一覧表示に戻る</a></p>
+			<p class="btn"><a th:href = "@{/mypage}">マイページに戻る</a></p>
+		</div>
+	</th:block>
+
+	<table class="question_list" id="question-table" th:if="${!#lists.isEmpty(Questions)}">
+		
+		<thead>
+		<tr>
+			<th class="category">カテゴリ</th>
+			<th class="difficulty">難易度</th>
+			<th class="questionText">問題文</th>
+			<th th:if="${session.user.permission==2}" class="questionUD" colspan="2">操作</th>
+			
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="q:${Questions}">
+			<td class="center" th:switch="${q.category}">
+				<span th:case="1">Java</span>
+				<span th:case="2">Spring</span>
+				<span th:case="3">HTML</span>
+				<span th:case="4">SQL</span>
+			</td>
+			
+		<td class="center" th:switch="${q.difficulty}" style="color: #FFB11B;">
+				<span th:case="1">★☆☆</span>
+				<span th:case="2">★★☆</span>
+				<span th:case="3">★★★</span>
+			</td>
+			
+		<td class="qtext" th:text="${q.questionText}"></td>
+		
+		<td th:if="${session.user.permission==2}">
+			<form class="center" th:action="@{/question/update/input}" method="post" >
+				<input type="hidden" name="questionId" th:value="${q.questionId}">
+				<input type="submit" value="更新" class="update-btn" />
+			</form>
+		</td>
+				
+		<td th:if="${session.user.permission==2}">
+			
+			<form class="center" th:action="@{/question/delrest/check}" method="post" >
+				<input type="hidden" name="questionId" th:value="${q.questionId}">
+				
+				<th:block th:if="${q.questionDelete==0}">
+					<input type="hidden" name="mode" value="delete">	
+					<input type="submit" value="削除" class="delete-btn" />
+				</th:block>
+				<th:block th:if="${q.questionDelete==1}">
+					<input type="hidden" name="mode" value="restore">	
+					<input type="submit" value="復元" class="delete-btn" />
+				</th:block>
+			</form>
+		</td>
+		
+		</tr>
+		</tbody>
+		
+		
+		
+	</table>
+		<p class="btn"><a th:href = "@{/question}">一覧表示に戻る</a></p>
+	
+		
+	<script>
+	  document.addEventListener('DOMContentLoaded', function() {
+	  const rowsPerPage = 6;
+	  const table = document.getElementById('question-table');
+	  if (!table) return;
+	
+	  const rows = table.querySelectorAll('tbody tr');
+	  const pageCount = Math.ceil(rows.length / rowsPerPage);
+	  const container = document.getElementById('pagination-container');
+	  if (pageCount <= 1) return;
+	  let currentPage = 1;
+	
+	  function showPage(page) {
+	    currentPage = page;
+	    const start = (page - 1) * rowsPerPage;
+	    const end = start + rowsPerPage;
+	    
+	    Array.from(rows).forEach((row, i) => row.style.display = (i >= start && i < end) ? '' : 'none');
+	    document.getElementById('p-prev').disabled = (currentPage === 1);
+	    document.getElementById('p-next').disabled = (currentPage === pageCount);
+	  }
+	  const prevButton = document.createElement('button');
+	  prevButton.id = 'p-prev';
+	  prevButton.type='button';
+	  prevButton.innerText = '前へ';
+	  prevButton.className = 'p-btm';
+	  prevButton.addEventListener('click', () => {
+	    if (currentPage > 1) showPage(currentPage - 1);
+	  });
+	
+	  const nextButton = document.createElement('button');
+	  nextButton.id = 'p-next';
+	  nextButton.type='button';
+	  nextButton.innerText = '次へ';
+	  nextButton.className = 'p-btm';
+	  nextButton.addEventListener('click', () => {
+	    if (currentPage < pageCount) showPage(currentPage + 1);
+	  });
+	
+	  container.appendChild(prevButton);
+	  container.appendChild(nextButton);
+	
+	  showPage(1);
+	});
+	</script>
+		
+</body>
+</html>

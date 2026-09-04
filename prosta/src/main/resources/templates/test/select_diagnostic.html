@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+
+<head>
+	<title>苦手範囲特定問題</title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="select_category_input">
+	<h3>苦手範囲特定問題選択画面</h3>
+	<div class="test_select">
+		<form th:action="@{/test/diagnostic/start}" method="get">
+				
+			<p class="error">
+					<span th:if="${errorMessage}">
+					<span th:text="${errorMessage}"></span><br />
+			</span>
+			</p>
+
+			<div class="form">
+				<div class="label">カテゴリー：</div>
+				<div class="select">
+					<input type="checkbox" name = "category" th:value="1" th:text="Java">
+					<input type="checkbox" name = "category" th:value="2" th:text="Spring">
+					<input type="checkbox" name = "category" th:value="3" th:text="HTML">
+					<input type="checkbox" name = "category" th:value="4" th:text="SQL">
+				</div>
+			</div>
+			<div class="form">
+				<div class="label">難易度：</div>
+				<div class="select">
+					<select class="difficulty" name="difficulty" style="color: #FFB11B;">
+						<option value="1">★☆☆</option>
+						<option value="2">★★☆</option>
+						<option value="3">★★★</option>
+					</select>
+				</div>
+			</div>
+			<div class="form">
+				<div class="label"></div>
+				<div class="select">
+					<input type="submit" value="スタート" />
+				</div>
+			</div>
+		</form>
+		<form th:action="@{/mypage}">
+			<div class="form">
+				<div class="label"></div>
+				<div class="select">
+					<input type="submit" value="戻る" />
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+
+</html>
