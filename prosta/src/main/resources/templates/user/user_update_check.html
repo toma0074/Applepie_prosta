@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+	
+<head>
+	<meta charset="UTF-8">
+	<title>ユーザー情報更新</title>
+</head>
+<body>
+	<h3>更新確認画面</h3>
+	<form th:action="@{/user/update/complete}" method ="post" th:object="${user}">
+	
+		<p class="center">このユーザーの情報を更新しますか？</p>
+		<div class="inputform">	
+			<table>
+			
+			
+				<tr>
+					<th calss="userName">名前</th>
+					<td th:text="${user.userName}"></td>
+				</tr>
+				
+				<tr>
+					<th calss="pw">パスワード</th>
+					<td th:text="非表示"></td>
+				</tr>
+				<tr>
+					<th calss="permi">権限</th>
+					<td th:if="*{permission==1}">一般</td>
+					<td th:if="*{permission==2}">管理者</td>
+				</tr>
+			
+			</table>
+		</div>
+		<div class="inputform">
+			<input type="hidden" name="userId" th:value="${user.userId}" />
+			<input type="hidden" name="userName" th:value="${user.userName}" />
+			<input type="hidden" name="userPass" th:value="${user.userPass}" />
+			<input type="hidden" name="permission" th:value="${user.permission}" />
+			<input type="hidden" name="deleteFlag" th:value="${user.deleteFlag}" />
+			
+			
+			<div class="inputselect">
+				<input type="submit" value="確定" />
+			</div>
+		</div>
+			
+	</form>
+	<form th:action="@{/user/update/input}" method="get">
+			
+		<input type="hidden" name="userId" th:value="${user.userId}" />
+		<input type="hidden" name="userName" th:value="${user.userName}" />
+		<input type="hidden" name="userPass" th:value="${user.userPass}" />
+		<input type="hidden" name="permission" th:value="${user.permission}" />
+		<input type="hidden" name="deleteFlag" th:value="${user.deleteFlag}" />
+			
+		<div class="inputform">
+			<div class="inputselect">
+				<input type="submit" value="戻る" />
+			</div>
+		</div>
+	</form>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+
+<head>
+	<title>カテゴリ別問題</title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="select_category_input">
+	<h3>カテゴリ別問題選択画面</h3>
+	<div class="test_select">
+		<form th:action="@{/test/category/start}" method="get" th:object="${questionForm}">
+			<div class="form">
+				<div class="label">カテゴリー：</div>
+				<div class="select">
+					<select class="category" th:field="*{category}">
+						<option th:value="1">Java</option>
+						<option th:value="2">Spring</option>
+						<option th:value="3">HTML</option>
+						<option th:value="4">SQL</option>
+					</select>
+				</div>
+			</div>
+			<div class="form">
+				<div class="label">難易度：</div>
+				<div class="select">
+					<select class="difficulty" th:field="*{difficulty}" style="color: #FFB11B;">
+						<option th:value="1">★☆☆</option>
+						<option th:value="2">★★☆</option>
+						<option th:value="3">★★★</option>
+					</select>
+				</div>
+			</div>
+			<div class="form">
+				<div class="label"></div>
+				<div class="select">
+					<input type="submit" value="スタート" />
+				</div>
+			</div>
+		</form>
+		<form th:action="@{/mypage}">
+			<div class="form">
+				<div class="label"></div>
+				<div class="select">
+					<input type="submit" value="戻る" />
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+
+</html>
