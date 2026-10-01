@@ -5,6 +5,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/layout.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/stylesheet.css}" />
 <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
 <title>PROSTA</title>
@@ -29,3 +30,29 @@
 	</footer>
 </body>
 </html>
+
+<script th:src="@{/js/background-heartbeat.js}">
+
+document.addEventListener("DOMContentLoaded", function () {
+    // 5分（300,000ミリ秒）おきにサーバーに「ログイン中だよ」と通信する
+    const INTERVAL_TIME = 300000;
+ 
+    function sendHeartbeat() {
+        fetch('/api/login-status/heartbeat', { method: 'POST' })
+            .then(response => {
+                if (!response.ok) {
+                    // もしセッションが切れていたらログイン画面に飛ばすなどの制御も可能
+                    console.warn("セッションが切れている可能性があります");
+                }
+            })
+            .catch(error => console.error("状態同期エラー:", error));
+    }
+ 
+    // 画面が開かれた瞬間にまず1回実行する
+    sendHeartbeat();
+ 
+    //その後、5分ごとに定期実行を開始する
+    setInterval(sendHeartbeat, INTERVAL_TIME);
+});
+
+</script>

@@ -1,5 +1,5 @@
 @charset "UTF-8";
-
+/* ---- ログイン、新規登録専用。今あるものをベースにする ---- */
 @font-face {
     font-family: 'MODI';
     src: url('../fonts/Senobi-Gothic-Bold.ttf') format('truetype');
