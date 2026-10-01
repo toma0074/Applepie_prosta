@@ -1,5 +1,7 @@
 package jp.co.sss.pr.form;
 
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -19,12 +21,25 @@ public class CustomerForm {
 	  private String userPass;
 
 	  private Integer permission;
+	  
 	  private Integer deleteFlag;
+	  
+//		【追加開始】2026/10/01 大塚
+		
+		private LocalDateTime loginDate;
+		
+		private Integer loginCount;
+
+		private Integer loginFlag;
+
+		private Integer userLevel;
+		
+//		【追加終了】2026/10/01 大塚
 	
 	  //getter setter
 	  public Integer getUserId() {
 			return userId;
-		}
+	  }
 		public void setUserId(Integer userId) {
 			this.userId = userId;
 		}
@@ -53,4 +68,39 @@ public class CustomerForm {
 			this.deleteFlag = deleteFlag;
 		}
 	  
+//		【追加開始】2026/10/01 大塚
+		
+		public LocalDateTime getLoginDate() {
+			return loginDate;
+		}
+
+		public void setLoginDate(LocalDateTime loginDate) {
+			this.loginDate = loginDate;
+		}
+
+		public Integer getLoginCount() {
+			return loginCount;
+		}
+
+		public void setLoginCount(Integer loginCount) {
+			this.loginCount = loginCount;
+		}
+
+		public Integer getLoginFlag() {
+			return loginFlag;
+		}
+
+		public void setLoginFlag(Integer loginFlag) {
+			this.loginFlag = loginFlag;
+		}
+
+		public Integer getUserLevel() {
+			return userLevel;
+		}
+
+		public void setUserLevel(Integer userLevel) {
+			this.userLevel = userLevel;
+		}
+		
+//		【追加終了】2026/10/01 大塚
 }

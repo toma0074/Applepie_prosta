@@ -1,5 +1,8 @@
 package jp.co.sss.pr.login_function;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,13 +54,23 @@ public class LoginController {
 		Customer customer = customerRepository.findByUserNameAndUserPass(userName,userPass);
 
 		if (customer != null && customer.getDeleteFlag()==0) {
+			
+			// 最後に今回の最終ログイン日時を「現在時刻」に更新
+			customer.setLoginDate(LocalDateTime.now());
+			
+			if (customer.getLoginDate().equals(LocalDate.now().minusDays(1))) {
+			    // 前回のログインが「昨日」なら、連続ログイン日数をインクリメント
+			    customer.setLoginCount(customer.getLoginCount() + 1);
+			    
+			} else if (!customer.getLoginDate().equals(LocalDate.now())) {
+			    // 同一日でなければリセット
+				customer.setLoginCount(1);
+			}
+			
 			CustomerBean customerbean = new CustomerBean();
-			customerbean.setUserId(customer.getUserId());
-			customerbean.setUserName(customer.getUserName());
-			customerbean.setUserPass(customer.getUserPass());
-			customerbean.setPermission(customer.getPermission());
-			customerbean.setDeleteFlag(customer.getDeleteFlag());
+			BeanUtils.copyProperties(customer, customerbean);
 			session.setAttribute("user", customerbean);
+			customerRepository.save(customer);
 			// 一覧へリダイレクト
 			return "redirect:/mypage";
 
