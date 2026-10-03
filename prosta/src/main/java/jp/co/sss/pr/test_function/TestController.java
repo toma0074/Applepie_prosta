@@ -140,6 +140,70 @@ public class TestController {
 
 		return "test/show_test";
 	}
+	
+//	【追加開始】2026/10/04
+	
+	//苦手克服問題選択画面
+	@RequestMapping(path = "/test/overcoming", method = RequestMethod.GET)
+	public String selectOvercoming(Model model) {
+
+		session.removeAttribute("question");
+		session.removeAttribute("ans");
+		session.removeAttribute("testFlag");
+
+		List<QuestionForm>qForm = new ArrayList<>();
+		Integer difficulty=0;
+
+		model.addAttribute(difficulty);
+		model.addAttribute("question",qForm);
+
+
+		return "test/select_overcoming";
+	}
+
+	//苦手克服テスト解答画面
+	@RequestMapping(path = "/test/overcoming/start", method = RequestMethod.GET)
+	public String startOvercoming(@RequestParam(value="category",required=false)List<Integer>catList, Integer difficulty, Model model) {
+		
+		if(catList==null || catList.size()==0) {
+			
+			model.addAttribute("errorMessage","カテゴリを1つ以上選択してください");
+			return "test/select_overcoming";
+		}
+
+		//検索条件を解答回数と正解回数で検索に変更（まだできてない）例：解答回数と正解回数で正答率が70％以下のものを抽出など
+		List<Question> quesList = quesRpstry.findAllByCategoryInAndDifficultyLessThanEqualAndQuestionDelete(catList, difficulty,0);
+		
+		
+		if(quesList==null || quesList.size() == 0) {
+			
+			model.addAttribute("errorMessage","解答できる問題がありません");
+			return "test/select_overcoming";
+		}
+
+
+		List<AnswerForm> ansList = new ArrayList<>();
+
+		AnswerListForm ansForm = new AnswerListForm();
+
+		for(int i=0;i<quesList.size();i++) {
+
+			AnswerForm af = new AnswerForm();
+
+			af.setAnsOption(0);
+
+			ansList.add(af);
+
+		}
+
+		model.addAttribute("answerListForm",ansForm);
+		session.setAttribute("ans", ansList);
+		session.setAttribute("question",quesList);
+
+		return "test/show_test";
+	}
+	
+//	【追加終了】2026/10/04
 
 
 
