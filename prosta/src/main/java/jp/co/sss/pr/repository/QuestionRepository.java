@@ -3,31 +3,34 @@ package jp.co.sss.pr.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import jp.co.sss.pr.entity.Category;
 import jp.co.sss.pr.entity.Question;
 
+@Repository
+public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
-public interface QuestionRepository extends JpaRepository<Question,Integer>{
-	
-	List<Question>findAllByQuestionDeleteInOrderByDifficultyAscCategoryAsc(List<Integer> questionDelete);
-	
-	Question findByQuestionText(String questionText);
-	
-	List<Question> findByQuestionDeleteOrderByDifficultyAscCategoryAsc(Integer deleteFlag);
+    /** 全問題を難易度昇順・カテゴリ昇順で取得 */
+    List<Question> findAllByOrderByDifficultyAscCategoryAsc();
 
-	public List<Question> findByCategoryAndQuestionDeleteInOrderByDifficultyAscCategoryAsc(Integer category,List<Integer> questionDelete);
+    /** カテゴリ別に問題を取得 */
+    List<Question> findByCategoryOrderByDifficultyAscCategoryAsc(
+            Category category);
 
-	public List<Question> findByQuestionTextContainingAndQuestionDeleteInOrderByDifficultyAscCategoryAsc(String questionText,List<Integer> questionDelete);
+    /** 問題文のあいまい検索 */
+    List<Question> findByQuestionTextContainingOrderByDifficultyAscCategoryAsc(
+            String questionText);
 
-	public List<Question> findByDifficultyAndQuestionDeleteInOrderByCategory(Integer difficulty,List<Integer> questionDelete);
-	
-	List<Question>findAllByCategoryAndDifficultyLessThanEqualAndQuestionDelete(Integer category, Integer difficulty,Integer questionDelete);
-	
-	List<Question>findAllByCategoryInAndDifficultyLessThanEqualAndQuestionDelete(List<Integer> list, Integer difficulty,Integer questionDelete);
+    /** 難易度別に問題を取得 */
+    List<Question> findByDifficultyOrderByCategoryAsc(
+            Integer difficulty);
 
-	List<Question> findByQuestionId(Integer questionId);
-	
+    /** カテゴリ・難易度以下で問題を取得（カテゴリ別テスト用） */
+    List<Question> findAllByCategoryAndDifficultyLessThanEqual(
+            Category category, Integer difficulty);
 
-
-	
+    /** 複数カテゴリ・難易度以下で問題を取得（苦手範囲特定テスト用） */
+    List<Question> findAllByCategoryInAndDifficultyLessThanEqual(
+            List<Category> categories, Integer difficulty);
 }

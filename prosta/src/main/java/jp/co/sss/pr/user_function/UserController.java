@@ -16,66 +16,69 @@ import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.form.CustomerForm;
 import jp.co.sss.pr.repository.CustomerRepository;
 
-
 @Controller
 public class UserController {
 
-	@Autowired
-	CustomerRepository userRepository;
+    @Autowired
+    CustomerRepository userRepository;
 
-	@Autowired
-	HttpSession session;
+    @Autowired
+    HttpSession session;
 
-	@RequestMapping(path = "/user/update/input", method = RequestMethod.GET)
-	public String userUpdateInput(Model model, CustomerForm userForm) {
-	    CustomerBean user = new CustomerBean();
-	    
-	    if(userForm.getUserId() == null) {
-	    	 user=(CustomerBean)session.getAttribute("user");
-	    }else {
-	    	BeanUtils.copyProperties(userForm, user);
-	    }
-	   
-	    model.addAttribute("user", user);
+    @RequestMapping(path = "/user/update/input", method = RequestMethod.GET)
+    public String userUpdateInput(Model model, CustomerForm userForm) {
+        CustomerBean user = new CustomerBean();
 
-	    return "user/user_update_input"; 
-	}
+        if (userForm.getUserId() == null) {
+            user = (CustomerBean) session.getAttribute("user");
+        } else {
+            BeanUtils.copyProperties(userForm, user);
+        }
 
-	@RequestMapping(path = "/user/update/check", method = RequestMethod.POST)
-	public String userUpdateCheck(@Valid @ModelAttribute("user") CustomerForm user, BindingResult result, Model model) {
-		Customer customer = userRepository.findByUserName(user.getUserName());
+        model.addAttribute("user", user);
+        return "user/user_update_input";
+    }
 
-	    if(result.hasErrors()) {
-	        return "user/user_update_input";
-	        
-	    }else if(customer != null && customer.getUserId() != user.getUserId()) {
-	
-	    	model.addAttribute("err","既に使用されているユーザー名です。");
-	    	return "user/user_update_input";
-	    }
-	    
+    @RequestMapping(path = "/user/update/check", method = RequestMethod.POST)
+    public String userUpdateCheck(@Valid @ModelAttribute("user") CustomerForm user,
+                                  BindingResult result, Model model) {
+        Customer customer = userRepository.findByUserName(user.getUserName());
 
-        return "user/user_update_check"; 
-	}
-	
-	@RequestMapping(path = "/user/update/complete",method = RequestMethod.POST)
-	public String userUpdateComplete(CustomerForm userForm, Model model) {
+        if (result.hasErrors()) {
+            return "user/user_update_input";
+        } else if (customer != null && !customer.getUserId().equals(user.getUserId())) {
+            model.addAttribute("err", "既に使用されているユーザー名です。");
+            return "user/user_update_input";
+        }
 
-		CustomerBean user = (CustomerBean)session.getAttribute("user");	
-		Customer user2 = new Customer();
-		
-		if(userForm.getUserId()==user.getUserId()) {
-			
-			BeanUtils.copyProperties(userForm,user);
-			session.setAttribute("user", user);
-	
-		}
-		
-		BeanUtils.copyProperties(userForm,user2);
-		userRepository.save(user2);
-		
-		model.addAttribute("pm",user.getPermission());
+        return "user/user_update_check";
+    }
 
-		return "user/user_update_complete";
-	}
+    @RequestMapping(path = "/user/update/complete", method = RequestMethod.POST)
+    public String userUpdateComplete(CustomerForm userForm, Model model) {
+        CustomerBean userBean = (CustomerBean) session.getAttribute("user");
+        Customer user2 = new Customer();
+
+        if (userForm.getUserId() != null && userForm.getUserId().equals(userBean.getUserId())) {
+            userBean.setUserName(userForm.getUserName());
+            userBean.setUserPass(userForm.getUserPass());
+            userBean.setPermission(userForm.getPermission());
+            session.setAttribute("user", userBean);
+        }
+
+        // Customer entity に詰め替えて保存
+        Customer existing = userRepository.findByUserId(userForm.getUserId());
+        if (existing != null) {
+            existing.setUserName(userForm.getUserName());
+            existing.setUserPass(userForm.getUserPass());
+            existing.setPermission(userForm.getPermission());
+            userRepository.save(existing);
+        } else {
+            BeanUtils.copyProperties(userForm, user2);
+            userRepository.save(user2);
+        }
+
+        model.addAttribute("pm", userBean.getPermission());
+        return "user/user_update_complete";
+    }
 }

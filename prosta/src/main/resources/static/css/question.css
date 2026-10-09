@@ -1,0 +1,18 @@
+@charset "UTF-8";
+/************************
+ * Question一覧
+ ************************/
+ 
+ /* 難易度表示 
+ *question_list.html
+ */
+.difficulty-star {
+    color: #FFB11B;
+}
+
+
+table.question_list {
+    margin: 0 50 0 20px;
+    width: 90%;
+    justify-content: center;
+}

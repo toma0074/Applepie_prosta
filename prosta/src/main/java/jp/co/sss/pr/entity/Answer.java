@@ -1,5 +1,7 @@
 package jp.co.sss.pr.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,66 +15,90 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "answer")
 public class Answer {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_ans_gen")
-	@SequenceGenerator(name = "seq_ans_gen",sequenceName = "seq_answer",allocationSize = 1)
-	private Integer ansId;
-	
-	@ManyToOne
-	@JoinColumn(name = "user_id",referencedColumnName = "userId")
-	private Customer customer;
-	
-	@ManyToOne
-	@JoinColumn(name = "question_id",referencedColumnName = "questionId")
-	private Question question;
-	
-	@Column
-	private Integer ansOption;
-	
-	@Column
-	private Integer correctOption;
 
-	public Integer getAnsId() {
-		return ansId;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_ans_gen")
+    @SequenceGenerator(name = "seq_ans_gen", sequenceName = "seq_answer", allocationSize = 1)
+    @Column(name = "ans_id")
+    private Integer ansId;
 
-	public void setAnsId(Integer ansId) {
-		this.ansId = ansId;
-	}
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Customer customer;
 
-	public Customer getCustomer() {
-		return customer;
-	}
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    private Question question;
 
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
+    @Column(name = "ans_option", nullable = false)
+    private Integer ansOption;
 
-	public Question getQuestion() {
-		return question;
-	}
+    @Column(name = "correct_option", nullable = false)
+    private Integer correctOption;
 
-	public void setQuestion(Question question) {
-		this.question = question;
-	}
+    /** 正解フラグ（true=正解） */
+    @Column(name = "correct_flag", nullable = false)
+    private Boolean correctFlag;
 
-	public Integer getAnsOption() {
-		return ansOption;
-	}
+    /** 解答日時 */
+    @Column(name = "ans_date", nullable = false)
+    private LocalDate ansDate;
 
-	public void setAnsOption(Integer ansOption) {
-		this.ansOption = ansOption;
-	}
+    // --- getters / setters ---
 
-	public Integer getCorrectOption() {
-		return correctOption;
-	}
+    public Integer getAnsId() {
+        return ansId;
+    }
 
-	public void setCorrectOption(Integer correctOption) {
-		this.correctOption = correctOption;
-	}
-	
-	
+    public void setAnsId(Integer ansId) {
+        this.ansId = ansId;
+    }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
+    public Integer getAnsOption() {
+        return ansOption;
+    }
+
+    public void setAnsOption(Integer ansOption) {
+        this.ansOption = ansOption;
+    }
+
+    public Integer getCorrectOption() {
+        return correctOption;
+    }
+
+    public void setCorrectOption(Integer correctOption) {
+        this.correctOption = correctOption;
+    }
+
+    public Boolean getCorrectFlag() {
+        return correctFlag == null ? false : correctFlag;
+    }
+
+    public void setCorrectFlag(Boolean correctFlag) {
+        this.correctFlag = correctFlag;
+    }
+
+    public LocalDate getAnsDate() {
+        return ansDate;
+    }
+
+    public void setAnsDate(LocalDate ansDate) {
+        this.ansDate = ansDate;
+    }
 }

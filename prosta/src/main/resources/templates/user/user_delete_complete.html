@@ -1,24 +1,19 @@
-
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"th:replace="~{common/layout_5block :: layout(~{::body/content()})}">
-
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_5block :: layout(~{::body/content()})}">
 <head>
-	<meta charset="UTF-8">
-	<title>ユーザー状態更新</title>
+<meta charset="UTF-8">
+<title>ユーザー状態更新</title>
 </head>
-
 <body>
-	<h3>ユーザー状態更新完了</h3>
-	<div class="inputform">
-	<form th:action="@{/user/list}">
-		<p class="center" th:text="${userName}"></p>
-		<div class="form">
-		<div class="login_label"></div>
-		<div class="input">
-		<input type="submit" value="ユーザー一覧" />
-		</div>
-		</div>
-	</form>
-	</div>
+<h3>ユーザー状態更新完了</h3>
+<form th:action="@{/user/list}">
+  <p class="center" th:text="${userName}"></p>
+  <div class="inputform">
+    <div class="inputselect">
+      <input type="submit" value="ユーザー一覧" />
+    </div>
+  </div>
+</form>
 </body>
 </html>

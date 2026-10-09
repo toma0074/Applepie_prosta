@@ -55,17 +55,17 @@ td.data {
 }
 
 /* ---- 解答履歴リスト ---- */
-table.my_table{
-	margin: 0 50 0 20px;
-	width: 90%;
-	justify-content: center;
-}
+/*table.my_table{*/
+/*	margin: 0 50 0 20px;*/
+/*	width: 90%;*/
+/*	justify-content: center;*/
+/*}*/
 
-table.question_list{
-	margin: 0 50 0 20px;
-	width: 90%;
-	justify-content: center;
-}
+/*table.question_list{*/
+/*	margin: 0 50 0 20px;*/
+/*	width: 90%;*/
+/*	justify-content: center;*/
+/*}*/
 th.category{
 	width: 15%
 }
@@ -368,20 +368,20 @@ table.list_tables{
 /*	text-align: center;*/
 /*}*/
 /* ---- QuestionsList ---- */
-.p-btm {
-		padding: 3px 8px;   
-		background-color:rgba(15, 37, 64, 0.8);
-		color: rgb(255, 255, 255);
-		cursor: pointer;
-		font-size: 12px;    
-		border: none;
-		opacity: 0.7;
-	}
+/*.p-btm {*/
+/*		padding: 3px 8px;   */
+/*		background-color:rgba(15, 37, 64, 0.8);*/
+/*		color: rgb(255, 255, 255);*/
+/*		cursor: pointer;*/
+/*		font-size: 12px;    */
+/*		border: none;*/
+/*		opacity: 0.7;*/
+/*	}*/
 	
-.p-btm:disabled {
-		cursor: not-allowed;
-		opacity: 0.2 !important; 
-	}
+/*.p-btm:disabled {*/
+/*		cursor: not-allowed;*/
+/*		opacity: 0.2 !important; */
+/*	}*/
 /* ---- error ---- */
 .error{
 	color: #cc0000;

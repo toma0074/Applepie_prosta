@@ -6,84 +6,109 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "question")
 public class Question {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_question_gen")
-	@SequenceGenerator(name = "seq_question_gen",sequenceName = "seq_question",allocationSize = 1)
-	private Integer questionId;
-	
-	@OneToOne
-	@JoinColumn(name = "questionId",referencedColumnName = "question_id")
-	private QuestionOption questionOption;
 
-	@Column
-	private Integer category;
-	
-	@Column
-	private Integer difficulty;
-	
-	@Column
-	private String questionText;
-	
-	@Column
-	private Integer questionDelete;
-	
-	public Integer getQuestionId() {
-		return questionId;
-	}
-	
-	public void setQuestionId(Integer questionId) {
-		this.questionId = questionId;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_question_gen")
+    @SequenceGenerator(name = "seq_question_gen", sequenceName = "seq_question", allocationSize = 1)
+    @Column(name = "question_id")
+    private Integer questionId;
 
-	public QuestionOption getQuestionOption() {
-		return questionOption;
-	}
+    /** カテゴリー（外部キー） */
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
-	public void setQuestionOption(QuestionOption questionOption) {
-		this.questionOption = questionOption;
-	}
+    @Column(name = "difficulty", nullable = false)
+    private Integer difficulty;
 
-	public Integer getCategory() {
-		return category;
-	}
+    @Column(name = "question_text", nullable = false, length = 1000)
+    private String questionText;
 
-	public void setCategory(Integer category) {
-		this.category = category;
-	}
+    @Column(name = "option_a", nullable = false, length = 300)
+    private String optionA;
 
-	public Integer getDifficulty() {
-		return difficulty;
-	}
+    @Column(name = "option_b", nullable = false, length = 300)
+    private String optionB;
 
-	public void setDifficulty(Integer difficulty) {
-		this.difficulty = difficulty;
-	}
+    @Column(name = "option_c", nullable = false, length = 300)
+    private String optionC;
 
-	public String getQuestionText() {
-		return questionText;
-	}
+    @Column(name = "correct_option", nullable = false)
+    private Integer correctOption;
 
-	public void setQuestionText(String questionText) {
-		this.questionText = questionText;
-	}
 
-	public Integer getQuestionDelete() {
-		return questionDelete;
-	}
+    // --- getters / setters ---
 
-	public void setQuestionDelete(Integer questionDelete) {
-		this.questionDelete = questionDelete;
-	}
+    public Integer getQuestionId() {
+        return questionId;
+    }
 
-	
-	
+    public void setQuestionId(Integer questionId) {
+        this.questionId = questionId;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Integer getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(Integer difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public String getQuestionText() {
+        return questionText;
+    }
+
+    public void setQuestionText(String questionText) {
+        this.questionText = questionText;
+    }
+
+    public String getOptionA() {
+        return optionA;
+    }
+
+    public void setOptionA(String optionA) {
+        this.optionA = optionA;
+    }
+
+    public String getOptionB() {
+        return optionB;
+    }
+
+    public void setOptionB(String optionB) {
+        this.optionB = optionB;
+    }
+
+    public String getOptionC() {
+        return optionC;
+    }
+
+    public void setOptionC(String optionC) {
+        this.optionC = optionC;
+    }
+
+    public Integer getCorrectOption() {
+        return correctOption;
+    }
+
+    public void setCorrectOption(Integer correctOption) {
+        this.correctOption = correctOption;
+    }
+
 
 }

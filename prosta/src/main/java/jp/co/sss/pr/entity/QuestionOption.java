@@ -20,7 +20,8 @@ public class QuestionOption {
 	private Integer optionId;
 	
 	@OneToOne
-	@JoinColumn(name = "question_id",referencedColumnName = "questionId")
+	@JoinColumn(name = "question_id")
+	
 	private Question question;
 	
 	@Column(name = "option_a")

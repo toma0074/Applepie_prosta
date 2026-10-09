@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-   th:replace="~{common/layout_3block :: layout(~{::body/content()})}">
+      th:replace="~{common/layout_3block :: layout(~{::body/content()})}">
 <head>
+<title>ログインエラー</title>
 <meta charset="UTF-8" />
 </head>
 <body>
-		<div class="container">
-			<p>不正なアクセスです</p>
-			<p><a th:href = "@{/}">ログイン画面に戻る</a></p>
-		</div>
-
+<div class="message">
+  <h3>エラー</h3>
+  <p class="center">セッションが切れました。再度ログインしてください。</p>
+  <p class="btn"><a th:href="@{/login}">ログイン画面へ</a></p>
+</div>
 </body>
 </html>
