@@ -3,9 +3,6 @@ package jp.co.sss.pr.login_function;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +12,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import jp.co.sss.pr.bean.CustomerBean;
 import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.form.CustomerForm;
@@ -80,6 +79,24 @@ public class LoginController {
 			return "login/login";
 		}
 	}
+	
+//	【追加開始】 2026/10/09
+	
+	@RequestMapping(path = "/logout/analyze", method = RequestMethod.GET)
+	public String logoutAnalyze (Model model) {
+		
+		//その日学習した内容のまとめを表示する
+		
+		//グラフは欲しい、あとその日解いた問題数と正答数、カテゴリとかも
+		
+		
+
+		
+		return "logout_analyze";
+	}
+
+//	【追加終了】 2026/10/09
+	
 	
 	//logout
 	@RequestMapping(path = "/logout", method = RequestMethod.GET)

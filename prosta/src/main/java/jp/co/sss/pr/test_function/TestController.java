@@ -3,9 +3,6 @@ package jp.co.sss.pr.test_function;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import jp.co.sss.pr.bean.CustomerBean;
 import jp.co.sss.pr.entity.Answer;
 import jp.co.sss.pr.entity.Customer;
@@ -33,7 +32,9 @@ public class TestController {
 
 	@Autowired
 	QuestionRepository quesRpstry;
-
+	
+	@Autowired
+	AnswerRepository answerRepository;
 
 	@Autowired
 	AnswerRepository ansRpstry;
@@ -173,6 +174,15 @@ public class TestController {
 
 		//検索条件を解答回数と正解回数で検索に変更（まだできてない）例：解答回数と正解回数で正答率が70％以下のものを抽出など
 		List<Question> quesList = quesRpstry.findAllByCategoryInAndDifficultyLessThanEqualAndQuestionDelete(catList, difficulty,0);
+		
+		CustomerBean userBean=(CustomerBean)session.getAttribute("user");
+		
+		
+		List<Answer> quesOldList = answerRepository.findAllByUserId(userBean.getUserId());
+		
+		
+		
+		
 		
 		
 		if(quesList==null || quesList.size() == 0) {
