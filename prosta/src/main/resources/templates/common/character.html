@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/></head>
+<body>
+
+<!--
+  キャラクターフラグメント
+  使い方: th:replace="~{common/character :: character(level=${currentLevel})}"
+  レベル段階:
+    Lv 1-9   : たまご (Egg)
+    Lv10-24  : ひよこ (Chick)
+    Lv25-49  : 少年   (Boy)
+    Lv50+    : 勇者   (Hero)
+-->
+<div th:fragment="character(level)" class="character-wrapper">
+
+  <!-- Lv1-9: たまご -->
+  <div th:if="${level < 10}" class="char-stage char-egg">
+    <div class="char-label">Lv.<span th:text="${level}">1</span></div>
+    <svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg" class="char-svg">
+      <defs>
+        <radialGradient id="eggGrad" cx="45%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#fff9e6"/>
+          <stop offset="100%" stop-color="#f5d67a"/>
+        </radialGradient>
+        <radialGradient id="crackGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#e8c84a"/>
+          <stop offset="100%" stop-color="#c9a82a"/>
+        </radialGradient>
+      </defs>
+      <!-- たまご本体 -->
+      <ellipse cx="60" cy="82" rx="42" ry="52" fill="url(#eggGrad)" stroke="#e0b830" stroke-width="1.5"/>
+      <!-- ひびアニメーション -->
+      <g class="crack-anim">
+        <polyline points="55,58 60,68 52,75 63,88" fill="none" stroke="#c9a82a" stroke-width="1.8" stroke-linecap="round"/>
+        <polyline points="65,62 60,68" fill="none" stroke="#c9a82a" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <!-- 目 -->
+      <ellipse cx="51" cy="80" rx="4" ry="4.5" fill="#1a1a2e"/>
+      <ellipse cx="69" cy="80" rx="4" ry="4.5" fill="#1a1a2e"/>
+      <circle cx="52.5" cy="78.5" r="1.2" fill="white"/>
+      <circle cx="70.5" cy="78.5" r="1.2" fill="white"/>
+      <!-- 口 -->
+      <path d="M55,90 Q60,95 65,90" fill="none" stroke="#c9a82a" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- 星マーク -->
+      <text x="60" y="35" text-anchor="middle" font-size="18" fill="#f5c400" class="float-anim">✦</text>
+    </svg>
+    <div class="char-name">たまご</div>
+  </div>
+
+  <!-- Lv10-24: ひよこ -->
+  <div th:if="${level >= 10 and level < 25}" class="char-stage char-chick">
+    <div class="char-label">Lv.<span th:text="${level}">10</span></div>
+    <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" class="char-svg">
+      <defs>
+        <radialGradient id="chickBody" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#fff176"/>
+          <stop offset="100%" stop-color="#ffca28"/>
+        </radialGradient>
+        <radialGradient id="chickHead" cx="45%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#fff59d"/>
+          <stop offset="100%" stop-color="#ffd54f"/>
+        </radialGradient>
+      </defs>
+      <!-- 胴体 -->
+      <ellipse cx="60" cy="110" rx="32" ry="30" fill="url(#chickBody)"/>
+      <!-- 翼 (左) -->
+      <ellipse cx="28" cy="112" rx="14" ry="10" fill="#ffca28" transform="rotate(-20 28 112)"/>
+      <!-- 翼 (右) -->
+      <ellipse cx="92" cy="112" rx="14" ry="10" fill="#ffca28" transform="rotate(20 92 112)"/>
+      <!-- 頭 -->
+      <circle cx="60" cy="72" r="26" fill="url(#chickHead)"/>
+      <!-- 頭のトサカ -->
+      <ellipse cx="60" cy="46" rx="6" ry="10" fill="#ff7043" transform="rotate(-10 60 46)"/>
+      <ellipse cx="68" cy="48" rx="5" ry="9" fill="#ff7043" transform="rotate(10 68 48)"/>
+      <!-- 目 -->
+      <circle cx="50" cy="70" r="5" fill="#1a1a2e"/>
+      <circle cx="70" cy="70" r="5" fill="#1a1a2e"/>
+      <circle cx="51.5" cy="68.5" r="1.5" fill="white"/>
+      <circle cx="71.5" cy="68.5" r="1.5" fill="white"/>
+      <!-- くちばし -->
+      <polygon points="55,79 65,79 60,86" fill="#ff8f00"/>
+      <!-- 足 -->
+      <line x1="48" y1="138" x2="42" y2="152" stroke="#ff8f00" stroke-width="3" stroke-linecap="round"/>
+      <line x1="72" y1="138" x2="78" y2="152" stroke="#ff8f00" stroke-width="3" stroke-linecap="round"/>
+      <line x1="36" y1="152" x2="42" y2="152" stroke="#ff8f00" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="48" y1="152" x2="42" y2="152" stroke="#ff8f00" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="72" y1="152" x2="78" y2="152" stroke="#ff8f00" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="84" y1="152" x2="78" y2="152" stroke="#ff8f00" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- 頬 -->
+      <circle cx="40" cy="76" r="5" fill="#ffab91" opacity="0.6"/>
+      <circle cx="80" cy="76" r="5" fill="#ffab91" opacity="0.6"/>
+      <!-- 星 -->
+      <text x="60" y="25" text-anchor="middle" font-size="16" fill="#ffd700" class="float-anim">★</text>
+    </svg>
+    <div class="char-name">ひよこ</div>
+  </div>
+
+  <!-- Lv25-49: 少年 -->
+  <div th:if="${level >= 25 and level < 50}" class="char-stage char-boy">
+    <div class="char-label">Lv.<span th:text="${level}">25</span></div>
+    <svg viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg" class="char-svg">
+      <defs>
+        <radialGradient id="skinGrad" cx="50%" cy="30%" r="60%">
+          <stop offset="0%" stop-color="#ffe0b2"/>
+          <stop offset="100%" stop-color="#ffb74d"/>
+        </radialGradient>
+        <linearGradient id="robeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#7c5cd8"/>
+          <stop offset="100%" stop-color="#4a2eb0"/>
+        </linearGradient>
+      </defs>
+      <!-- ローブ -->
+      <path d="M30,100 Q20,160 25,195 L95,195 Q100,160 90,100 Z" fill="url(#robeGrad)"/>
+      <!-- ローブ装飾 -->
+      <path d="M50,100 L55,195 M70,100 L65,195" fill="none" stroke="#9c7ce8" stroke-width="1.5" opacity="0.6"/>
+      <!-- 首 -->
+      <rect x="52" y="78" width="16" height="16" rx="5" fill="url(#skinGrad)"/>
+      <!-- 胴体（ローブ上部） -->
+      <rect x="35" y="92" width="50" height="14" rx="7" fill="#6a4fc0"/>
+      <!-- 肩マント -->
+      <ellipse cx="25" cy="98" rx="18" ry="8" fill="#5c3fb0" transform="rotate(-15 25 98)"/>
+      <ellipse cx="95" cy="98" rx="18" ry="8" fill="#5c3fb0" transform="rotate(15 95 98)"/>
+      <!-- 頭 -->
+      <circle cx="60" cy="60" r="24" fill="url(#skinGrad)"/>
+      <!-- 髪 -->
+      <ellipse cx="60" cy="38" rx="22" ry="14" fill="#4a2e10"/>
+      <ellipse cx="37" cy="55" rx="9" ry="14" fill="#4a2e10"/>
+      <ellipse cx="83" cy="55" rx="9" ry="14" fill="#4a2e10"/>
+      <!-- 目 -->
+      <circle cx="51" cy="60" r="4.5" fill="#1a1a2e"/>
+      <circle cx="69" cy="60" r="4.5" fill="#1a1a2e"/>
+      <circle cx="52.5" cy="58.5" r="1.4" fill="white"/>
+      <circle cx="70.5" cy="58.5" r="1.4" fill="white"/>
+      <!-- 眉 -->
+      <path d="M46,53 Q51,50 56,53" fill="none" stroke="#4a2e10" stroke-width="2" stroke-linecap="round"/>
+      <path d="M64,53 Q69,50 74,53" fill="none" stroke="#4a2e10" stroke-width="2" stroke-linecap="round"/>
+      <!-- 口 -->
+      <path d="M54,70 Q60,76 66,70" fill="none" stroke="#d4916a" stroke-width="2" stroke-linecap="round"/>
+      <!-- 頬 -->
+      <circle cx="42" cy="66" r="5" fill="#ffab91" opacity="0.5"/>
+      <circle cx="78" cy="66" r="5" fill="#ffab91" opacity="0.5"/>
+      <!-- 杖 -->
+      <line x1="96" y1="100" x2="100" y2="190" stroke="#8d6e63" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="100" cy="95" r="8" fill="none" stroke="#8d6e63" stroke-width="3"/>
+      <circle cx="100" cy="95" r="4" fill="#64b5f6"/>
+      <!-- 星エフェクト -->
+      <text x="15" y="55" font-size="14" fill="#ffd700" class="float-anim" opacity="0.8">★</text>
+      <text x="90" y="45" font-size="12" fill="#ce93d8" class="float-anim2" opacity="0.8">✦</text>
+    </svg>
+    <div class="char-name">魔法少年</div>
+  </div>
+
+  <!-- Lv50+: 勇者 -->
+  <div th:if="${level >= 50}" class="char-stage char-hero">
+    <div class="char-label">Lv.<span th:text="${level}">50</span></div>
+    <svg viewBox="0 0 140 210" xmlns="http://www.w3.org/2000/svg" class="char-svg">
+      <defs>
+        <radialGradient id="heroSkin" cx="50%" cy="30%" r="60%">
+          <stop offset="0%" stop-color="#ffe0b2"/>
+          <stop offset="100%" stop-color="#ffb74d"/>
+        </radialGradient>
+        <linearGradient id="armorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#ffd740"/>
+          <stop offset="100%" stop-color="#ff8f00"/>
+        </linearGradient>
+        <linearGradient id="capeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e53935"/>
+          <stop offset="100%" stop-color="#880e4f"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- マント -->
+      <path d="M35,95 Q10,130 15,205 L50,205 Q48,160 70,130 Q92,160 90,205 L125,205 Q130,130 105,95 Z"
+            fill="url(#capeGrad)" opacity="0.9"/>
+      <!-- 鎧胴体 -->
+      <path d="M38,90 Q38,140 70,145 Q102,140 102,90 Z" fill="url(#armorGrad)"/>
+      <!-- 鎧装飾ライン -->
+      <path d="M55,92 L55,140 M70,90 L70,145 M85,92 L85,140" fill="none" stroke="#fff176" stroke-width="1.2" opacity="0.5"/>
+      <!-- 肩アーマー (左) -->
+      <ellipse cx="28" cy="92" rx="18" ry="10" fill="#ff8f00" transform="rotate(-20 28 92)"/>
+      <ellipse cx="28" cy="92" rx="14" ry="7" fill="#ffd740" transform="rotate(-20 28 92)"/>
+      <!-- 肩アーマー (右) -->
+      <ellipse cx="112" cy="92" rx="18" ry="10" fill="#ff8f00" transform="rotate(20 112 92)"/>
+      <ellipse cx="112" cy="92" rx="14" ry="7" fill="#ffd740" transform="rotate(20 112 92)"/>
+      <!-- 首 -->
+      <rect x="56" y="72" width="18" height="16" rx="5" fill="url(#heroSkin)"/>
+      <!-- 頭 -->
+      <circle cx="70" cy="55" r="25" fill="url(#heroSkin)"/>
+      <!-- 兜 -->
+      <path d="M45,52 Q70,22 95,52 Q90,44 70,40 Q50,44 45,52 Z" fill="#ff8f00"/>
+      <path d="M58,42 Q70,30 82,42" fill="none" stroke="#ffd740" stroke-width="2"/>
+      <!-- 目 -->
+      <circle cx="60" cy="57" r="5" fill="#1a1a2e"/>
+      <circle cx="80" cy="57" r="5" fill="#1a1a2e"/>
+      <circle cx="61.5" cy="55.5" r="1.5" fill="white"/>
+      <circle cx="81.5" cy="55.5" r="1.5" fill="white"/>
+      <!-- 目の輝き（グロウ） -->
+      <circle cx="60" cy="57" r="5" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.5" filter="url(#glow)"/>
+      <circle cx="80" cy="57" r="5" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.5" filter="url(#glow)"/>
+      <!-- 眉 -->
+      <path d="M54,49 Q60,45 66,49" fill="none" stroke="#4a2e10" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M74,49 Q80,45 86,49" fill="none" stroke="#4a2e10" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- 口（自信ある表情） -->
+      <path d="M63,68 Q70,74 77,68" fill="none" stroke="#d4916a" stroke-width="2" stroke-linecap="round"/>
+      <!-- 頬 -->
+      <circle cx="47" cy="63" r="6" fill="#ffab91" opacity="0.4"/>
+      <circle cx="93" cy="63" r="6" fill="#ffab91" opacity="0.4"/>
+      <!-- 剣 -->
+      <rect x="108" y="80" width="6" height="80" rx="2" fill="#b0bec5" transform="rotate(15 111 120)"/>
+      <rect x="100" y="88" width="20" height="6" rx="2" fill="#ffd740" transform="rotate(15 110 91)"/>
+      <ellipse cx="111" cy="83" rx="5" ry="7" fill="#ffd740" transform="rotate(15 111 83)"/>
+      <!-- 盾 -->
+      <path d="M18,92 Q10,105 18,120 Q25,132 30,120 Q36,105 30,92 Z" fill="#1565c0"/>
+      <path d="M21,97 Q18,108 21,118 Q26,126 30,118 Q34,108 30,97 Z" fill="#1976d2"/>
+      <path d="M24,100 L24,116 M18,108 L30,108" stroke="#ffd740" stroke-width="2" stroke-linecap="round"/>
+      <!-- オーラエフェクト -->
+      <text x="10" y="45"  font-size="18" fill="#ffd700" class="float-anim"  filter="url(#glow)">★</text>
+      <text x="108" y="40" font-size="14" fill="#ce93d8" class="float-anim2" filter="url(#glow)">✦</text>
+      <text x="62" y="15"  font-size="20" fill="#fff176" class="float-anim3" filter="url(#glow)">✦</text>
+    </svg>
+    <div class="char-name">勇者</div>
+  </div>
+</div>
+
+</body>
+</html>

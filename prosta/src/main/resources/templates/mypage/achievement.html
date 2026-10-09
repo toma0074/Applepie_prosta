@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PROSTA | 実績</title>
+</head>
+<body>
+<main class="suku">
+
+  <h3>実績一覧</h3>
+
+  <!-- ===== 進捗サマリー ===== -->
+  <div class="ach-summary">
+    <div class="ach-summary-inner">
+      <div class="ach-summary-icon">🏆</div>
+      <div class="ach-summary-text">
+        <span class="ach-count">
+          <strong th:text="${unlockedCount}">0</strong>
+          /
+          <span th:text="${totalCount}">6</span>
+        </span>
+        <span class="ach-count-label">実績解除済み</span>
+      </div>
+      <div class="ach-summary-progress">
+        <div class="ach-progress-bg">
+          <div class="ach-progress-fill"
+               th:style="'width:' + (${totalCount > 0} ? (${unlockedCount * 100 / totalCount}) : 0) + '%'">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 現在のキャラクター（小） ===== -->
+  <div class="ach-char-mini">
+    <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
+    <div class="ach-level-info">
+      <span class="level-badge-sm">Lv.<strong th:text="${currentLevel}">1</strong></span>
+    </div>
+  </div>
+
+  <!-- ===== 実績カードグリッド ===== -->
+  <div class="ach-grid">
+
+    <th:block th:each="ach : ${allAchievements}">
+      <!-- 解除済み -->
+      <div th:if="${#lists.contains(unlockedIds, ach.achievementId)}"
+           class="ach-card ach-unlocked">
+        <div class="ach-card-icon" th:text="${ach.icon}">🏆</div>
+        <div class="ach-card-name" th:text="${ach.achievementName}">名称</div>
+        <div class="ach-card-desc" th:text="${ach.description}">説明</div>
+        <div class="ach-card-badge">✔ 解除済み</div>
+      </div>
+
+      <!-- 未解除 -->
+      <div th:unless="${#lists.contains(unlockedIds, ach.achievementId)}"
+           class="ach-card ach-locked">
+        <div class="ach-card-icon ach-locked-icon">🔒</div>
+        <div class="ach-card-name">???</div>
+        <div class="ach-card-desc">条件を達成すると解除されます</div>
+        <div class="ach-card-badge ach-badge-locked">未解除</div>
+      </div>
+    </th:block>
+
+  </div>
+
+  <!-- ===== 解除日時一覧 ===== -->
+  <div th:if="${!#lists.isEmpty(unlockedList)}" class="ach-history">
+    <div class="ach-history-title">解除履歴</div>
+    <table class="my_table" style="width:90%;margin:0 auto 20px;">
+      <thead>
+        <tr>
+          <th style="width:10%">アイコン</th>
+          <th style="width:35%">実績名</th>
+          <th style="width:40%">説明</th>
+          <th style="width:15%">解除日</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="ua : ${unlockedList}">
+          <td class="center" th:text="${ua.achievement.icon}">🏆</td>
+          <td th:text="${ua.achievement.achievementName}">名称</td>
+          <td th:text="${ua.achievement.description}">説明</td>
+          <td class="center" th:text="${#temporals.format(ua.unlockedDate, 'yyyy/MM/dd')}">2025/01/01</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mypage-links">
+    <p class="btn"><a th:href="@{/mypage}">マイページに戻る</a></p>
+  </div>
+
+</main>
+</body>
+</html>

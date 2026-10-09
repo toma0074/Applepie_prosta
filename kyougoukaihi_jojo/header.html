@@ -24,7 +24,7 @@
 		<div class="header-container">
 <!--			<div class="title" > -->
 				<div class="header-logo" ><img th:src="@{/images/prosta.jpg}" alt="logo" class="logo"> </div>
-			<div th:if="${session.user != null}" class="user-info">
+			<div th:if="${session.user != null}" class="user_info">
 				<!-- ログイン中のユーザ名の表示をこの下に記述してください -->
 				ようこそ、<span th:text = "${session.user.userName}"></span>さん
 				<a class="btn" th:href="@{/logout}">ログアウト</a>
