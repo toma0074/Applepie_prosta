@@ -3,6 +3,9 @@ package jp.co.sss.pr.login_function;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,8 +15,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import jp.co.sss.pr.bean.CustomerBean;
 import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.form.CustomerForm;
@@ -55,7 +56,7 @@ public class LoginController {
 
 		if (customer != null && customer.getDeleteFlag()==0) {
 			
-			// 最後に今回の最終ログイン日時を「現在時刻」に更新
+			// 今回の最終ログイン日時を「現在時刻」に更新
 			customer.setLoginDate(LocalDateTime.now());
 			
 			if (customer.getLoginDate().equals(LocalDate.now().minusDays(1))) {

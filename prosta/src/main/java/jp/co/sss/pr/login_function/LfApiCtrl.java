@@ -2,15 +2,18 @@
 
 package jp.co.sss.pr.login_function;
 
+import java.time.LocalDateTime;
+
 import jakarta.servlet.http.HttpSession;
-import jp.co.sss.pr.bean.CustomerBean;
-import jp.co.sss.pr.entity.Customer;
-import jp.co.sss.pr.repository.CustomerRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.time.LocalDateTime;
+
+import jp.co.sss.pr.bean.CustomerBean;
+import jp.co.sss.pr.entity.Customer;
+import jp.co.sss.pr.repository.CustomerRepository;
 
 
 @RestController
@@ -25,7 +28,7 @@ public class LfApiCtrl {
     @PostMapping("/api/login-status/heartbeat")
     public ResponseEntity<Void> handleHeartbeat(HttpSession session) {
         // セッションからログインユーザーを取得
-        CustomerBean loginUser = (CustomerBean) session.getAttribute("loginUser");
+        CustomerBean loginUser = (CustomerBean) session.getAttribute("user");
         
         if (loginUser != null) {
             // ユーザーが現在もブラウザを開いて操作している場合
