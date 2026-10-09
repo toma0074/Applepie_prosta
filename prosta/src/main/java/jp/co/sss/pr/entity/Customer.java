@@ -1,5 +1,7 @@
 package jp.co.sss.pr.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,64 +11,114 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="customer")
+@Table(name = "customer")
 public class Customer {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="seq_userId")
-	@SequenceGenerator(name="seq_userId",sequenceName="seq_user",allocationSize=1)	
-	private Integer userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_user_gen")
+    @SequenceGenerator(name = "seq_user_gen", sequenceName = "seq_user", allocationSize = 1)
+    @Column(name = "user_id")
+    private Integer userId;
 
-	@Column
-	private String userName;
-	
-	@Column
-	private String userPass;
-	
-	@Column
-	private Integer permission;
-	
-	@Column 
-	private Integer deleteFlag;
-	
-	
-	public Integer getUserId() {
-		return userId;
-	}
+    @Column(name = "user_name", nullable = false, length = 20)
+    private String userName;
 
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
+    @Column(name = "user_pass", nullable = false, length = 16)
+    private String userPass;
 
-	public String getUserName() {
-		return userName;
-	}
+    @Column(name = "permission", nullable = false)
+    private Integer permission;
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    @Column(name = "delete_flag", nullable = false)
+    private Boolean deleteFlag;
 
-	public String getUserPass() {
-		return userPass;
-	}
+    /** 最終ログイン日 */
+    @Column(name = "login_date")
+    private LocalDate loginDate;
 
-	public void setUserPass(String userPass) {
-		this.userPass = userPass;
-	}
+    /** 累計ログイン日数 */
+    @Column(name = "login_count")
+    private Integer loginCount;
 
-	public Integer getPermission() {
-		return permission;
-	}
+    /** 当日ログイン済みフラグ（true=当日ログイン済み） */
+    @Column(name = "login_flag")
+    private Boolean loginFlag;
 
-	public void setPermission(Integer permission) {
-		this.permission = permission;
-	}
+    /** 現在のレベル */
+    @Column(name = "user_level")
+    private Integer userLevel;
 
-	public Integer getDeleteFlag() {
-		return deleteFlag;
-	}
+    // --- getters / setters ---
 
-	public void setDeleteFlag(Integer deleteFlag) {
-		this.deleteFlag = deleteFlag;
-	}
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserPass() {
+        return userPass;
+    }
+
+    public void setUserPass(String userPass) {
+        this.userPass = userPass;
+    }
+
+    public Integer getPermission() {
+        return permission;
+    }
+
+    public void setPermission(Integer permission) {
+        this.permission = permission;
+    }
+
+    public Boolean getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(Boolean deleteFlag) {
+        this.deleteFlag = deleteFlag;
+    }
+
+    public LocalDate getLoginDate() {
+        return loginDate;
+    }
+
+    public void setLoginDate(LocalDate loginDate) {
+        this.loginDate = loginDate;
+    }
+
+    public Integer getLoginCount() {
+        return loginCount == null ? 0 : loginCount;
+    }
+
+    public void setLoginCount(Integer loginCount) {
+        this.loginCount = loginCount;
+    }
+
+    public Boolean getLoginFlag() {
+        return loginFlag == null ? false : loginFlag;
+    }
+
+    public void setLoginFlag(Boolean loginFlag) {
+        this.loginFlag = loginFlag;
+    }
+
+    public Integer getUserLevel() {
+        return userLevel == null ? 1 : userLevel;
+    }
+
+    public void setUserLevel(Integer userLevel) {
+        this.userLevel = userLevel;
+    }
 }

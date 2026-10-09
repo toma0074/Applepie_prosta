@@ -1,111 +1,163 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-       th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>PROSTA | MyPage</title>
 </head>
 <body>
-	<main class="suku">
-	<h3>My Page</h3>
+<main class="suku">
+  <h3>My Page</h3>
 
-		<p class="btn"><a th:href="@{/user/update/input}">ユーザー更新</a></p>
-		
-	
-		
-			<div class="center" >解答履歴</div>
-			<div id="pagination-container" style="display: flex; gap: 5px; justify-content: center; margin: 5px;"></div>
-		
-		<table id="ans-table" class="my_table" th:if="!${#lists.isEmpty(answerlist)}">
-			
-			<form th:action="@{/mypage}" method="get">
-				<select class="mypage_sort" name="sort" onchange="this.form.submit()" style="margin:0 45px;">
-					<option th:value="1">新しい順</option>
-					<option th:value="2" th:selected="${sort==2}">古い順</option>
-				</select>
-			</form>
-		<thead>
-		<tr>
-			<th class="category">カテゴリー</th>
-			<th class="questionId">問題</th>
-			<th class="ansOption">選択履歴</th>
-			<th class="correctOption">正解選択肢</th>
-		</tr>
-		</thead>
-		<tbody>
-		<tr th:each="ans:${answerlist}">
-			<td class="center" th:switch="${ans.question.category}" >
-				<span th:case="1">Java</span>
-				<span th:case="2">Spring</span>
-				<span th:case="3">HTML</span>
-				<span th:case="4">SQL</span>
-        	</td>
-        	<td th:text="${ans.question.questionText}"></td>
-        	<td class="center" th:switch="${ans.ansOption}" >
-				<span th:case="1">A</span>
-				<span th:case="2">B</span>
-				<span th:case="3">C</span>
-				<span th:case="4">わからない</span>
-        	</td>
-        	<td class="center" th:switch="${ans.correctOption}">
-				<span th:case="1">A</span>
-				<span th:case="2">B</span>
-				<span th:case="3">C</span>
-			</td>
-		</tr>
-		</tbody>
-		</div>
-		</table>
-		
-		<p class="center" th:if="${#lists.isEmpty(answerlist)}">履歴がありません。</p>
-	</main>
-	<script>
-	document.addEventListener('DOMContentLoaded', function() {
-	  const rowsPerPage = 6;
-	  const table = document.getElementById('ans-table');
-	  if (!table) return;
-	
-	  const rows = table.querySelectorAll('tbody tr');
-	  const pageCount = Math.ceil(rows.length / rowsPerPage);
-	  const container = document.getElementById('pagination-container');
-	  if (pageCount <= 1) return;
-	  let currentPage = 1;
-	
-	  function showPage(page) {
-	    currentPage = page;
-	    const start = (page - 1) * rowsPerPage;
-	    const end = start + rowsPerPage;
-	    
-	    Array.from(rows).forEach((row, i) => row.style.display = (i >= start && i < end) ? '' : 'none');
-	    document.getElementById('p-prev').disabled = (currentPage === 1);
-	    document.getElementById('p-next').disabled = (currentPage === pageCount);
-	  }
-	  const prevButton = document.createElement('button');
-	  prevButton.id = 'p-prev';
-	  prevButton.type='button';
-	  prevButton.innerText = '前へ';
-	  prevButton.className = 'p-btm';
-	  prevButton.addEventListener('click', () => {
-	    if (currentPage > 1) showPage(currentPage - 1);
-	  });
-	
-	  const nextButton = document.createElement('button');
-	  nextButton.id = 'p-next';
-	  nextButton.type='button';
-	  nextButton.innerText = '次へ';
-	  nextButton.className = 'p-btm';
-	  nextButton.addEventListener('click', () => {
-	    if (currentPage < pageCount) showPage(currentPage + 1);
-	  });
-	
-	  container.appendChild(prevButton);
-	  container.appendChild(nextButton);
-	
-	  showPage(1);
-	});
-	</script>
-</bodyclass>
+  <!-- ===== 新規実績解除フラッシュ ===== -->
+  <div th:if="${newAchievements != null and !#lists.isEmpty(newAchievements)}" class="achievement-toast">
+    <div class="achievement-toast-inner">
+      <span class="toast-icon">🎉</span>
+      <span class="toast-title">実績解除！</span>
+      <span th:each="ach : ${newAchievements}"
+            th:text="${ach.icon + ' ' + ach.achievementName}"
+            class="toast-item"></span>
+    </div>
+  </div>
+
+  <!-- ===== レベル・キャラクターエリア ===== -->
+  <div class="status-panel">
+
+    <!-- キャラクター -->
+    <div class="char-area">
+      <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
+    </div>
+
+    <!-- ステータス情報 -->
+    <div class="status-info">
+      <div class="level-badge">
+        <span class="level-label">LEVEL</span>
+        <span class="level-num" th:text="${currentLevel}">1</span>
+      </div>
+
+      <div class="stats-row" style="margin-top:8px;">
+        <div class="stat-chip">
+          <span class="stat-icon">📅</span>
+          ログイン日数
+          <strong th:text="${loginCount}">0</strong>日
+        </div>
+        <div class="stat-chip">
+          <span class="stat-icon">✅</span>
+          累計正解数
+          <strong th:text="${totalCorrect}">0</strong>問
+        </div>
+        <div class="stat-chip">
+          <span class="stat-icon">⭐</span>
+          満点回数
+          <strong th:text="${perfectCount}">0</strong>回
+        </div>
+      </div>
+
+      <div class="mypage-links">
+        <p class="btn"><a th:href="@{/user/update/input}">ユーザー更新</a></p>
+        <p class="btn"><a th:href="@{/achievement}">実績一覧</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 解除済み実績（最新5件プレビュー） ===== -->
+  <div th:if="${achievements != null and !#lists.isEmpty(achievements)}" class="ach-preview">
+    <div class="ach-preview-title">🏆 最近の実績</div>
+    <div class="ach-chips">
+      <span th:each="ua, stat : ${achievements}"
+            th:if="${stat.index < 5}"
+            class="ach-chip">
+        <span th:text="${ua.achievement.icon}">🏆</span>
+        <span th:text="${ua.achievement.achievementName}">名称</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ===== 解答履歴 ===== -->
+  <div class="center">解答履歴</div>
+  <div id="pagination-container" style="display:flex;gap:5px;justify-content:center;margin:5px;"></div>
+
+  <table id="ans-table" class="my_table" th:if="${!#lists.isEmpty(answerlist)}">
+    <form th:action="@{/mypage}" method="get">
+      <select class="mypage_sort" name="sort" onchange="this.form.submit()" style="margin:0 45px;">
+        <option th:value="1">新しい順</option>
+        <option th:value="2" th:selected="${sort==2}">古い順</option>
+      </select>
+    </form>
+    <thead>
+      <tr>
+        <th class="category">カテゴリー</th>
+        <th class="questionId">問題</th>
+        <th class="ansOption">選択履歴</th>
+        <th class="correctOption">正解選択肢</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="ans : ${answerlist}">
+        <td class="center" th:switch="${ans.question.category}">
+          <span th:case="1">Java</span>
+          <span th:case="2">Spring</span>
+          <span th:case="3">HTML</span>
+          <span th:case="4">SQL</span>
+        </td>
+        <td th:text="${ans.question.questionText}"></td>
+        <td class="center" th:switch="${ans.ansOption}">
+          <span th:case="1">A</span>
+          <span th:case="2">B</span>
+          <span th:case="3">C</span>
+          <span th:case="4">わからない</span>
+        </td>
+        <td class="center" th:switch="${ans.correctOption}">
+          <span th:case="1">A</span>
+          <span th:case="2">B</span>
+          <span th:case="3">C</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="center" th:if="${#lists.isEmpty(answerlist)}">履歴がありません。</p>
+
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // ---- ページネーション ----
+  const rowsPerPage = 6;
+  const table = document.getElementById('ans-table');
+  if (table) {
+    const rows = table.querySelectorAll('tbody tr');
+    const pageCount = Math.ceil(rows.length / rowsPerPage);
+    const container = document.getElementById('pagination-container');
+    if (pageCount > 1) {
+      let currentPage = 1;
+      function showPage(page) {
+        currentPage = page;
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        Array.from(rows).forEach((r, i) => r.style.display = (i >= start && i < end) ? '' : 'none');
+        document.getElementById('p-prev').disabled = (currentPage === 1);
+        document.getElementById('p-next').disabled = (currentPage === pageCount);
+      }
+      const prev = document.createElement('button');
+      prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'p-btm';
+      prev.addEventListener('click', () => { if (currentPage > 1) showPage(currentPage - 1); });
+      const next = document.createElement('button');
+      next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'p-btm';
+      next.addEventListener('click', () => { if (currentPage < pageCount) showPage(currentPage + 1); });
+      container.appendChild(prev);
+      container.appendChild(next);
+      showPage(1);
+    }
+  }
+
+  // ---- 実績トーストの自動非表示 ----
+  const toast = document.querySelector('.achievement-toast');
+  if (toast) {
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-30px)'; }, 4000);
+    setTimeout(() => { toast.style.display = 'none'; }, 4600);
+  }
+});
+</script>
+</body>
 </html>
-
-	

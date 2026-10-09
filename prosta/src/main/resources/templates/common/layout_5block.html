@@ -6,25 +6,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/layout.css}" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/stylesheet.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/gamification.css}" />
 <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
 <title>PROSTA</title>
 </head>
 <body>
-	<!--/* ヘッダー */-->
-	<header>
-		<div th:replace="~{common/header :: layout-header}"></div>
-	</header>
-	<div class="contents">
-		<!--/* サイドバー */-->
-		<asaide th:replace="~{common/sidebar2 :: layout-sidebar}"></asaide>
-		<!--/* メイン */-->
-		<article class="main">
-			<div th:replace="${body}"></div>
-		</article>
-	</div>
-	<!--/* フッター */-->
-	<footer>
-		<div th:replace="~{common/footer :: layout-footer}"></div>
-	</footer>
+<!--/* ヘッダー */-->
+<header>
+<div th:replace="~{common/header :: layout-header}">
+</div>
+</header>
+<div class="contents">
+<!--/* サイドバー */-->
+<aside th:replace="~{common/sidebar2 :: layout-sidebar}">
+</aside>
+<!--/* メイン */-->
+<article class="main">
+<div th:replace="${body}">
+</div>
+</article>
+</div>
+<!--/* フッター */-->
+<footer>
+<div th:replace="~{common/footer :: layout-footer}">
+</div>
+</footer>
 </body>
 </html>
+
