@@ -6,7 +6,7 @@
 	<meta charset="UTF-8" />
 </head>
 
-<body class="admin user_list">
+<body ><!--class="admin user_list"-->
 	
 	<div class="forms">
 			<p class="label">検索：「
@@ -15,18 +15,18 @@
 			</p>
 		</div>
 	<div th:if="${session.user.permission==2}">
-		<p class="btn"><a th:href="@{/question/regist/input}">新規問題登録</a></p>
+		<a class="btn" th:href="@{/question/regist/input}">新規問題登録</a>
 	</div>
-	<div id="pagination-container" style="display: flex; gap: 5px; justify-content: center; margin-top: 5px;"></div>
+	<div id="pagination-container" class="pagination-container"></div>
 	<th:block th:if="${#lists.isEmpty(Questions)}">
 		<div class="message">
 			<p class="back_to_top_message">該当する問題は存在しません。</p>
-			<p class="btn"><a th:href = "@{/question}">一覧表示に戻る</a></p>
-			<p class="btn"><a th:href = "@{/mypage}">マイページに戻る</a></p>
+			<a class="btn" th:href = "@{/question}">一覧表示に戻る</a>
+			<a class="btn" th:href = "@{/mypage}">マイページに戻る</a>
 		</div>
 	</th:block>
 
-	<table class="question_list" id="question-table" th:if="${!#lists.isEmpty(Questions)}">
+	<table class="data-table" id="question-table" th:if="${!#lists.isEmpty(Questions)}">
 		
 		<thead>
 		<tr>
@@ -39,14 +39,14 @@
 		</thead>
 		<tbody>
 		<tr th:each="q:${Questions}">
-			<td class="center" th:switch="${q.category}">
+			<td class="text-center" th:switch="${q.category}">
 				<span th:case="1">Java</span>
 				<span th:case="2">Spring</span>
 				<span th:case="3">HTML</span>
 				<span th:case="4">SQL</span>
 			</td>
 			
-		<td class="center" th:switch="${q.difficulty}" style="color: #FFB11B;">
+		<td class="text-center difficulty-star" th:switch="${q.difficulty}">
 				<span th:case="1">★☆☆</span>
 				<span th:case="2">★★☆</span>
 				<span th:case="3">★★★</span>
@@ -55,7 +55,7 @@
 		<td class="qtext" th:text="${q.questionText}"></td>
 		
 		<td th:if="${session.user.permission==2}">
-			<form class="center" th:action="@{/question/update/input}" method="post" >
+			<form class="text-center" th:action="@{/question/update/input}" method="post" >
 				<input type="hidden" name="questionId" th:value="${q.questionId}">
 				<input type="submit" value="更新" class="update-btn" />
 			</form>
@@ -63,7 +63,7 @@
 				
 		<td th:if="${session.user.permission==2}">
 			
-			<form class="center" th:action="@{/question/delrest/check}" method="post" >
+			<form class="text-center" th:action="@{/question/delrest/check}" method="post" >
 				<input type="hidden" name="questionId" th:value="${q.questionId}">
 				
 				<th:block th:if="${q.questionDelete==0}">
@@ -83,7 +83,7 @@
 		
 		
 	</table>
-		<p class="btn"><a th:href = "@{/question}">一覧表示に戻る</a></p>
+		<a class="btn" th:href = "@{/question}">一覧表示に戻る</a>
 	
 		
 	<script>
@@ -111,7 +111,7 @@
 	  prevButton.id = 'p-prev';
 	  prevButton.type='button';
 	  prevButton.innerText = '前へ';
-	  prevButton.className = 'p-btm';
+	  prevButton.className = 'btn-pagination';
 	  prevButton.addEventListener('click', () => {
 	    if (currentPage > 1) showPage(currentPage - 1);
 	  });
@@ -120,7 +120,7 @@
 	  nextButton.id = 'p-next';
 	  nextButton.type='button';
 	  nextButton.innerText = '次へ';
-	  nextButton.className = 'p-btm';
+	  nextButton.className = 'btn-pagination';
 	  nextButton.addEventListener('click', () => {
 	    if (currentPage < pageCount) showPage(currentPage + 1);
 	  });

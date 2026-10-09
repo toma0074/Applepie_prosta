@@ -7,22 +7,22 @@
 <title>PROSTA | MyPage</title>
 </head>
 <body>
-	<main class="suku">
+	<main class="scroll-area">
 	<h3>My Page</h3>
 
-		<p class="btn"><a th:href="@{/user/update/input}">ユーザー更新</a></p>
+		<a class="btn" th:href="@{/user/update/input}">ユーザー更新</a>
 
-			<div class="center" >解答履歴</div>
-			<div id="pagination-container" style="display: flex; gap: 5px; justify-content: center; margin: 5px;"></div>
+			<div class="text-center" >解答履歴</div>
+			<div id="pagination-container"  class="pagination-container"></div>
 		
-		<table id="ans-table" class="my_table" th:if="!${#lists.isEmpty(answerlist)}">
-			
 			<form th:action="@{/mypage}" method="get">
-				<select class="mypage_sort" name="sort" onchange="this.form.submit()" style="margin:0 45px;">
+				<select class="mypage-sort" name="sort" onchange="this.form.submit()">
 					<option th:value="1">新しい順</option>
 					<option th:value="2" th:selected="${sort==2}">古い順</option>
 				</select>
 			</form>
+			
+		<table id="ans-table" class="data-table" th:if="!${#lists.isEmpty(answerlist)}">
 		<thead>
 		<tr>
 			<th class="category">カテゴリー</th>
@@ -33,30 +33,29 @@
 		</thead>
 		<tbody>
 		<tr th:each="ans:${answerlist}">
-			<td class="center" th:switch="${ans.question.category}" >
+			<td class="text-center" th:switch="${ans.question.category}" >
 				<span th:case="1">Java</span>
 				<span th:case="2">Spring</span>
 				<span th:case="3">HTML</span>
 				<span th:case="4">SQL</span>
         	</td>
         	<td th:text="${ans.question.questionText}"></td>
-        	<td class="center" th:switch="${ans.ansOption}" >
+        	<td class="text-center" th:switch="${ans.ansOption}" >
 				<span th:case="1">A</span>
 				<span th:case="2">B</span>
 				<span th:case="3">C</span>
 				<span th:case="4">わからない</span>
         	</td>
-        	<td class="center" th:switch="${ans.correctOption}">
+        	<td class="text-center" th:switch="${ans.correctOption}">
 				<span th:case="1">A</span>
 				<span th:case="2">B</span>
 				<span th:case="3">C</span>
 			</td>
 		</tr>
 		</tbody>
-		</div>
 		</table>
 		
-		<p class="center" th:if="${#lists.isEmpty(answerlist)}">履歴がありません。</p>
+		<p class="text-center" th:if="${#lists.isEmpty(answerlist)}">履歴がありません。</p>
 	</main>
 	<script>
 	document.addEventListener('DOMContentLoaded', function() {
@@ -83,7 +82,7 @@
 	  prevButton.id = 'p-prev';
 	  prevButton.type='button';
 	  prevButton.innerText = '前へ';
-	  prevButton.className = 'p-btm';
+	  prevButton.className = 'btn-pagination';
 	  prevButton.addEventListener('click', () => {
 	    if (currentPage > 1) showPage(currentPage - 1);
 	  });
@@ -92,7 +91,7 @@
 	  nextButton.id = 'p-next';
 	  nextButton.type='button';
 	  nextButton.innerText = '次へ';
-	  nextButton.className = 'p-btm';
+	  nextButton.className = 'btn-pagination';
 	  nextButton.addEventListener('click', () => {
 	    if (currentPage < pageCount) showPage(currentPage + 1);
 	  });
@@ -103,7 +102,7 @@
 	  showPage(1);
 	});
 	</script>
-</bodyclass>
+</body>
 </html>
 
 	
