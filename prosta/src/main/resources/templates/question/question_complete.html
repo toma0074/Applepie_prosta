@@ -6,29 +6,6 @@
 <meta charset="UTF-8" />
 </head>
 <body>
-<<<<<<< HEAD
-	<th:block th:if="${mode=='delete'}">
-		<div class="message">
-			<p class="back_to_top_message">削除が完了しました。</p>
-		</div>
-	</th:block>
-	
-	<th:block th:if="${mode=='restore'}">
-		<div class="message">
-			<p class="back_to_top_message">復元が完了しました。</p>
-		</div>
-	</th:block>
-	
-	<th:block th:if="${mode=='create'}">
-		<div class="message">
-			<p class="back_to_top_message">完了しました。</p>
-		</div>
-	</th:block>
-	
-	<a class="btn" th:href = "@{/question}">一覧表示に戻る</a>
-	<a class="btn" th:href = "@{/mypage}">マイページに戻る</a>
-
-=======
 <th:block th:if="${mode == 'delete'}">
   <div class="message"><p>削除が完了しました。</p></div>
 </th:block>
@@ -40,6 +17,5 @@
 </th:block>
 <p class="btn"><a th:href="@{/question}">一覧表示に戻る</a></p>
 <p class="btn"><a th:href="@{/mypage}">マイページに戻る</a></p>
->>>>>>> aa1f263ec89914af726eb9f4d7b00b6acbe7949a
 </body>
 </html>

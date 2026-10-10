@@ -6,69 +6,8 @@
 <meta charset="UTF-8" />
 </head>
 <body>
-<<<<<<< HEAD
-	<h3>問題操作確認</h3>
-	
-	<p class="text-center"> 以下の内容でよろしいですか？</p>
-			<table class="qcheck">
-			<tr>
-				<th class="cat">カテゴリー</th>
-				<td class="input" th:switch="${question.category}">
-					<span th:case="1">Java</span>
-					<span th:case="2">Spring</span>
-					<span th:case="3">HTML</span>
-					<span th:case="4">SQL</span>
-				</td>
-			</tr>
-			<tr>
-
-				<th class="dif">難易度</th>
-				<td class="input difficulty-star" th:switch="${question.difficulty}">
-					<span th:case="1">★☆☆</span>
-					<span th:case="2">★★☆</span>
-					<span th:case="3">★★★</span>
-
-				</td>
-			</tr>
-			
-			<tr>
-
-				<th class="que">問題文</th>
-				<td class="input" th:text="${question.questionText}"></td>
-
-			</tr>
-			
-
-			<tr>
-				<th class="opA">選択肢A</th>
-				<td class="input" th:text="${question.optionA}"></td>
-			</tr>
-			
-			<tr>
-				<th class="opB">選択肢B</th>
-				<td class="input" th:text="${question.optionB}"></td>
-			</tr>
-			
-			<tr>
-				<th class="opC">選択肢C</th>
-				<td class="input" th:text="${question.optionC}"></td>
-			</tr>
-			
-			</table>
-	 <th:block th:if="${mode == 'create'}">
-		<form th:action="@{/question/regist/complete}" method="post">
-			<input type="hidden" name="questionId" th:value="${question.questionId}">
-			<input type="hidden" name="category" th:value="${question.category}">
-			<input type="hidden" name="difficulty" th:value="${question.difficulty}">
-			<input type="hidden" name="questionText" th:value="${question.questionText}">
-			<input type="hidden" name="optionA" th:value="${question.optionA}">
-			<input type="hidden" name="optionB" th:value="${question.optionB}">
-			<input type="hidden" name="optionC" th:value="${question.optionC}">
-			<input type="hidden" name="correctOption" th:value="${question.correctOption}">
-=======
 <h3>問題操作確認</h3>
 <p class="center">以下の内容でよろしいですか？</p>
->>>>>>> aa1f263ec89914af726eb9f4d7b00b6acbe7949a
 
 <table class="qcheck">
   <tr>
@@ -131,21 +70,6 @@
   </form>
 </th:block>
 
-<<<<<<< HEAD
-				<div class="inputform">
-	<!--				<div class="label"></div>-->
-					<div class="inputselect">
-						<input type="submit" value="復元を完了する" />
-					</div>
-				</div>
-			</form>
-		</th:block>
-
-	<div style="margin-top: 20px;">
-		<a class="btn" onclick="history.back()">前の画面に戻る</a>
-		<a class="btn" th:href="@{/question}">一覧表示に戻る</a>
-	</div>
-=======
 <th:block th:if="${mode == 'restore'}">
   <form th:action="@{/question/delrest/complete}" method="post">
     <input type="hidden" name="questionId" th:value="${question.questionId}">
@@ -157,7 +81,6 @@
     </div>
   </form>
 </th:block>
->>>>>>> aa1f263ec89914af726eb9f4d7b00b6acbe7949a
 
 <div style="margin-top:20px;">
   <p class="btn"><a onclick="history.back()">前の画面に戻る</a></p>

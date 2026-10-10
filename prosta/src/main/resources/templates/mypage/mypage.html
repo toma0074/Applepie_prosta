@@ -7,29 +7,10 @@
 <title>PROSTA | MyPage</title>
 </head>
 <body>
-<<<<<<< HEAD
-	<main class="scroll-area">
-	<h3>My Page</h3>
-
-		<a class="btn" th:href="@{/user/update/input}">ユーザー更新</a>
-=======
 <main class="suku">
   <h3>My Page</h3>
 
-<<<<<<< HEAD
-  <!-- ===== 新規実績解除フラッシュ ===== -->
-  <div th:if="${newAchievements != null and !#lists.isEmpty(newAchievements)}" class="achievement-toast">
-    <div class="achievement-toast-inner">
-      <span class="toast-icon">🎉</span>
-      <span class="toast-title">実績解除！</span>
-      <span th:each="ach : ${newAchievements}"
-            th:text="${ach.icon + ' ' + ach.achievementName}"
-            class="toast-item"></span>
-    </div>
-  </div>
-=======
 		<p class="btn"><a th:href="@{/user/update/input}">ユーザー更新</a></p>
->>>>>>> aa1f263ec89914af726eb9f4d7b00b6acbe7949a
 
 			<div class="text-center" >解答履歴</div>
 			<div id="pagination-container"  class="pagination-container"></div>
@@ -123,7 +104,6 @@
 	</script>
 </body>
 </html>
->>>>>>> dbbeeff4a6dc45b31000f5bdad3215498d51e015
 
   <!-- ===== レベル・キャラクターエリア ===== -->
   <div class="status-panel">
