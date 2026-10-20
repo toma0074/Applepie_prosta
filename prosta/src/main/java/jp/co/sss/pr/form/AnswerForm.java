@@ -13,6 +13,7 @@ public class AnswerForm {
     private Integer ansOption;
 
     private Integer correctOption;
+    private Integer ansCount;
     private String questionText;
     private String optionA;
     private String optionB;
@@ -38,6 +39,9 @@ public class AnswerForm {
     public Integer getCorrectOption() { return correctOption; }
     public void setCorrectOption(Integer correctOption) { this.correctOption = correctOption; }
 
+    public Integer getAnsCount() { return ansCount; }
+    public void setAnsCount(Integer ansCount) { this.ansCount = ansCount; }
+
     public String getQuestionText() { return questionText; }
     public void setQuestionText(String questionText) { this.questionText = questionText; }
 
@@ -50,4 +54,3 @@ public class AnswerForm {
     public String getOptionC() { return optionC; }
     public void setOptionC(String optionC) { this.optionC = optionC; }
 }
-

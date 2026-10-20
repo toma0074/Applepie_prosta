@@ -170,6 +170,7 @@ public class TestController {
             answer.setCorrectOption(aForm.getCorrectOption());
             answer.setCorrectFlag(isCorrect);   // ← correct_flag に保存
             answer.setAnsDate(today);            // ← ans_date に保存
+            answer.setAnsCount(1);
             ansRpstry.save(answer);
 
             if (isCorrect) caCount++;
