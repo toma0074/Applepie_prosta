@@ -8,12 +8,14 @@
 <body>
 <h3>ユーザー状態更新完了</h3>
 <form th:action="@{/user/list}">
-  <p class="center" th:text="${userName}"></p>
-  <div class="inputform">
-    <div class="inputselect">
-      <input type="submit" value="ユーザー一覧" />
-    </div>
+  <div class="message">
+  <p class="text-center" th:text="${userName}"></p>
   </div>
+  <div class="button-area">
+    <div class="inputselect">
+        <input type="submit" value="ユーザー一覧" />
+    </div>
+</div>
 </form>
 </body>
 </html>

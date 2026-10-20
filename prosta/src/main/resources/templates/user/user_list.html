@@ -9,20 +9,27 @@
 <h3>ユーザー一覧</h3>
 
 <th:block th:if="${errorMessage}">
-  <span th:text="${errorMessage}" style="margin-left:20px;color:#cc0000;"></span>
-  <p class="btn"><a th:href="@{/user/list}" th:text="${back}"></a></p>
+  <span class="error-message"
+      th:text="${errorMessage}">
+  </span>
+  <a class="btn"
+   th:href="@{/user/list}"
+   th:text="${back}">
+</a>
 </th:block>
 
 <th:block th:if="${#lists.size(customerForm) == 0}">
   <div class="message">
-    <p class="center">該当するユーザー情報がありません</p>
-    <p class="btn"><a th:href="@{/user/list}">ユーザー一覧に戻る</a></p>
+    <p class="text-center">該当するユーザー情報がありません</p>
+    <a class="btn" th:href="@{/user/list}">ユーザー一覧に戻る</a>
   </div>
 </th:block>
 
-<div id="pagination-container" style="display:flex;gap:5px;justify-content:center;margin-top:5px;"></div>
+<div id="pagination-container"
+     class="pagination-container">
+</div>
 
-<table id="user-table" class="list_table" th:if="${#lists.size(customerForm) != 0}">
+<table id="user-table" class="data-table" th:if="${#lists.size(customerForm) != 0}">
   <thead>
     <tr>
       <th class="userId">ユーザーID</th>
@@ -41,7 +48,7 @@
       <td th:if="${!user.deleteFlag}">アクティブ</td>
       <td th:if="${user.deleteFlag}">削除済み</td>
       <td class="button">
-        <form class="center" th:action="@{/user/update/input}" method="get">
+        <form class="text-center" th:action="@{/user/update/input}" method="get">
           <input type="hidden" name="userId"     th:value="${user.userId}" />
           <input type="hidden" name="userName"   th:value="${user.userName}" />
           <input type="hidden" name="userPass"   th:value="${user.userPass}" />
@@ -51,7 +58,7 @@
         </form>
       </td>
       <td class="button">
-        <form class="center" th:action="@{/user/delete/check}" method="post">
+        <form class="text-center" th:action="@{/user/delete/check}" method="post">
           <input type="hidden" name="userId"     th:value="${user.userId}" />
           <input type="hidden" name="userName"   th:value="${user.userName}" />
           <input type="hidden" name="userPass"   th:value="${user.userPass}" />
@@ -61,7 +68,7 @@
         </form>
       </td>
       <td class="button">
-        <form class="center" th:action="@{/user/restore/check}" method="post">
+        <form class="text-center" th:action="@{/user/restore/check}" method="post">
           <input type="hidden" name="userId"     th:value="${user.userId}" />
           <input type="hidden" name="userName"   th:value="${user.userName}" />
           <input type="hidden" name="userPass"   th:value="${user.userPass}" />
@@ -93,10 +100,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('p-next').disabled = (currentPage === pageCount);
   }
   const prev = document.createElement('button');
-  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'p-btm';
+  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'btn-pagination';
   prev.addEventListener('click', () => { if (currentPage > 1) showPage(currentPage - 1); });
   const next = document.createElement('button');
-  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'p-btm';
+  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'btn-pagination';
   next.addEventListener('click', () => { if (currentPage < pageCount) showPage(currentPage + 1); });
   container.appendChild(prev);
   container.appendChild(next);

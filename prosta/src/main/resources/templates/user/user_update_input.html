@@ -9,8 +9,10 @@
 <h3>ユーザー情報入力</h3>
 <form th:action="@{/user/update/check}" method="post" th:object="${user}">
   <span th:each="error:${#fields.detailedErrors()}"
-        th:text="${error.message}" class="error"></span>
-  <span th:text="${err}" class="error"></span>
+      th:text="${error.message}"
+      class="error-message"></span>
+  <span th:text="${err}"
+      class="error-message"></span>
 
   <div class="inputform">
     <table>
@@ -46,22 +48,18 @@
 </form>
 
 <div th:if="${session.user.permission == 1}">
-  <form th:action="@{/mypage}" method="get">
-    <div class="inputform">
-      <div class="inputselect">
-        <input type="submit" value="戻る">
-      </div>
+    <div class="button-area">
+        <a class="btn" th:href="@{/mypage}">
+            戻る
+        </a>
     </div>
-  </form>
 </div>
 <div th:if="${session.user.permission == 2}">
-  <form th:action="@{/user/list}" method="get">
-    <div class="inputform">
-      <div class="inputselect">
-        <input type="submit" value="戻る">
-      </div>
+    <div class="button-area">
+        <a class="btn" th:href="@{/user/list}">
+            戻る
+        </a>
     </div>
-  </form>
 </div>
 </body>
 </html>

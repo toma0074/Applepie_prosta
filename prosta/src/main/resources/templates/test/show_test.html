@@ -7,12 +7,12 @@
 </head>
 <body>
 <h3>問題解答画面</h3>
-<div class="test_ans">
+<div>
   <form th:action="@{/test/check}" method="post" th:object="${answerListForm}">
-    <p class="error">
+    <p class="error-message">
       <th:block th:each="error,status : *{results}">
         <span th:if="${#fields.hasErrors('results[' + status.index + '].ansOption')}"
-              th:text="'第' + ${status.count} + '問目を入力してください'" class="error"></span><br/>
+              th:text="'第' + ${status.count} + '問目を入力してください'" class="error-message"></span><br/>
       </th:block>
     </p>
 
@@ -59,12 +59,14 @@
       </div>
     </div>
 
-    <div id="pagination-container" style="display:flex;gap:5px;justify-content:center;margin-top:5px;"></div>
+    <div id="pagination-container"
+     class="pagination-container">
+     </div>
 
-    <div class="inputform">
-      <div class="inputselect">
+    <div class="button-area">
+    <div class="inputselect">
         <input type="submit" value="確認" />
-      </div>
+    </div>
     </div>
   </form>
 </div>
@@ -88,10 +90,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('p-next').disabled = (currentPage === pageCount);
   }
   const prev = document.createElement('button');
-  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'p-btm';
+  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'btn-pagination';
   prev.addEventListener('click', () => { if (currentPage > 1) showPage(currentPage - 1); });
   const next = document.createElement('button');
-  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'p-btm';
+  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'btn-pagination';
   next.addEventListener('click', () => { if (currentPage < pageCount) showPage(currentPage + 1); });
   container.appendChild(prev);
   container.appendChild(next);

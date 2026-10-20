@@ -7,19 +7,25 @@
 </head>
 <body>
 <h3>問題操作確認</h3>
-<p class="center">以下の内容でよろしいですか？</p>
+<p class="text-center">以下の内容でよろしいですか？</p>
 
 <table class="qcheck">
   <tr>
     <th class="cat">カテゴリー</th>
-    <td th:text="${question.category}"></td>
+    <td th:switch="${question.category}">
+    <span th:case="1">Java</span>
+    <span th:case="2">Spring</span>
+    <span th:case="3">HTML</span>
+    <span th:case="4">SQL</span>
+  </td>
   </tr>
   <tr>
     <th class="dif">難易度</th>
-    <td th:switch="${question.difficulty}" style="color: #FFB11B;">
-      <span th:case="1">★☆☆</span>
-      <span th:case="2">★★☆</span>
-      <span th:case="3">★★★</span>
+    <td class="difficulty-star"
+    th:switch="${question.difficulty}">
+    <span th:case="1">★☆☆</span>
+    <span th:case="2">★★☆</span>
+    <span th:case="3">★★★</span>
     </td>
   </tr>
   <tr>
@@ -82,9 +88,9 @@
   </form>
 </th:block>
 
-<div style="margin-top:20px;">
-  <p class="btn"><a onclick="history.back()">前の画面に戻る</a></p>
-  <p class="btn"><a th:href="@{/question}">一覧表示に戻る</a></p>
+<div class="button-area">
+  <a class="btn" href="javascript:history.back();">前の画面に戻る</a>
+  <a class="btn" th:href="@{/question}">一覧表示に戻る</a>
 </div>
 </body>
 </html>
