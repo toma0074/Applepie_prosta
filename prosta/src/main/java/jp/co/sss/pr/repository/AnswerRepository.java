@@ -1,6 +1,7 @@
 package jp.co.sss.pr.repository;
 
 import java.util.List;
+import java.time.LocalDate;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,6 +26,24 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
      */
     int countByCustomerAndCorrectFlagTrue(Customer customer);
 
+    @Query("""
+            SELECT c.userId AS userId,
+                   COUNT(a.ansId) AS answerCount,
+                   COALESCE(SUM(CASE WHEN a.correctFlag = true THEN 1 ELSE 0 END), 0) AS correctCount
+            FROM Customer c
+            LEFT JOIN Answer a ON a.customer = c
+              AND (:categoryId IS NULL OR a.question.category.categoryId = :categoryId)
+              AND (:fromDate IS NULL OR a.ansDate >= :fromDate)
+              AND (:toDate IS NULL OR a.ansDate <= :toDate)
+            WHERE c.userId IN :userIds
+            GROUP BY c.userId
+            """)
+    List<FriendStudySummary> summarizeStudy(
+            @Param("userIds") List<Integer> userIds,
+            @Param("categoryId") Integer categoryId,
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate);
+
     /**
      * 指定ユーザーが「その日の全問正解」した日数を返す。
      *
@@ -45,4 +64,3 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
             """)
     int countPerfectDaysByCustomer(@Param("customer") Customer customer);
 }
-

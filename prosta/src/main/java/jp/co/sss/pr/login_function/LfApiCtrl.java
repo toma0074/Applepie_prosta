@@ -2,7 +2,7 @@
 
 package jp.co.sss.pr.login_function;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -34,7 +34,7 @@ public class LfApiCtrl {
             // ユーザーが現在もブラウザを開いて操作している場合
             Customer customer = customerRepository.findById(loginUser.getUserId()).orElse(null);
             if (customer != null) {
-                customer.setLoginDate(LocalDate.now()); // 現在日で更新
+                customer.setLastSeenAt(LocalDateTime.now());
                 customer.setLoginFlag(true); // ログイン中を維持
                 customerRepository.save(customer);
             }

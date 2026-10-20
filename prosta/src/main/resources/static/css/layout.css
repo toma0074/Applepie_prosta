@@ -125,7 +125,41 @@ aside input[type=submit] {
 	
 }
 aside .sidebar-search{
-	padding: 0 5%;
+	padding: 0 5% 16px;
+	box-sizing: border-box;
+}
+
+.sidebar-search-item {
+	margin-bottom: 12px;
+}
+
+.sidebar-search-item label {
+	display: block;
+	margin-bottom: 4px;
+	font-weight: 600;
+}
+
+.sidebar-search-controls {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	min-width: 0;
+}
+
+.sidebar-search-controls input[type="text"],
+.sidebar-search-controls select {
+	flex: 1 1 auto;
+	width: 0;
+	min-width: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+.sidebar-search-controls input[type="submit"] {
+	flex: 0 0 50px;
+	width: 50px;
+	margin: 0;
 }
 
 .sidebar-menu {

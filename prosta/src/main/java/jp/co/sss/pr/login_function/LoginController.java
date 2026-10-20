@@ -80,6 +80,14 @@ public class LoginController {
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     public String logout() {
+        CustomerBean userBean = (CustomerBean) session.getAttribute("user");
+        if (userBean != null) {
+            customerRepository.findById(userBean.getUserId()).ifPresent(customer -> {
+                customer.setLoginFlag(false);
+                customer.setLastSeenAt(null);
+                customerRepository.save(customer);
+            });
+        }
         session.invalidate();
         return "redirect:/";
     }
