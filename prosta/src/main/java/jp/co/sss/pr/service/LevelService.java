@@ -1,6 +1,7 @@
 package jp.co.sss.pr.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,10 +57,11 @@ public class LevelService {
      *
      * <p>処理内容：
      * <ul>
-     *   <li>同日2回目以降のログインはスキップ（login_flag=true の場合）</li>
-     *   <li>login_count をインクリメント</li>
-     *   <li>login_date を今日に更新</li>
+     *   <li>同日2回目以降のログインはログイン日数を増やさない</li>
+     *   <li>連続日数を前回ログイン日から計算</li>
+     *   <li>login_count と login_date を更新</li>
      *   <li>login_flag を true に設定</li>
+     *   <li>last_seen_at を現在時刻に更新</li>
      *   <li>レベルを再計算して user_level に保存</li>
      * </ul>
      *
@@ -69,24 +71,21 @@ public class LevelService {
     @Transactional
     public List<Achievement> processLogin(Customer customer) {
         LocalDate today = LocalDate.now();
+        LocalDate lastLoginDate = customer.getLoginDate();
+        customer.setLastSeenAt(LocalDateTime.now());
+        customer.setLoginFlag(true);
 
-        // 同日の重複ログインはスキップ
-        if (Boolean.TRUE.equals(customer.getLoginFlag())
-                && today.equals(customer.getLoginDate())) {
+        if (today.equals(lastLoginDate)) {
+            customerRepository.save(customer);
             return new ArrayList<>();
         }
 
-        // 日付が変わったら login_flag をリセット
-        if (!today.equals(customer.getLoginDate())) {
-            customer.setLoginFlag(false);
-        }
-
-        // 初回ログイン or 日付変わり
-        if (!Boolean.TRUE.equals(customer.getLoginFlag())) {
-            customer.setLoginCount(customer.getLoginCount() + 1);
-            customer.setLoginDate(today);
-            customer.setLoginFlag(true);
-        }
+        customer.setConsecutiveLoginDays(
+                today.minusDays(1).equals(lastLoginDate)
+                        ? customer.getConsecutiveLoginDays() + 1
+                        : 1);
+        customer.setLoginCount(customer.getLoginCount() + 1);
+        customer.setLoginDate(today);
 
         // レベル再計算
         recalcLevel(customer);
@@ -128,7 +127,7 @@ public class LevelService {
      * <p>レベル = ログイン日数 + 連続ログインボーナス + (総正解数 × 2) + (満点回数 × 5)
      * <ul>
      *   <li>ログイン日数 : customer.login_count（1日1カウント）</li>
-     *   <li>連続ログインボーナス : login_count が 7の倍数のとき +10</li>
+     * <li>連続ログインボーナス : consecutive_login_days が 7の倍数のとき +10</li>
      *   <li>総正解数   : answer テーブルの correct_flag=true の件数</li>
      *   <li>満点回数   : 同一 ans_date に全問正解した日の回数</li>
      * </ul>
@@ -138,7 +137,7 @@ public class LevelService {
         int loginCount = customer.getLoginCount();
 
         // 連続ログインボーナス（7の倍数ごとに+10）
-        int streakBonus = (loginCount / 7) * 10;
+        int streakBonus = (customer.getConsecutiveLoginDays() / 7) * 10;
 
         // 正解数（answer.correct_flag = true の件数）
         int totalCorrect = answerRepository.countByCustomerAndCorrectFlagTrue(customer);
@@ -180,12 +179,12 @@ public class LevelService {
     private List<Achievement> checkAchievements(Customer customer) {
         List<Achievement> newlyUnlocked = new ArrayList<>();
 
-        int loginCount  = customer.getLoginCount();
+        int consecutiveLoginDays = customer.getConsecutiveLoginDays();
         int level       = customer.getUserLevel();
         int perfectDays = answerRepository.countPerfectDaysByCustomer(customer);
 
-        // 実績ID 1: 連続7日ログイン（7日以上ログイン済み）
-        if (loginCount >= 7) {
+        // 実績ID 1: 連続7日ログイン
+        if (consecutiveLoginDays >= 7) {
             tryUnlock(customer, 1, newlyUnlocked);
         }
         // 実績ID 2: 満点1回

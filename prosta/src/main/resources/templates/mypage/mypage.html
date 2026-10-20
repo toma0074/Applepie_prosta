@@ -8,18 +8,33 @@
 </head>
 <body>
 <main class="suku">
-  <h3>My Page</h3>
+  <div class="mypage-header">
+    <h3>My Page</h3>
+    <div class="mypage-links">
+      <a class="btn" th:href="@{/user/update/input}">ユーザー更新</a>
+      <a class="btn" th:href="@{/achievement}">実績一覧</a>
+    </div>
+  </div>
 
   <div class="status-panel">
     <div class="char-area">
       <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
     </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> f33d926ece464314a857c6ba342e62d5f01b93b3
     <div class="status-info">
       <div class="level-badge">
         <span class="level-label">LEVEL</span>
         <span class="level-num" th:text="${currentLevel}">1</span>
       </div>
+<<<<<<< HEAD
       <div class="stats-row" style="margin-top:8px;">
+=======
+
+      <div class="stats-row">
+>>>>>>> f33d926ece464314a857c6ba342e62d5f01b93b3
         <div class="stat-chip">
           <span class="stat-icon">📅</span>
           ログイン日数 <strong th:text="${loginCount}">0</strong>日
@@ -33,6 +48,7 @@
           満点回数 <strong th:text="${perfectCount}">0</strong>回
         </div>
       </div>
+<<<<<<< HEAD
       <div class="mypage-links">
         <p class="btn"><a th:href="@{/user/update/input}">ユーザー更新</a></p>
         <p class="btn"><a th:href="@{/achievement}">実績一覧</a></p>
@@ -53,6 +69,13 @@
 
   <div th:if="${achievements != null and !#lists.isEmpty(achievements)}"
        class="ach-preview">
+=======
+
+    </div>
+  </div>
+
+  <div th:if="${achievements != null and !#lists.isEmpty(achievements)}" class="ach-preview">
+>>>>>>> f33d926ece464314a857c6ba342e62d5f01b93b3
     <div class="ach-preview-title">🏆 最近の実績</div>
     <div class="ach-chips">
       <span th:each="ua, stat : ${achievements}"
@@ -65,6 +88,7 @@
   </div>
 
   <div class="center">解答履歴</div>
+<<<<<<< HEAD
   <div id="pagination-container"
        style="display:flex;gap:5px;justify-content:center;margin:5px;"></div>
 
@@ -72,12 +96,23 @@
     <select class="mypage_sort" name="sort" onchange="this.form.submit()"
             style="margin:0 45px;">
       <option th:value="1">新しい順</option>
+=======
+  <div id="pagination-container" class="pagination-container"></div>
+
+  <form class="mypage-sort-form" th:action="@{/mypage}" method="get">
+    <select class="mypage-sort" name="sort" onchange="this.form.submit()">
+      <option th:value="1" th:selected="${sort == null or sort == 1}">新しい順</option>
+>>>>>>> f33d926ece464314a857c6ba342e62d5f01b93b3
       <option th:value="2" th:selected="${sort == 2}">古い順</option>
     </select>
   </form>
 
+<<<<<<< HEAD
   <table id="ans-table" class="my_table"
          th:if="${!#lists.isEmpty(answerlist)}">
+=======
+  <table id="ans-table" class="mypage-table" th:if="${!#lists.isEmpty(answerlist)}">
+>>>>>>> f33d926ece464314a857c6ba342e62d5f01b93b3
     <thead>
       <tr>
         <th class="category">カテゴリー</th>
@@ -117,6 +152,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   const rowsPerPage = 6;
   const table = document.getElementById('ans-table');
+<<<<<<< HEAD
   if (table) {
     const rows = table.querySelectorAll('tbody tr');
     const pageCount = Math.ceil(rows.length / rowsPerPage);
@@ -165,6 +201,48 @@ document.addEventListener('DOMContentLoaded', function () {
       toast.style.display = 'none';
     }, 4600);
   }
+=======
+  if (!table) return;
+
+  const rows = table.querySelectorAll('tbody tr');
+  const pageCount = Math.ceil(rows.length / rowsPerPage);
+  const container = document.getElementById('pagination-container');
+  if (pageCount <= 1) return;
+
+  let currentPage = 1;
+  function showPage(page) {
+    currentPage = page;
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    Array.from(rows).forEach((row, index) => {
+      row.style.display = index >= start && index < end ? '' : 'none';
+    });
+    document.getElementById('p-prev').disabled = currentPage === 1;
+    document.getElementById('p-next').disabled = currentPage === pageCount;
+  }
+
+  const prevButton = document.createElement('button');
+  prevButton.id = 'p-prev';
+  prevButton.type = 'button';
+  prevButton.innerText = '前へ';
+  prevButton.className = 'btn-pagination';
+  prevButton.addEventListener('click', () => {
+    if (currentPage > 1) showPage(currentPage - 1);
+  });
+
+  const nextButton = document.createElement('button');
+  nextButton.id = 'p-next';
+  nextButton.type = 'button';
+  nextButton.innerText = '次へ';
+  nextButton.className = 'btn-pagination';
+  nextButton.addEventListener('click', () => {
+    if (currentPage < pageCount) showPage(currentPage + 1);
+  });
+
+  container.appendChild(prevButton);
+  container.appendChild(nextButton);
+  showPage(1);
+>>>>>>> f33d926ece464314a857c6ba342e62d5f01b93b3
 });
 </script>
 </body>

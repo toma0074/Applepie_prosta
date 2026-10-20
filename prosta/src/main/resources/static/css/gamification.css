@@ -79,7 +79,9 @@
     border: 1.5px solid #0B346E;
     border-radius: 16px;
     padding: 20px 24px;
-    margin: 10px 20px 16px;
+    margin: 10px 0 16px;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .char-area {
@@ -95,6 +97,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-width: 0;
 }
 
 /* レベルバッジ（大） */
@@ -180,19 +183,270 @@
 }
 
 /* マイページリンクボタン群 */
+.mypage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.mypage-header h3 {
+    margin: 0;
+}
+
 .mypage-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.mypage-sort-form {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 12px 8px;
+}
+
+table.mypage-table {
+    width: calc(100% - 24px);
+    margin: 0 auto 16px;
+    table-layout: fixed;
+}
+
+.mypage-table th,
+.mypage-table td {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+    .mypage-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .mypage-header .mypage-links {
+        justify-content: flex-start;
+    }
+}
+
+/* ---- フレンド画面 ---- */
+.friends-page {
+    width: 100%;
+    min-width: 0;
+    padding-bottom: 24px;
+    color: #0B346E;
+}
+
+.friends-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.friends-page-header h3 {
+    margin: 0;
+}
+
+.friends-page-header p,
+.friends-card > p {
+    margin: 6px 0;
+    padding: 0;
+}
+
+.friends-page-header .btn {
+    flex: 0 0 auto;
+}
+
+.friends-message {
+    margin: 10px 0;
+    padding: 10px 14px;
+    border: 1px solid #0B346E;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.friends-message.is-error {
+    border-color: #b42318;
+    color: #b42318;
+}
+
+.friends-message.is-success {
+    border-color: #17803d;
+    color: #176b35;
+}
+
+.friends-card {
+    min-width: 0;
+    margin: 12px 0;
+    padding: 16px;
+    border: 1.5px solid #0B346E;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+    box-sizing: border-box;
+}
+
+.friends-card h4 {
+    margin: 0 0 12px;
+    color: #0B346E;
+}
+
+.friends-card h5 {
+    margin: 4px 0 8px;
+}
+
+.friends-self-summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.friends-self-summary p {
+    margin: 0;
+    padding: 0;
+}
+
+.friends-inline-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.friends-inline-form input,
+.friends-inline-form select {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.friends-inline-form input[type="search"] {
+    flex: 1 1 180px;
+}
+
+.friends-inline-form input[type="date"] {
+    flex: 1 1 130px;
+}
+
+.friends-inline-form button,
+.friends-action-button,
+.friends-secondary-button {
+    padding: 6px 12px;
+    border: 1px solid #0B346E;
+    border-radius: 18px;
+    color: #fff;
+    background: #0B346E;
+    font: inherit;
+    cursor: pointer;
+}
+
+.friends-inline-form button:disabled,
+.friends-action-button:disabled,
+.friends-secondary-button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+.friends-secondary-button {
+    color: #0B346E;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.friends-request-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.friends-list {
+    min-width: 0;
+}
+
+.friends-list-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(11, 52, 110, 0.18);
+}
+
+.friends-profile-details {
+    display: flex;
+    align-items: center;
+    flex: 1 1 240px;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    min-width: 0;
+}
+
+.friends-user-name {
+    font-weight: 700;
+}
+
+.friends-stat-line {
+    margin: 0;
+    padding: 0;
+}
+
+.friends-presence {
+    padding: 2px 9px;
+    border: 1px solid #777;
+    border-radius: 14px;
+    color: #555;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.friends-presence.is-online {
+    border-color: #17803d;
+    color: #176b35;
+    background: rgba(32, 166, 85, 0.1);
+}
+
+.friends-empty {
+    margin: 4px 0;
+    padding: 0;
+    color: #57606a;
+}
+
+.friends-ranking-table {
+    width: 100%;
+    margin: 12px 0 0;
+    table-layout: auto;
+}
+
+.friends-ranking-table th,
+.friends-ranking-table td {
+    text-align: left;
+}
+
+@media (max-width: 700px) {
+    .friends-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .friends-request-columns {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .friends-card {
+        padding: 12px;
+    }
 }
 
 /* ---- 実績プレビュー（マイページ） ---- */
 .ach-preview {
-    margin: 0 20px 16px;
+    margin: 0 0 16px;
     padding: 10px 16px;
     background: rgba(255,255,255,0.5);
     border: 1px solid #0B346E;
     border-radius: 12px;
+    box-sizing: border-box;
 }
 
 .ach-preview-title {
