@@ -1,4 +1,4 @@
-﻿package jp.co.sss.pr.service;
+package jp.co.sss.pr.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -1,4 +1,4 @@
-﻿package jp.co.sss.pr.test_function;
+package jp.co.sss.pr.test_function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

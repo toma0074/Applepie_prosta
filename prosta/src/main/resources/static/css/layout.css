@@ -349,3 +349,62 @@ footer {
   .contents aside.is-open { display: block; }
   article.main { width: 100%; padding-left: 10px; padding-right: 10px; }
 }
+
+/* ---- スマホ: メイン領域の中央寄せ（PCは変更なし） ---- */
+@media (max-width: 700px) {
+  .contents {
+    width: 100%;
+    justify-content: center;
+  }
+  article.main,
+  article:not(.main) {
+    width: 100%;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  article.main > h3,
+  article:not(.main) > h3 {
+    text-align: center;
+  }
+  .test_select {
+    width: 100%;
+    margin: 0 auto;
+  }
+  .test_select div.form {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto 10px;
+  }
+  .test_select div.label {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+  }
+  .test_select div.select,
+  .test_select div.inputselect {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+  }
+  .test_select div.select > label {
+    margin: 0 6px;
+  }
+  .test_select table,
+  article.main table {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .friends-card,
+  .mypage-header,
+  .result-status-panel {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
