@@ -11,10 +11,10 @@
   <form th:action="@{/question/update/check}" method="post" th:object="${question}">
 
     <th:block th:if="${#fields.hasAnyErrors()}">
-      <div class="error" th:errors="*{questionText}"></div>
-      <div class="error" th:errors="*{optionA}"></div>
-      <div class="error" th:errors="*{optionB}"></div>
-      <div class="error" th:errors="*{optionC}"></div>
+      <div class="error-message" th:errors="*{questionText}"></div>
+      <div class="error-message" th:errors="*{optionA}"></div>
+      <div class="error-message" th:errors="*{optionB}"></div>
+      <div class="error-message" th:errors="*{optionC}"></div>
     </th:block>
 
     <div class="form">

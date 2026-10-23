@@ -179,9 +179,9 @@ box-shadow    : none;        /* カーソル時の影消去 */
   
  }
 
-table.list_tables{
-	justify-content: center;
-}
+/*table.list_tables{*/
+/*	justify-content: center;*/
+/*}*/
 
 
 .logo{
