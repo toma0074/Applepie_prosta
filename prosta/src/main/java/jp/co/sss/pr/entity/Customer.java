@@ -1,5 +1,5 @@
 package jp.co.sss.pr.entity;
-
+ 
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -9,41 +9,41 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-
+ 
 @Entity
 @Table(name = "customer")
 public class Customer {
-
+ 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_user_gen")
     @SequenceGenerator(name = "seq_user_gen", sequenceName = "seq_user", allocationSize = 1)
     @Column(name = "user_id")
     private Integer userId;
-
+ 
     @Column(name = "user_name", nullable = false, length = 20)
     private String userName;
-
+ 
     @Column(name = "user_pass", nullable = false, length = 16)
     private String userPass;
-
+ 
     @Column(name = "permission", nullable = false)
     private Integer permission;
-
+ 
     @Column(name = "delete_flag", nullable = false)
     private Boolean deleteFlag;
-
+ 
     @Column(name = "login_date")
     private LocalDate loginDate;
-
+ 
     @Column(name = "login_count")
     private Integer loginCount;
-
+ 
     @Column(name = "login_flag")
     private Boolean loginFlag;
-
+ 
     @Column(name = "user_level")
     private Integer userLevel;
-
+ 
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
     public String getUserName() { return userName; }
