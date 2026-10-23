@@ -1,6 +1,7 @@
 package jp.co.sss.pr.entity;
  
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,7 +44,17 @@ public class Customer {
  
     @Column(name = "user_level")
     private Integer userLevel;
+<<<<<<< HEAD
  
+=======
+
+    @Column(name = "consecutive_login_days", nullable = false)
+    private Integer consecutiveLoginDays = 0;
+
+    @Column(name = "last_seen_at")
+    private LocalDateTime lastSeenAt;
+
+>>>>>>> 90925222afed254169700f1067b22b4f56a81962
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
     public String getUserName() { return userName; }
@@ -62,4 +73,12 @@ public class Customer {
     public void setLoginFlag(Boolean loginFlag) { this.loginFlag = loginFlag; }
     public Integer getUserLevel() { return userLevel == null ? 1 : userLevel; }
     public void setUserLevel(Integer userLevel) { this.userLevel = userLevel; }
+<<<<<<< HEAD
 }
+=======
+    public Integer getConsecutiveLoginDays() { return consecutiveLoginDays == null ? 0 : consecutiveLoginDays; }
+    public void setConsecutiveLoginDays(Integer consecutiveLoginDays) { this.consecutiveLoginDays = consecutiveLoginDays; }
+    public LocalDateTime getLastSeenAt() { return lastSeenAt; }
+    public void setLastSeenAt(LocalDateTime lastSeenAt) { this.lastSeenAt = lastSeenAt; }
+}
+>>>>>>> 90925222afed254169700f1067b22b4f56a81962

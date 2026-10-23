@@ -8,83 +8,75 @@
        th:class="${session.user == null or session.user.permission == 1} ? 'search' : 'admin_menu'">
   <div class="side-inner">
     <div class="title">MENU</div>
-    <div>
-      <ul style="list-style:none; padding-left:0;">
-        <li class="sbt">
-          <a th:href="@{/mypage}"><span>MyPage</span></a>
-        </li>
-        <li class="sbt">
-          <a th:href="@{/test/category}"><span>カテゴリ別問題</span></a>
-        </li>
-        <li class="sbt">
-          <a th:href="@{/test/diagnostic}"><span>苦手範囲特定問題</span></a>
-        </li>
-        <li class="sbt" th:if="${session.user != null and session.user.permission == 2}">
-          <a th:href="@{/user/list}"><span>ユーザー一覧</span></a>
-        </li>
-        <li class="sbt">
-          <a th:href="@{/question}"><span>問題検索</span></a>
-        </li>
-        <li class="sbt">
-          <a th:href="@{/achievement}"><span>実績一覧</span></a>
-        </li>
-      </ul>
-
 		<div>
 			<ul class="sidebar-menu">
 				<li><a class="sidebar-link" th:href="@{/mypage}">MyPage</a></li>
+				<li th:if="${session.user != null and session.user.permission == 1}">
+					<a class="sidebar-link" th:href="@{/friends}">フレンド</a>
+				</li>
 				<li><a class="sidebar-link" th:href="@{/test/category}">カテゴリ別問題</a></li>
 				<li><a class="sidebar-link" th:href="@{/test/diagnostic}">苦手範囲特定問題</a></li>
 				<li th:if="${session.user.permission == 2}">
 					<a class="sidebar-link" th:href="@{/user/list}">ユーザー一覧</a></li>
 				<li><a class="sidebar-link" th:href="@{/question}">問題検索</a></li>
+				<li><a class="sidebar-link" th:href="@{/achievement}">実績一覧</a></li>
 			</ul>
 			
 			<div class="sidebar-search">
-				<div  th:text="問題文あいまい検索"></div>
-				<form th:action="@{/question/list/text}" method="get" >
-					
-				<div class="input">
-				<input type="text" name="questionText" class="qt"/>
+				<div class="sidebar-search-item">
+					<form th:action="@{/question/list/text}" method="get">
+						<label for="sidebar-question-text">問題文あいまい検索</label>
+						<div class="sidebar-search-controls">
+							<input id="sidebar-question-text" type="text" name="questionText" class="qt" />
+							<input type="submit" value="検索" />
+						</div>
+					</form>
+				</div>
 
-        <div>カテゴリ検索</div>
-        <form th:action="@{/question/list/category}" method="get">
-          <div class="input">
-            <select class="category" name="category">
-              <option value="1">Java</option>
-              <option value="2">Spring</option>
-              <option value="3">HTML</option>
-              <option value="4">SQL</option>
-            </select>
-            <input type="submit" value="検索" />
-          </div>
-        </form>
+				<div class="sidebar-search-item">
+					<form th:action="@{/question/list/category}" method="get">
+						<label for="sidebar-category">カテゴリ検索</label>
+						<div class="sidebar-search-controls">
+							<select id="sidebar-category" class="category" name="category">
+								<option value="1">Java</option>
+								<option value="2">Spring</option>
+								<option value="3">HTML</option>
+								<option value="4">SQL</option>
+							</select>
+							<input type="submit" value="検索" />
+						</div>
+					</form>
+				</div>
 
-        <div>難易度検索</div>
-        <form th:action="@{/question/list/difficulty}" method="get">
-          <div class="input">
-            <select class="difficulty" name="difficulty" style="color: #FFB11B;">
-              <option value="1">★☆☆</option>
-              <option value="2">★★☆</option>
-              <option value="3">★★★</option>
-            </select>
-            <input type="submit" value="検索" />
-          </div>
-        </form>
+				<div class="sidebar-search-item">
+					<form th:action="@{/question/list/difficulty}" method="get">
+						<label for="sidebar-difficulty">難易度検索</label>
+						<div class="sidebar-search-controls">
+							<select id="sidebar-difficulty" class="difficulty" name="difficulty" style="color: #FFB11B;">
+								<option value="1">★☆☆</option>
+								<option value="2">★★☆</option>
+								<option value="3">★★★</option>
+							</select>
+							<input type="submit" value="検索" />
+						</div>
+					</form>
+				</div>
 
-        <th:block th:if="${session.user != null and session.user.permission == 2}">
-          <div>削除検索</div>
-          <form th:action="@{/question/list/delete}" method="get">
-            <div class="input">
-              <select class="category" name="questionDelete">
-                <option value="0">表示</option>
-                <option value="1">非表示</option>
-              </select>
-              <input type="submit" value="検索" />
-            </div>
-          </form>
-        </th:block>
-      </div>
+				<th:block th:if="${session.user != null and session.user.permission == 2}">
+					<div class="sidebar-search-item">
+						<form th:action="@{/question/list/delete}" method="get">
+							<label for="sidebar-delete">削除検索</label>
+							<div class="sidebar-search-controls">
+								<select id="sidebar-delete" class="category" name="questionDelete">
+									<option value="0">表示</option>
+									<option value="1">非表示</option>
+								</select>
+								<input type="submit" value="検索" />
+							</div>
+						</form>
+					</div>
+				</th:block>
+			</div>
     </div>
   </div>
 </aside>
