@@ -88,7 +88,7 @@ aside {
   top: 0;
   float: left;
   padding: 5px 20px 0 0;  /* %指定からpx指定に変えて幅を安定させます */
-  width: 25%;
+  width: 20%;
   max-height: 100vh;      /* 高さを画面全体の高さ（最大値）に制限 */
   overflow-y: auto;       /* 縦方向にはみ出たらスクロール */
   overflow-x: hidden;     /* 横スクロールは絶対に禁止 */
@@ -189,7 +189,8 @@ aside .sidebar-search{
 /*    color: #ffff;*/
 /*    box-shadow: none;*/
 /*}*/
-.sidebar-link:before,.sidebar-link a:after {
+.sidebar-link:before,
+.sidebar-link:after {
   box-sizing: inherit;
   content: "";
   position: absolute;
@@ -205,7 +206,8 @@ aside .sidebar-search{
   bottom: 0;
   right: 0;
 }
-.sidebar-link:hover:before, .sidebar-link a:hover:after {
+.sidebar-link:hover:before,
+.sidebar-link:hover:after {
   width: 100%;
   height: 100%;
 }
@@ -240,7 +242,7 @@ aside .sidebar-search{
 }
 
 article.main{
-    width: 75%;
+    width: 80%;
     height: 100%;
     padding: 20px 0 20px 3%;
     overflow-y: auto;
@@ -302,4 +304,48 @@ footer {
 	height: 30px;
 	width: auto;
 	
+}
+
+/* ---- スマホ: サイドバー開閉 ---- */
+.sidebar-toggle { display: none; }
+
+@media (max-width: 700px) {
+  .sidebar-toggle {
+    display: block;
+    margin: 6px 8px 0;
+    align-self: flex-start;
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 5px;
+    color: #fff;
+    background: rgba(15, 37, 64, 0.85);
+    font: inherit;
+    font-size: 10pt;
+    cursor: pointer;
+  }
+  header .header-container {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 6px 0;
+  }
+  header .user-info {
+    margin-right: 8px;
+    line-height: 1.6;
+  }
+  .contents aside {
+    display: none;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    width: 80%;
+    max-width: 300px;
+    max-height: none;
+    padding-top: 40px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+  }
+  .contents aside.is-open { display: block; }
+  article.main { width: 100%; padding-left: 10px; padding-right: 10px; }
 }

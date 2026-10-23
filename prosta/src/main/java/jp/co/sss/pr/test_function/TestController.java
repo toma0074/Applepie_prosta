@@ -2,7 +2,10 @@ package jp.co.sss.pr.test_function;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,6 +32,7 @@ import jp.co.sss.pr.repository.CategoryRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.repository.QuestionRepository;
 import jp.co.sss.pr.service.LevelService;
+import jp.co.sss.pr.service.WeakQuestionService;
 
 @Controller
 public class TestController {
@@ -47,6 +51,9 @@ public class TestController {
 
     @Autowired
     LevelService levelService;
+
+    @Autowired
+    WeakQuestionService weakQuestionService;
 
     @Autowired
     HttpSession session;
@@ -68,9 +75,9 @@ public class TestController {
     @RequestMapping(path = "/test/category/start", method = RequestMethod.GET)
     public String startCategory(Model model, QuestionForm questionForm) {
         Category category = categoryRepository.getReferenceById(questionForm.getCategory());
-        List<Question> quesList = quesRpstry
-                .findAllByCategoryAndDifficultyLessThanEqual(
-                        category, questionForm.getDifficulty());
+        List<Question> quesList = pickRandom(quesRpstry
+                .findAllByCategoryAndDifficulty(
+                        category, questionForm.getDifficulty()));
 
         List<AnswerForm> ansList = buildAnswerFormList(quesList.size());
 
@@ -109,9 +116,9 @@ public class TestController {
         // Integer の ID リスト → Category エンティティリストに変換
         List<Category> categories = categoryRepository.findAllById(categoryIds);
 
-        List<Question> quesList = quesRpstry
-                .findAllByCategoryInAndDifficultyLessThanEqual(
-                        categories, difficulty);
+        List<Question> quesList = pickBalanced(quesRpstry
+                .findAllByCategoryInAndDifficulty(
+                        categories, difficulty));
 
         List<AnswerForm> ansList = buildAnswerFormList(quesList.size());
 
@@ -119,6 +126,34 @@ public class TestController {
         session.setAttribute("ans", ansList);
         session.setAttribute("question", quesList);
 
+        return "test/show_test";
+    }
+
+    // 弱点問題（正答率の低い問題）の一覧画面
+    @RequestMapping(path = "/test/weak", method = RequestMethod.GET)
+    public String selectWeak(Model model) {
+        session.removeAttribute("question");
+        session.removeAttribute("ans");
+        session.removeAttribute("testFlag");
+
+        model.addAttribute("weakList", weakQuestionService.pick(currentUser(), WeakQuestionService.MAX_QUESTIONS));
+        model.addAttribute("minAttempts", WeakQuestionService.MIN_ATTEMPTS);
+        return "test/select_weak";
+    }
+
+    // 弱点問題テスト解答画面
+    @RequestMapping(path = "/test/weak/start", method = RequestMethod.GET)
+    public String startWeak(Model model) {
+        List<WeakQuestionService.WeakQuestion> weakList =
+                weakQuestionService.pick(currentUser(), WeakQuestionService.MAX_QUESTIONS);
+        if (weakList.isEmpty()) {
+            return "redirect:/test/weak";
+        }
+        List<Question> quesList = weakList.stream().map(WeakQuestionService.WeakQuestion::question).toList();
+
+        model.addAttribute("answerListForm", new AnswerListForm());
+        session.setAttribute("ans", buildAnswerFormList(quesList.size()));
+        session.setAttribute("question", quesList);
         return "test/show_test";
     }
 
@@ -212,6 +247,44 @@ public class TestController {
     }
 
     // ---- ユーティリティ ----
+    private Customer currentUser() {
+        CustomerBean userBean = (CustomerBean) session.getAttribute("user");
+        return customerRepository.getReferenceById(userBean.getUserId());
+    }
+
+    private static final int MAX_QUESTIONS = 15;
+
+    // 全件の中からランダムに最大15問を抽出（出題順もランダム）
+    private List<Question> pickRandom(List<Question> all) {
+        List<Question> shuffled = new ArrayList<>(all);
+        Collections.shuffle(shuffled);
+        return shuffled.size() > MAX_QUESTIONS ? new ArrayList<>(shuffled.subList(0, MAX_QUESTIONS)) : shuffled;
+    }
+
+    // カテゴリごとにシャッフルし、順番に1問ずつ取り出して偏りを防ぐ
+    private List<Question> pickBalanced(List<Question> all) {
+        Map<Integer, List<Question>> byCategory = new LinkedHashMap<>();
+        for (Question q : all) {
+            byCategory.computeIfAbsent(q.getCategory().getCategoryId(), k -> new ArrayList<>()).add(q);
+        }
+        List<List<Question>> groups = new ArrayList<>(byCategory.values());
+        groups.forEach(Collections::shuffle);
+
+        List<Question> picked = new ArrayList<>();
+        for (int i = 0; picked.size() < MAX_QUESTIONS; i++) {
+            boolean added = false;
+            for (List<Question> g : groups) {
+                if (i < g.size() && picked.size() < MAX_QUESTIONS) {
+                    picked.add(g.get(i));
+                    added = true;
+                }
+            }
+            if (!added) break;
+        }
+        Collections.shuffle(picked);
+        return picked;
+    }
+
     private List<AnswerForm> buildAnswerFormList(int size) {
         List<AnswerForm> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {

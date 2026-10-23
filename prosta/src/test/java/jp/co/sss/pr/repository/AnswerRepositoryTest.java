@@ -89,6 +89,7 @@ class AnswerRepositoryTest {
         answer.setCorrectOption(1);
         answer.setCorrectFlag(correct);
         answer.setAnsDate(date);
+        answer.setAnsCount(1);
         return answer;
     }
 }

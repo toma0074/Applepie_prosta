@@ -41,7 +41,14 @@
     <div class="form_group" th:each="ans,count : ${ans}">
       <div class="question_row">
         <span class="label" th:text="'問題' + ${count.count} + '：'"></span>
-        <span th:text="${ans.questionText}"></span>
+        <button type="button" class="question-link"
+                th:data-question="${ans.questionText}"
+                th:data-option-a="${ans.optionA}"
+                th:data-option-b="${ans.optionB}"
+                th:data-option-c="${ans.optionC}"
+                th:data-correct="${ans.correctOption}"
+                th:data-chosen="${ans.ansOption}"
+                th:text="${ans.questionText}"></button>
       </div>
       <div class="ans_row">
         <span class="label">選んだ選択肢：</span>
@@ -80,8 +87,54 @@
   </form>
 </div>
 
+<div id="question-modal" class="question-modal" hidden>
+  <div class="question-modal-backdrop" data-close="true"></div>
+  <div class="question-modal-body" role="dialog" aria-modal="true" aria-labelledby="question-modal-text">
+    <button type="button" class="question-modal-close" data-close="true" aria-label="閉じる">×</button>
+    <p id="question-modal-text" class="question-modal-text"></p>
+    <ul id="question-modal-options" class="question-modal-options"></ul>
+    <p id="question-modal-result" class="question-modal-result"></p>
+  </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  // ---- 問題文モーダル ----
+  const modal = document.getElementById('question-modal');
+  if (modal) {
+    const labels = ['A', 'B', 'C'];
+    const textEl = document.getElementById('question-modal-text');
+    const optionsEl = document.getElementById('question-modal-options');
+    const resultEl = document.getElementById('question-modal-result');
+    const closeModal = () => { modal.hidden = true; };
+
+    function openModal(btn) {
+      const correct = Number(btn.dataset.correct);
+      const chosen = Number(btn.dataset.chosen);
+      const options = [btn.dataset.optionA, btn.dataset.optionB, btn.dataset.optionC];
+      textEl.textContent = btn.dataset.question;
+      optionsEl.replaceChildren();
+      options.forEach((text, i) => {
+        const no = i + 1;
+        const li = document.createElement('li');
+        const tags = [];
+        if (no === correct) { li.classList.add('is-correct'); tags.push('正解'); }
+        if (no === chosen) { li.classList.add('is-chosen'); tags.push('あなたの解答'); }
+        li.textContent = labels[i] + '. ' + text + (tags.length ? '  [' + tags.join(' / ') + ']' : '');
+        optionsEl.appendChild(li);
+      });
+      resultEl.textContent = chosen === 4 ? '解答：わからない' : (chosen === correct ? '正解でした' : '不正解でした');
+      resultEl.className = 'question-modal-result ' + (chosen === correct ? 'ok' : 'ng');
+      modal.hidden = false;
+    }
+
+    document.querySelectorAll('.question-link').forEach((btn) => {
+      btn.addEventListener('click', () => openModal(btn));
+    });
+    modal.addEventListener('click', (e) => { if (e.target.dataset.close) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+  }
+
   // ---- ページネーション ----
   const rowsPerPage = 3;
   const table = document.getElementById('question-table');

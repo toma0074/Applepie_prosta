@@ -11,6 +11,10 @@
   <div class="mypage-header">
     <h3>My Page</h3>
     <div class="mypage-links">
+      <a class="btn" th:href="@{/friends}"
+         th:if="${session.user != null and session.user.permission == 1}">フレンド<span
+         th:if="${pendingFriendRequestCount != null and pendingFriendRequestCount > 0}"
+         class="notify-badge" th:text="${pendingFriendRequestCount}">1</span></a>
       <a class="btn" th:href="@{/user/update/input}">ユーザー更新</a>
       <a class="btn" th:href="@{/achievement}">実績一覧</a>
     </div>
@@ -94,7 +98,16 @@
           <span th:case="3">HTML</span>
           <span th:case="4">SQL</span>
         </td>
-        <td th:text="${ans.question.questionText}"></td>
+        <td class="question-cell">
+          <button type="button" class="question-link"
+                  th:data-question="${ans.question.questionText}"
+                  th:data-option-a="${ans.question.optionA}"
+                  th:data-option-b="${ans.question.optionB}"
+                  th:data-option-c="${ans.question.optionC}"
+                  th:data-correct="${ans.correctOption}"
+                  th:data-chosen="${ans.ansOption}"
+                  th:text="${ans.question.questionText}"></button>
+        </td>
         <td class="center" th:switch="${ans.ansOption}">
           <span th:case="1">A</span>
           <span th:case="2">B</span>
@@ -110,6 +123,16 @@
     </tbody>
   </table>
   <p class="center" th:if="${#lists.isEmpty(answerlist)}">履歴がありません。</p>
+
+  <div id="question-modal" class="question-modal" hidden>
+    <div class="question-modal-backdrop" data-close="true"></div>
+    <div class="question-modal-body" role="dialog" aria-modal="true" aria-labelledby="question-modal-text">
+      <button type="button" class="question-modal-close" data-close="true" aria-label="閉じる">×</button>
+      <p id="question-modal-text" class="question-modal-text"></p>
+      <ul id="question-modal-options" class="question-modal-options"></ul>
+      <p id="question-modal-result" class="question-modal-result"></p>
+    </div>
+  </div>
 
   <div th:replace="~{common/chatbot :: chatbot}"></div>
 </main>
@@ -154,6 +177,60 @@ document.addEventListener('DOMContentLoaded', function () {
       container.appendChild(next);
       showPage(1);
     }
+  }
+
+  const modal = document.getElementById('question-modal');
+  if (modal) {
+    const labels = ['A', 'B', 'C'];
+    const textEl = document.getElementById('question-modal-text');
+    const optionsEl = document.getElementById('question-modal-options');
+    const resultEl = document.getElementById('question-modal-result');
+
+    function closeModal() {
+      modal.hidden = true;
+    }
+
+    function openModal(btn) {
+      const correct = Number(btn.dataset.correct);
+      const chosen = Number(btn.dataset.chosen);
+      const options = [btn.dataset.optionA, btn.dataset.optionB, btn.dataset.optionC];
+
+      textEl.textContent = btn.dataset.question;
+      optionsEl.replaceChildren();
+      options.forEach((text, i) => {
+        const no = i + 1;
+        const li = document.createElement('li');
+        const tags = [];
+        if (no === correct) {
+          li.classList.add('is-correct');
+          tags.push('正解');
+        }
+        if (no === chosen) {
+          li.classList.add('is-chosen');
+          tags.push('あなたの解答');
+        }
+        li.textContent = labels[i] + '. ' + text + (tags.length ? '  [' + tags.join(' / ') + ']' : '');
+        optionsEl.appendChild(li);
+      });
+
+      if (chosen === 4) {
+        resultEl.textContent = '解答：わからない';
+      } else {
+        resultEl.textContent = chosen === correct ? '正解でした' : '不正解でした';
+      }
+      resultEl.className = 'question-modal-result ' + (chosen === correct ? 'ok' : 'ng');
+      modal.hidden = false;
+    }
+
+    document.querySelectorAll('.question-link').forEach((btn) => {
+      btn.addEventListener('click', () => openModal(btn));
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target.dataset.close) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.hidden) closeModal();
+    });
   }
 
   const toast = document.querySelector('.achievement-toast');

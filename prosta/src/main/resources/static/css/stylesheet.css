@@ -237,6 +237,7 @@ input[type="password"]:hover{
 
 select.category,
 select.mypage_sort,
+select.mypage-sort,
 select.difficulty,
 select.permission,
 select.deleteFlag{
@@ -251,6 +252,7 @@ select.deleteFlag{
 
 select.category:hover,
 select.mypage_sort:hover,
+select.mypage-sort:hover,
 select.difficulty:hover,
 select.permission:hover,
 select.deleteFlag:hover{

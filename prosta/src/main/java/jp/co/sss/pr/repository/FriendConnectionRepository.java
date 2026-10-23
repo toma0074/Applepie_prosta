@@ -23,5 +23,14 @@ public interface FriendConnectionRepository extends JpaRepository<FriendConnecti
     List<FriendConnection> findAllForUserAndStatus(
             @Param("user") Customer user, @Param("status") String status);
 
+    @Query("""
+            SELECT COUNT(f)
+            FROM FriendConnection f
+            WHERE (f.userLow = :user OR f.userHigh = :user)
+              AND f.status = 'PENDING'
+              AND f.requestedBy <> :user
+            """)
+    long countIncomingPending(@Param("user") Customer user);
+
     Optional<FriendConnection> findByUserLowAndUserHigh(Customer userLow, Customer userHigh);
 }

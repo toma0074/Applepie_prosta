@@ -26,11 +26,11 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     List<Question> findByDifficultyOrderByCategoryAsc(
             Integer difficulty);
 
-    /** カテゴリ・難易度以下で問題を取得（カテゴリ別テスト用） */
-    List<Question> findAllByCategoryAndDifficultyLessThanEqual(
+    /** カテゴリ・難易度が一致する問題を取得（カテゴリ別テスト用） */
+    List<Question> findAllByCategoryAndDifficulty(
             Category category, Integer difficulty);
 
-    /** 複数カテゴリ・難易度以下で問題を取得（苦手範囲特定テスト用） */
-    List<Question> findAllByCategoryInAndDifficultyLessThanEqual(
+    /** 複数カテゴリ・難易度が一致する問題を取得（苦手範囲特定テスト用） */
+    List<Question> findAllByCategoryInAndDifficulty(
             List<Category> categories, Integer difficulty);
 }

@@ -44,6 +44,21 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
             @Param("fromDate") LocalDate fromDate,
             @Param("toDate") LocalDate toDate);
 
+    /** 指定ユーザーの問題別の解答回数・正解回数（解答回数が minAttempts 以上のもの）。 */
+    @Query("""
+            SELECT a.question.questionId AS questionId,
+                   COUNT(a.ansId) AS attemptCount,
+                   COALESCE(SUM(CASE WHEN a.correctFlag = true THEN 1 ELSE 0 END), 0) AS correctCount
+            FROM Answer a
+            WHERE a.customer = :customer
+              AND a.question IS NOT NULL
+            GROUP BY a.question.questionId
+            HAVING COUNT(a.ansId) >= :minAttempts
+            """)
+    List<QuestionAttemptStat> summarizeByQuestion(
+            @Param("customer") Customer customer,
+            @Param("minAttempts") long minAttempts);
+
     /**
      * 指定ユーザーが「その日の全問正解」した日数を返す。
      *

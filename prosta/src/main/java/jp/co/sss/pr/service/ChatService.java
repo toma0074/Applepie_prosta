@@ -44,10 +44,16 @@ public class ChatService {
     @Autowired
     private LevelService levelService;
 
+    @Autowired
+    private WeakQuestionService weakQuestionService;
+
     @Transactional(readOnly = true)
     public Reply reply(Customer user, String message, String contextPath) {
         String m = message == null ? "" : message.trim().toLowerCase();
 
+        if (containsAny(m, "弱点問題", "弱点から", "出題", "復習", "間違えた問題")) {
+            return weakQuiz(user, contextPath);
+        }
         if (containsAny(m, "苦手", "弱点", "弱い", "間違", "不正解", "ミス")) {
             return weakPoints(user, contextPath);
         }
@@ -103,8 +109,27 @@ public class ChatService {
         }
         sb.append("\n一番苦手なのは「").append(sorted.get(0).getKey()).append("」です。");
         return new Reply(sb.toString(), List.of(
+                new Link("弱点から出題", ctx + "/test/weak"),
                 new Link("カテゴリ別問題", ctx + "/test/category"),
                 new Link("苦手範囲特定問題", ctx + "/test/diagnostic")));
+    }
+
+    private Reply weakQuiz(Customer user, String ctx) {
+        List<WeakQuestionService.WeakQuestion> weak = weakQuestionService.pick(user, WeakQuestionService.MAX_QUESTIONS);
+        if (weak.isEmpty()) {
+            return new Reply("弱点問題はまだありません。\n"
+                    + "同じ問題を" + WeakQuestionService.MIN_ATTEMPTS + "回以上解いて、間違いがあると対象になります。",
+                    List.of(new Link("カテゴリ別問題", ctx + "/test/category")));
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("正答率の低い問題が").append(weak.size()).append("問あります。\n");
+        for (WeakQuestionService.WeakQuestion w : weak.subList(0, Math.min(3, weak.size()))) {
+            sb.append("・").append(shorten(w.question().getQuestionText()))
+              .append("（正答率").append(w.percent()).append("%、")
+              .append(w.correct()).append("/").append(w.attempts()).append("回）\n");
+        }
+        sb.append("\n「弱点から出題」で、これらをまとめて解けます。");
+        return new Reply(sb.toString().trim(), List.of(new Link("弱点から出題", ctx + "/test/weak")));
     }
 
     private Reply recommend(Customer user, String ctx) {
@@ -142,7 +167,7 @@ public class ChatService {
             return new Reply("まだ解答履歴がありません。",
                     List.of(new Link("カテゴリ別問題", ctx + "/test/category")));
         }
-        long correct = answers.stream().filter(Answer::getCorrectFlag).count();
+        long correct = answers.stream().filter(a -> Boolean.TRUE.equals(a.getCorrectFlag())).count();
         int total = answers.size();
         StringBuilder sb = new StringBuilder();
         sb.append("これまでの解答数：").append(total).append("問\n")
@@ -194,6 +219,7 @@ public class ChatService {
     private String helpText() {
         return "次のようなことを聞けます。\n"
                 + "・苦手な分野は？\n"
+                + "・弱点問題を出して\n"
                 + "・次に何をやればいい？\n"
                 + "・成績（正答率）を教えて\n"
                 + "・レベルについて\n"
@@ -210,7 +236,7 @@ public class ChatService {
         for (Answer a : answerRepository.findAllByCustomerOrderByAnsIdDesc(user)) {
             int[] v = map.computeIfAbsent(categoryName(a.getQuestion()), k -> new int[2]);
             v[0]++;
-            if (a.getCorrectFlag()) {
+            if (Boolean.TRUE.equals(a.getCorrectFlag())) {
                 v[1]++;
             }
         }
@@ -238,6 +264,13 @@ public class ChatService {
             return NO_CATEGORY;
         }
         return q.getCategory().getCategoryName();
+    }
+
+    private String shorten(String text) {
+        if (text == null) {
+            return "";
+        }
+        return text.length() <= 30 ? text : text.substring(0, 30) + "…";
     }
 
     private double rate(int[] v) {
