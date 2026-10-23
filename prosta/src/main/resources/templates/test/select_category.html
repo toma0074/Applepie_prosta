@@ -7,11 +7,11 @@
 </head>
 <body>
 <h3>カテゴリ別問題選択画面</h3>
-<div class="test_select">
+<div>
   <form th:action="@{/test/category/start}" method="get" th:object="${questionForm}">
     <div class="form">
       <div class="label">カテゴリー：</div>
-      <div class="select">
+      <div class="inputselect">
         <select class="category" th:field="*{category}">
           <option th:each="cat : ${categoryList}"
                   th:value="${cat.categoryId}"
@@ -21,14 +21,15 @@
     </div>
     <div class="form">
       <div class="label">難易度：</div>
-      <div class="select">
-        <select class="difficulty" th:field="*{difficulty}" style="color: #FFB11B;">
+      <div class="inputselect">
+        <select class="difficulty-star" th:field="*{difficulty}">
           <option value="1">★☆☆</option>
           <option value="2">★★☆</option>
           <option value="3">★★★</option>
         </select>
       </div>
     </div>
+<<<<<<< HEAD
     <div class="form">
       <div class="label"></div>
       <div class="select">
@@ -37,6 +38,17 @@
       </div>
     </div>
   </form>
+=======
+    <div class="button-area">
+    <input type="submit" value="スタート">
+    </div>
+  </form>
+  <form th:action="@{/mypage}">
+    <div class="button-area">
+        <input type="submit" value="戻る" />
+    </div>
+</form>
+>>>>>>> 9addf844348931df292c7699616f1e20d4dceee6
 </div>
 </body>
 </html>
