@@ -8,21 +8,26 @@
 <body>
 <h3>ユーザー削除確認</h3>
 <form th:action="@{/user/delete/complete}" method="post" th:object="${customerForm}">
-  <p class="center" th:text="${flag}"></p>
-  <p class="center" th:text="*{userName} + 'さん'"></p>
-  <input type="hidden" name="userId" th:value="${customerForm.userId}">
-  <div class="inputform">
-    <div class="inputselect">
-      <input type="submit" value="確定" />
+
+    <div class="message">
+        <p class="text-center" th:text="${flag}"></p>
+        <p class="text-center" th:text="*{userName} + 'さん'"></p>
     </div>
-  </div>
+
+    <input type="hidden" name="userId" th:value="${customerForm.userId}">
+    <div class="button-area">
+    <div class="inputselect">
+        <input type="submit" value="確定" />
+    </div>
+</div>
+
 </form>
 <form th:action="@{/user/list}" method="GET">
-  <div class="inputform">
+  <div class="button-area">
     <div class="inputselect">
-      <input type="submit" value="戻る" />
+        <input type="submit" value="戻る" />
     </div>
-  </div>
+</div>
 </form>
 </body>
 </html>

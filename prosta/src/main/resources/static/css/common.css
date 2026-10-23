@@ -40,7 +40,7 @@
 .data-table {
     margin: 0 50px 0 20px;
 	width: 90%;
-	justify-content: center;
+/*	justify-content: center;*/
 }
 /* =====================
    ページネーション
@@ -71,7 +71,9 @@
 
 /* 完了・通知メッセージ */
 .message {
-    text-align: center;
+	height: 150px;
+	padding-top: 30px;
+	text-align: center;
 }
 /* Question完了画面 */
 .back-to-top-message {
@@ -79,4 +81,53 @@
     font-weight: bold;
 }
 
+/**********************
+ * ボタンエリア
+ **********************/
+.button-area {
+    margin-top: 20px;
+}
 
+.error-message {
+    color: #cc0000;
+	text-align: left;
+	margin-left: 20px;
+}
+
+/************************
+ * フォーム共通
+ ************************/
+div.form {
+	display: flex;
+}
+
+div.label {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	width: 245px;
+	height: 35px;
+	text-align: right;
+	padding: 3px 0 3px 3px;
+}
+
+div.input {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	width: 470px;
+	height: 35px;
+	text-align: center;
+	
+}
+
+/* ---- 戻る送信ボタン ---- */
+.inputform {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: center;	
+	margin-top: 3px;
+}
+.inputselect {
+	justify-content: center;
+}

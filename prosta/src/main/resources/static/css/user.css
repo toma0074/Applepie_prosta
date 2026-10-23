@@ -1,8 +1,45 @@
 @charset "UTF-8";
+
+/************************
+ * MyPage
+ ************************/
+
+.mypage-sort {
+    margin: 0 45px;
+}
+
 /************************
  * User一覧
  ************************/
- /* MyPage ソート */
-.mypage-sort {
-    margin: 0 45px;
+
+th.userId {
+	width: 10%;
+}
+
+th.userName {
+	width: 15%;
+}
+
+th.permission {
+	width: 15%;
+}
+
+th.deleteFlag {
+	width: 15%;
+}
+
+th.button {
+	width: 15%;
+}
+
+/************************
+ * User確認画面
+ ************************/
+
+th.pw {
+	width: 15%;
+}
+
+th.permi {
+	width: 15%;
 }

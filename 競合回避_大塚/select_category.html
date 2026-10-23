@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<title>カテゴリ別問題</title>
+<meta charset="UTF-8" />
+</head>
+<body>
+<h3>カテゴリ別問題選択画面</h3>
+<div>
+  <form th:action="@{/test/category/start}" method="get" th:object="${questionForm}">
+    <div class="form">
+      <div class="label">カテゴリー：</div>
+      <div class="inputselect">
+        <select class="category" th:field="*{category}">
+          <option th:each="cat : ${categoryList}"
+                  th:value="${cat.categoryId}"
+                  th:text="${cat.categoryName}"></option>
+        </select>
+      </div>
+    </div>
+    <div class="form">
+      <div class="label">難易度：</div>
+      <div class="inputselect">
+        <select class="difficulty-star" th:field="*{difficulty}">
+          <option value="1">★☆☆</option>
+          <option value="2">★★☆</option>
+          <option value="3">★★★</option>
+        </select>
+      </div>
+    </div>
+<<<<<<< HEAD
+    <div class="form">
+      <div class="label"></div>
+      <div class="select">
+        <input type="submit" th:formaction="@{/mypage}" formmethod="get" formnovalidate="formnovalidate" value="戻る" />
+        <input type="submit" value="スタート" />
+      </div>
+    </div>
+  </form>
+=======
+    <div class="button-area">
+    <input type="submit" value="スタート">
+    </div>
+  </form>
+  <form th:action="@{/mypage}">
+    <div class="button-area">
+        <input type="submit" value="戻る" />
+    </div>
+</form>
+>>>>>>> 9addf844348931df292c7699616f1e20d4dceee6
+</div>
+</body>
+</html>
