@@ -50,10 +50,14 @@ public class LoginController {
             return "login/login";
         }
 
-        Customer customer = customerRepository.findByUserNameAndUserPass(
+        List<Customer> matchingCustomers = customerRepository.findAllByUserNameAndUserPass(
                 customerForm.getUserName(), customerForm.getUserPass());
+        List<Customer> activeCustomers = matchingCustomers.stream()
+                .filter(customer -> !Boolean.TRUE.equals(customer.getDeleteFlag()))
+                .toList();
 
-        if (customer != null && !Boolean.TRUE.equals(customer.getDeleteFlag())) {
+        if (activeCustomers.size() == 1) {
+            Customer customer = activeCustomers.get(0);
             CustomerBean customerBean = new CustomerBean();
             customerBean.setUserId(customer.getUserId());
             customerBean.setUserName(customer.getUserName());
@@ -69,6 +73,11 @@ public class LoginController {
             return "redirect:/mypage";
         }
 
+        if (activeCustomers.size() > 1) {
+            model.addAttribute("errMessage", "同じログイン情報のユーザーが複数登録されています。管理者にお問い合わせください。");
+            return "login/login";
+        }
+
         model.addAttribute("errMessage", "ユーザー名、またはパスワードが間違っています。");
         return "login/login";
     }
@@ -80,6 +89,14 @@ public class LoginController {
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     public String logout() {
+        CustomerBean userBean = (CustomerBean) session.getAttribute("user");
+        if (userBean != null) {
+            customerRepository.findById(userBean.getUserId()).ifPresent(customer -> {
+                customer.setLoginFlag(false);
+                customer.setLastSeenAt(null);
+                customerRepository.save(customer);
+            });
+        }
         session.invalidate();
         return "redirect:/";
     }

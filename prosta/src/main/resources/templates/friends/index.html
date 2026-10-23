@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROSTA | フレンド</title>
+</head>
+<body>
+<main class="friends-page">
+  <div class="friends-page-header">
+    <div>
+      <h3>フレンド</h3>
+      <p>友達と学習状況を共有し、同じカテゴリの学習量を比べてみましょう。</p>
+    </div>
+    <a class="btn" th:href="@{/mypage}">マイページへ戻る</a>
+  </div>
+
+  <div id="friends-message" class="friends-message" role="status" aria-live="polite" hidden></div>
+
+  <section class="friends-card" aria-labelledby="friends-self-title">
+    <h4 id="friends-self-title">あなたの学習状況</h4>
+    <div id="friends-self" class="friends-self-summary">
+      <p>読み込み中...</p>
+    </div>
+  </section>
+
+  <section class="friends-card" aria-labelledby="friends-search-title">
+    <h4 id="friends-search-title">友達を探す</h4>
+    <form id="friends-search-form" class="friends-inline-form">
+      <label for="friends-search-query">ユーザー名</label>
+      <input id="friends-search-query" name="query" type="search" maxlength="20"
+             placeholder="ユーザー名を入力" required>
+      <button type="submit">検索</button>
+    </form>
+    <div id="friends-search-results" class="friends-list">
+      <p class="friends-empty">ユーザー名で検索してください。</p>
+    </div>
+  </section>
+
+  <section class="friends-card" aria-labelledby="friends-request-title">
+    <h4 id="friends-request-title">友達申請</h4>
+    <div class="friends-request-columns">
+      <div>
+        <h5>受信した申請</h5>
+        <div id="friends-incoming" class="friends-list">
+          <p class="friends-empty">読み込み中...</p>
+        </div>
+      </div>
+      <div>
+        <h5>送信した申請</h5>
+        <div id="friends-outgoing" class="friends-list">
+          <p class="friends-empty">読み込み中...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="friends-card" aria-labelledby="friends-list-title">
+    <h4 id="friends-list-title">友達一覧</h4>
+    <div id="friends-list" class="friends-list">
+      <p class="friends-empty">読み込み中...</p>
+    </div>
+  </section>
+
+  <section class="friends-card" aria-labelledby="friends-ranking-title">
+    <h4 id="friends-ranking-title">カテゴリ別ランキング</h4>
+    <p>今月のカテゴリ別回答数・正解数・正答率を、あなたと友達で比較します。</p>
+    <form id="friends-ranking-form" class="friends-inline-form">
+      <label for="friends-category">カテゴリ</label>
+      <select id="friends-category" name="categoryId" required>
+        <option value="">カテゴリを選択</option>
+        <option th:each="category : ${categoryList}"
+                th:value="${category.categoryId}"
+                th:text="${category.categoryName}">Java</option>
+      </select>
+      <label for="friends-from">開始日</label>
+      <input id="friends-from" name="from" type="date" required>
+      <label for="friends-to">終了日</label>
+      <input id="friends-to" name="to" type="date" required>
+      <button type="submit">比較</button>
+    </form>
+    <div id="friends-leaderboard" class="friends-list">
+      <p class="friends-empty">カテゴリと期間を選択してください。</p>
+    </div>
+  </section>
+</main>
+
+<script th:inline="javascript">
+(() => {
+  const apiBase = /*[[@{/api/friends}]]*/ '/api/friends';
+  const message = document.getElementById('friends-message');
+  const searchForm = document.getElementById('friends-search-form');
+  const rankingForm = document.getElementById('friends-ranking-form');
+  const results = document.getElementById('friends-search-results');
+  const incoming = document.getElementById('friends-incoming');
+  const outgoing = document.getElementById('friends-outgoing');
+  const friendsList = document.getElementById('friends-list');
+  const selfSummary = document.getElementById('friends-self');
+  const leaderboard = document.getElementById('friends-leaderboard');
+  const today = new Date();
+  const dateValue = (date) => {
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return localDate.toISOString().slice(0, 10);
+  };
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+  document.getElementById('friends-from').value = dateValue(firstDay);
+  document.getElementById('friends-to').value = dateValue(today);
+
+  function showMessage(text, isError) {
+    message.textContent = text;
+    message.hidden = !text;
+    message.classList.toggle('is-error', Boolean(isError));
+    message.classList.toggle('is-success', Boolean(text) && !isError);
+  }
+
+  async function request(path, options) {
+    const response = await fetch(apiBase + path, {
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' },
+      ...options
+    });
+    if (!response.ok) {
+      const body = await response.text();
+      let detail = body;
+      try {
+        const problem = JSON.parse(body);
+        detail = problem.detail || problem.message || body;
+      } catch (error) {
+        if (!body) detail = '';
+      }
+      throw new Error(detail || `リクエストに失敗しました (${response.status})`);
+    }
+    if (response.status === 204) return null;
+    return response.json();
+  }
+
+  function makeElement(tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
+  }
+
+  function replaceWithEmpty(container, text) {
+    container.replaceChildren(makeElement('p', 'friends-empty', text));
+  }
+
+  function makeButton(text, className, onClick) {
+    const button = makeElement('button', className, text);
+    button.type = 'button';
+    button.addEventListener('click', onClick);
+    return button;
+  }
+
+  function renderSummary(container, user, includePresence) {
+    container.replaceChildren();
+    const name = makeElement('strong', '', user.userName || 'あなた');
+    const stats = makeElement('p', 'friends-stat-line',
+      `連続ログイン ${user.consecutiveLoginDays} 日 · 回答 ${user.answerCount} 問 · 正解 ${user.correctCount} 問`);
+    container.append(name, stats);
+    if (includePresence) {
+      const presence = makeElement('span',
+        user.online ? 'friends-presence is-online' : 'friends-presence',
+        user.online ? 'オンライン' : 'オフライン');
+      container.prepend(presence);
+    }
+  }
+
+  function renderUsers(users) {
+    results.replaceChildren();
+    if (users.length === 0) {
+      replaceWithEmpty(results, '該当するユーザーはいません。');
+      return;
+    }
+    users.forEach((user) => {
+      const row = makeElement('div', 'friends-list-row');
+      const name = makeElement('span', 'friends-user-name', user.userName);
+      const button = makeButton('申請する', 'friends-action-button', async () => {
+        button.disabled = true;
+        try {
+          await request(`/requests/${encodeURIComponent(user.userId)}`, { method: 'POST' });
+          showMessage(`${user.userName}さんに友達申請を送りました。`, false);
+          await loadRequests();
+        } catch (error) {
+          showMessage(error.message, true);
+          button.disabled = false;
+        }
+      });
+      row.append(name, button);
+      results.append(row);
+    });
+  }
+
+  function renderRequests(container, requests, type) {
+    container.replaceChildren();
+    if (requests.length === 0) {
+      replaceWithEmpty(container, '申請はありません。');
+      return;
+    }
+    requests.forEach((item) => {
+      const row = makeElement('div', 'friends-list-row');
+      row.append(makeElement('span', 'friends-user-name', item.userName));
+      if (type === 'incoming') {
+        row.append(
+          makeButton('承認', 'friends-action-button', async () => {
+            await updateRequest(item.requestId, 'accept');
+          }),
+          makeButton('拒否', 'friends-secondary-button', async () => {
+            await updateRequest(item.requestId, 'reject');
+          })
+        );
+      } else {
+        row.append(makeButton('取り消す', 'friends-secondary-button', async () => {
+          try {
+            await request(`/requests/${encodeURIComponent(item.requestId)}`, { method: 'DELETE' });
+            showMessage('友達申請を取り消しました。', false);
+            await loadRequests();
+          } catch (error) {
+            showMessage(error.message, true);
+          }
+        }));
+      }
+      container.append(row);
+    });
+  }
+
+  async function updateRequest(requestId, action) {
+    try {
+      await request(`/requests/${encodeURIComponent(requestId)}/${action}`, { method: 'POST' });
+      showMessage(action === 'accept' ? '友達申請を承認しました。' : '友達申請を拒否しました。', false);
+      await Promise.all([loadRequests(), loadFriends()]);
+    } catch (error) {
+      showMessage(error.message, true);
+    }
+  }
+
+  async function loadRequests() {
+    const data = await request('/requests');
+    renderRequests(incoming, data.incoming, 'incoming');
+    renderRequests(outgoing, data.outgoing, 'outgoing');
+  }
+
+  async function loadFriends() {
+    const data = await request('');
+    friendsList.replaceChildren();
+    if (data.length === 0) {
+      replaceWithEmpty(friendsList, '友達はまだいません。ユーザーを検索して申請してみましょう。');
+      return;
+    }
+    data.forEach((friend) => {
+      const row = makeElement('div', 'friends-list-row friends-profile');
+      const details = makeElement('div', 'friends-profile-details');
+      renderSummary(details, friend, true);
+      const remove = makeButton('友達解除', 'friends-secondary-button', async () => {
+        if (!window.confirm(`${friend.userName}さんを友達から解除しますか？`)) return;
+        try {
+          await request(`/${encodeURIComponent(friend.userId)}`, { method: 'DELETE' });
+          showMessage('友達を解除しました。', false);
+          await loadFriends();
+        } catch (error) {
+          showMessage(error.message, true);
+        }
+      });
+      row.append(details, remove);
+      friendsList.append(row);
+    });
+  }
+
+  async function loadSelf() {
+    renderSummary(selfSummary, await request('/me'), false);
+  }
+
+  function renderLeaderboard(data) {
+    leaderboard.replaceChildren();
+    if (data.entries.length === 0) {
+      replaceWithEmpty(leaderboard, '比較データがありません。');
+      return;
+    }
+    const table = makeElement('table', 'friends-ranking-table');
+    const head = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    ['順位', 'ユーザー', '回答数', '正解数', '正答率'].forEach((label) => {
+      headerRow.append(makeElement('th', '', label));
+    });
+    head.append(headerRow);
+    const body = document.createElement('tbody');
+    data.entries.forEach((entry, index) => {
+      const row = document.createElement('tr');
+      const values = [
+        `${index + 1}`,
+        entry.userName,
+        `${entry.answerCount}`,
+        `${entry.correctCount}`,
+        `${Number(entry.accuracy).toFixed(1)}%`
+      ];
+      values.forEach((value) => row.append(makeElement('td', '', value)));
+      body.append(row);
+    });
+    table.append(head, body);
+    leaderboard.append(table);
+  }
+
+  searchForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    showMessage('', false);
+    const query = new FormData(searchForm).get('query').trim();
+    if (!query) {
+      showMessage('ユーザー名を入力してください。', true);
+      return;
+    }
+    try {
+      renderUsers(await request(`/users?query=${encodeURIComponent(query)}`));
+    } catch (error) {
+      showMessage(error.message, true);
+    }
+  });
+
+  rankingForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    showMessage('', false);
+    const form = new FormData(rankingForm);
+    const params = new URLSearchParams(form);
+    try {
+      renderLeaderboard(await request(`/leaderboard?${params.toString()}`));
+    } catch (error) {
+      showMessage(error.message, true);
+    }
+  });
+
+  Promise.all([loadSelf(), loadRequests(), loadFriends()])
+    .catch((error) => {
+      showMessage(error.message, true);
+      replaceWithEmpty(friendsList, '友達情報を読み込めませんでした。');
+    });
+})();
+</script>
+</body>
+</html>

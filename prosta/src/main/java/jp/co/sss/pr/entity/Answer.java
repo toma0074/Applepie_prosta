@@ -44,6 +44,9 @@ public class Answer {
     @Column(name = "ans_date", nullable = false)
     private LocalDate ansDate;
 
+    @Column(name = "ans_count", nullable = false)
+    private Integer ansCount;
+
     // --- getters / setters ---
 
     public Integer getAnsId() {
@@ -100,5 +103,13 @@ public class Answer {
 
     public void setAnsDate(LocalDate ansDate) {
         this.ansDate = ansDate;
+    }
+
+    public Integer getAnsCount() {
+        return ansCount;
+    }
+
+    public void setAnsCount(Integer ansCount) {
+        this.ansCount = ansCount;
     }
 }

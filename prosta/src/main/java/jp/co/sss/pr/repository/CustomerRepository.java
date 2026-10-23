@@ -3,6 +3,7 @@ package jp.co.sss.pr.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import jp.co.sss.pr.entity.Customer;
@@ -10,7 +11,7 @@ import jp.co.sss.pr.entity.Customer;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
-    Customer findByUserNameAndUserPass(String userName, String userPass);
+    List<Customer> findAllByUserNameAndUserPass(String userName, String userPass);
 
     Customer findByUserName(String userName);
 
@@ -19,6 +20,9 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     List<Customer> findByPermission(Integer permission);
 
     List<Customer> findByUserNameContaining(String userName);
+
+    List<Customer> findByDeleteFlagAndPermissionAndUserNameContaining(
+            Boolean deleteFlag, Integer permission, String userName, Pageable pageable);
 
     Customer findByUserId(Integer userId);
 }
