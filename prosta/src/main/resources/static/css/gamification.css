@@ -207,6 +207,33 @@
     margin: 0 12px 8px;
 }
 
+.mypage-filter {
+    width: auto;
+    margin: 0 12px 8px;
+    box-sizing: border-box;
+}
+
+.mypage-filter input,
+.mypage-filter select {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.mypage-filter input[type=text] { flex: 1 1 160px; }
+
+.mypage-filter-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1 1 100%;
+}
+
+.mypage-filter-row input[type=date] { flex: 0 1 160px; }
+
+.mypage-reset { text-decoration: none !important; }
+
 table.mypage-table {
     width: calc(100% - 24px);
     margin: 0 auto 16px;
@@ -332,7 +359,7 @@ table.mypage-table {
     color: #d93025;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1184px) {
     .mypage-header {
         align-items: flex-start;
         flex-direction: column;
@@ -571,7 +598,7 @@ table.friends-ranking-table {
     overflow-wrap: anywhere;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 1184px) {
     .friends-page-header {
         align-items: flex-start;
         flex-direction: column;
@@ -929,6 +956,36 @@ table.friends-ranking-table {
     margin-top: 4px;
 }
 
+@media (min-width: 1185px) {
+    .test_select div.label,
+    .test_select div.select > label {
+        font-size: 18px;
+    }
+
+    .test_select select {
+        font-size: 16px;
+        padding: 5px 10px;
+        min-width: 130px;
+    }
+
+    .test_select input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        vertical-align: middle;
+        margin-right: 6px;
+    }
+
+    .test_select div.form + div.form {
+        margin-top: 10px;
+    }
+
+    .test_select input[type="submit"] {
+        min-width: 100px;
+        padding: 8px 20px;
+        font-size: 15px;
+    }
+}
+
 table.weak-table {
     width: 100%;
     margin: 12px 0;
@@ -944,10 +1001,10 @@ table.weak-table {
     text-align: left;
 }
 /* ---- 管理者: 問題管理 ---- */
-.aq-wrap { width: 100%; max-width: 980px; margin: 0 auto; box-sizing: border-box; }
+.aq-wrap { width: 100%; max-width: none; margin: 0; box-sizing: border-box; }
 .aq-filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
 .aq-filter input[type=text] { width: 180px; }
-.aq-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse: collapse; font-size: 14px; }
 .aq-table th, .aq-table td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: top; }
 .aq-table th { background: #f3f3f3; }
 .aq-table td.num { text-align: center; white-space: nowrap; }
@@ -957,12 +1014,12 @@ table.weak-table {
 .aq-actions { display: flex; gap: 6px; align-items: center; justify-content: center; }
 .aq-actions form { margin: 0; }
 .aq-pager { display: flex; gap: 12px; justify-content: center; margin: 12px 0; align-items: center; }
-.aq-page-btn { padding: 3px 8px; background-color: rgba(15, 37, 64, 0.8); color: #fff !important; font-size: 12px; text-decoration: none !important; opacity: 0.7; }
+.aq-page-btn { padding: 6px 16px; background-color: rgba(15, 37, 64, 0.8); color: #fff !important; font-size: 15px; text-decoration: none !important; opacity: 0.7; }
 .aq-page-btn.disabled { opacity: 0.2; pointer-events: none; cursor: not-allowed; }
 
 /* テストのタイマー */
 .tt-box { max-width: 520px; margin: 6px auto 12px; text-align: center; }
-.tt-toggle { font-size: 13px; cursor: pointer; }
+.tt-label { font-size: 13px; }
 .tt-body { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
 .tt-body[hidden] { display: none; }
 .tt-bar { flex: 1; height: 12px; border-radius: 6px; background: rgba(15, 37, 64, 0.15); overflow: hidden; }

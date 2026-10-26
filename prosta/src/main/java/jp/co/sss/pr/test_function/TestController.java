@@ -73,7 +73,8 @@ public class TestController {
 
     // カテゴリ別テスト解答画面
     @RequestMapping(path = "/test/category/start", method = RequestMethod.GET)
-    public String startCategory(Model model, QuestionForm questionForm) {
+    public String startCategory(Model model, QuestionForm questionForm,
+            @RequestParam(defaultValue = "false") boolean timer) {
         Category category = categoryRepository.getReferenceById(questionForm.getCategory());
         List<Question> quesList = pickRandom(quesRpstry
                 .findAllByCategoryAndDifficulty(
@@ -85,7 +86,7 @@ public class TestController {
         session.setAttribute("ans", ansList);
         session.setAttribute("question", quesList);
         session.setAttribute("testFlag", 1);
-        startTimer(quesList.size());
+        startTimer(quesList.size(), timer);
         addTimer(model);
 
         return "test/show_test";
@@ -107,7 +108,8 @@ public class TestController {
     @RequestMapping(path = "/test/diagnostic/start", method = RequestMethod.GET)
     public String startDiagnostic(
             @RequestParam(value = "categoryIds", required = false) List<Integer> categoryIds,
-            Integer difficulty, Model model) {
+            Integer difficulty, Model model,
+            @RequestParam(defaultValue = "false") boolean timer) {
 
         if (categoryIds == null || categoryIds.size() <= 2) {
             model.addAttribute("errorMessage", "カテゴリを3つ以上選択してください");
@@ -127,7 +129,7 @@ public class TestController {
         model.addAttribute("answerListForm", new AnswerListForm());
         session.setAttribute("ans", ansList);
         session.setAttribute("question", quesList);
-        startTimer(quesList.size());
+        startTimer(quesList.size(), timer);
         addTimer(model);
 
         return "test/show_test";
@@ -147,7 +149,8 @@ public class TestController {
 
     // 弱点問題テスト解答画面
     @RequestMapping(path = "/test/weak/start", method = RequestMethod.GET)
-    public String startWeak(Model model) {
+    public String startWeak(Model model,
+            @RequestParam(defaultValue = "false") boolean timer) {
         List<WeakQuestionService.WeakQuestion> weakList =
                 weakQuestionService.pick(currentUser(), WeakQuestionService.MAX_QUESTIONS);
         if (weakList.isEmpty()) {
@@ -158,7 +161,7 @@ public class TestController {
         model.addAttribute("answerListForm", new AnswerListForm());
         session.setAttribute("ans", buildAnswerFormList(quesList.size()));
         session.setAttribute("question", quesList);
-        startTimer(quesList.size());
+        startTimer(quesList.size(), timer);
         addTimer(model);
         return "test/show_test";
     }
@@ -195,6 +198,9 @@ public class TestController {
     @RequestMapping(path = "/test/check", method = RequestMethod.POST)
     public String checkTest(@Valid @ModelAttribute AnswerListForm answerForm,
                             BindingResult result, Model model) {
+        if (session.getAttribute("question") == null) {
+            return "redirect:/mypage";
+        }
         session.setAttribute("ans", answerForm.getResults());
         addTimer(model);
 
@@ -207,6 +213,9 @@ public class TestController {
     // テスト解答画面に戻る
     @RequestMapping(path = "/test/back", method = RequestMethod.POST)
     public String backTest(@ModelAttribute AnswerListForm ans, Model model) {
+        if (session.getAttribute("question") == null) {
+            return "redirect:/mypage";
+        }
         addTimer(model);
         return "test/show_test";
     }
@@ -238,6 +247,9 @@ public class TestController {
 
         @SuppressWarnings("unchecked")
         List<AnswerForm> results = (List<AnswerForm>) session.getAttribute("ans");
+        if (results == null || results.isEmpty() || session.getAttribute("question") == null) {
+            return "redirect:/mypage";
+        }
 
         int qCount  = results.size();
         int caCount = 0;
@@ -291,20 +303,35 @@ public class TestController {
         int currentLevel = updatedUser.getUserLevel();
         boolean isPerfect = qCount > 0 && caCount == qCount;
 
-        model.addAttribute("cateCorrect",    categCount);
-        model.addAttribute("cateCount",      cateCount);
-        model.addAttribute("qc",             qCount);
-        model.addAttribute("ca",             caCount);
-        model.addAttribute("ans",            results);
-        model.addAttribute("currentLevel",   currentLevel);
-        model.addAttribute("loginCount",     updatedUser.getLoginCount());
-        model.addAttribute("isPerfect",      isPerfect);
-        model.addAttribute("newAchievements", newAchievements);
+        Map<String, Object> view = new LinkedHashMap<>();
+        view.put("cateCorrect",    categCount);
+        view.put("cateCount",      cateCount);
+        view.put("qc",             qCount);
+        view.put("ca",             caCount);
+        view.put("ans",            results);
+        view.put("currentLevel",   currentLevel);
+        view.put("loginCount",     updatedUser.getLoginCount());
+        view.put("isPerfect",      isPerfect);
+        view.put("newAchievements", newAchievements);
+        session.setAttribute(RESULT_VIEW, view);
 
         session.removeAttribute("question");
         session.removeAttribute("ans");
         clearTimer();
 
+        // 再読み込みやブラウザバックでの二重登録を防ぐため、リダイレクトで結果を表示する
+        return "redirect:/test/result";
+    }
+
+    // 解答結果の表示（保存済みの結果をセッションから読む）
+    @RequestMapping(path = "/test/result", method = RequestMethod.GET)
+    public String showResult(Model model) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> view = (Map<String, Object>) session.getAttribute(RESULT_VIEW);
+        if (view == null) {
+            return "redirect:/mypage";
+        }
+        model.addAllAttributes(view);
         return "test/result_test";
     }
 
@@ -318,8 +345,14 @@ public class TestController {
     static final int SECONDS_PER_QUESTION = 25;
     static final String TIMER_START = "timerStartMillis";
     static final String TIMER_LIMIT = "timerLimitMillis";
+    static final String RESULT_VIEW = "testResult";
 
-    private void startTimer(int questionCount) {
+    // タイマーは出題開始時の選択で決まり、解答中は変更できない
+    private void startTimer(int questionCount, boolean enabled) {
+        if (!enabled) {
+            clearTimer();
+            return;
+        }
         session.setAttribute(TIMER_START, System.currentTimeMillis());
         session.setAttribute(TIMER_LIMIT, questionCount * SECONDS_PER_QUESTION * 1000L);
     }

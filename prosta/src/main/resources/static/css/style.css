@@ -374,7 +374,7 @@ footer ul li a:hover{
     transform: translateY(0);
 }
 /* ---- スマホ表示（PCは変更なし） ---- */
-@media (max-width: 700px) {
+@media (max-width: 1184px) {
 	header .row {
 		padding: 14px 0;
 	}

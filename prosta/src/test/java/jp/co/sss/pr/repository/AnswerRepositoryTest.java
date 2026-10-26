@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import jp.co.sss.pr.entity.Answer;
 import jp.co.sss.pr.entity.Category;
@@ -69,6 +71,39 @@ class AnswerRepositoryTest {
         assertEquals(2, byUser.get(first.getUserId()).getAnswerCount());
         assertEquals(1, byUser.get(first.getUserId()).getCorrectCount());
         assertEquals(0, byUser.get(second.getUserId()).getAnswerCount());
+    }
+
+    @Test
+    void searchHistoryFiltersByCorrectnessKeywordAndDateRange() {
+        Customer user = customerRepository.save(customer("history"));
+        Category category = new Category();
+        category.setCategoryName("Java");
+        category = categoryRepository.save(category);
+        Question question = new Question();
+        question.setCategory(category);
+        question.setDifficulty(2);
+        question.setQuestionText("整数を表す型は？");
+        question.setOptionA("A");
+        question.setOptionB("B");
+        question.setOptionC("C");
+        question.setCorrectOption(1);
+        question = questionRepository.save(question);
+
+        answerRepository.save(answer(user, question, true, LocalDate.now()));
+        answerRepository.save(answer(user, question, false, LocalDate.now()));
+        answerRepository.save(answer(user, question, false, LocalDate.now().minusDays(10)));
+
+        PageRequest paging = PageRequest.of(0, 6, Sort.by("ansId").descending());
+        Integer cid = category.getCategoryId();
+
+        assertEquals(3, answerRepository.searchHistory(user, null, null, "%%", null, null, null, paging)
+                .getTotalElements());
+        assertEquals(2, answerRepository.searchHistory(user, cid, 2, "%整数%", 0, null, null, paging)
+                .getTotalElements());
+        assertEquals(1, answerRepository.searchHistory(user, null, null, "%%", 0,
+                LocalDate.now().minusDays(2), LocalDate.now(), paging).getTotalElements());
+        assertEquals(0, answerRepository.searchHistory(user, null, 3, "%%", null, null, null, paging)
+                .getTotalElements());
     }
 
     private Customer customer(String name) {

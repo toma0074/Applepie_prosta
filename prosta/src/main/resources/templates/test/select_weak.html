@@ -32,6 +32,9 @@
     </table>
     <form th:action="@{/test/weak/start}" method="get">
       <div class="form">
+        <label><input type="checkbox" name="timer" value="true" /> タイマーを使う（1問25秒）</label>
+      </div>
+      <div class="form">
         <div class="select">
           <input type="submit" th:formaction="@{/mypage}" formmethod="get" value="戻る" />
           <input type="submit" value="スタート" />
