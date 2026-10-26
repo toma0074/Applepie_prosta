@@ -74,7 +74,7 @@ class TestTimerTemplateTest {
         q.setCategory(c);
         when(weakQuestionService.pick(any(), eq(15))).thenReturn(List.of(new WeakQuestion(q, 3, 0)));
 
-        mockMvc.perform(get("/test/weak/start").session(loggedIn()))
+        mockMvc.perform(get("/test/weak/start").param("timer", "true").session(loggedIn()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("id=\"test-timer\"")))
                 .andExpect(content().string(containsString("data-total=\"25000\"")))

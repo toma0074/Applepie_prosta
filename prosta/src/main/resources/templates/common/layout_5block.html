@@ -8,10 +8,11 @@
 <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/stylesheet.css}" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/gamification.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/test.css}" />
 <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
 <title>PROSTA</title>
 </head>
-<body>
+<body th:class="${session.backgroundClass != null ? session.backgroundClass : 'bg-grass'}">
 <!--/* ヘッダー */-->
 <header>
 <div th:replace="~{common/header :: layout-header}">

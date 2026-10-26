@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<meta charset="UTF-8">
+<title>背景変更</title>
+</head>
+
+<body>
+
+<h3>背景変更</h3>
+
+<div class="background-list">
+
+    <form th:action="@{/background/change}" method="post">
+
+        <button type="submit"
+                name="background"
+                value="bg-grass">
+            草原
+        </button>
+
+        <button th:if="${level >= 10}"
+                type="submit"
+                name="background"
+                value="bg-sky">
+            青空
+        </button>
+
+        <button th:if="${level >= 25}"
+                type="submit"
+                name="background"
+                value="bg-forest">
+            魔法の森
+        </button>
+
+        <button th:if="${level >= 50}"
+                type="submit"
+                name="background"
+                value="bg-castle">
+            王国
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

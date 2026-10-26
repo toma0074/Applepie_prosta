@@ -4,23 +4,19 @@
 <div th:fragment="timer(mode)" th:if="${timerRemainingMillis != null}"
      id="test-timer" class="tt-box"
      th:attr="data-remaining=${timerRemainingMillis},data-total=${timerTotalMillis},data-mode=${mode},data-timeup-url=@{/test/timeup}">
-  <label class="tt-toggle"><input type="checkbox" id="tt-enable" /> タイマー（1問25秒）</label>
-  <div class="tt-body" id="tt-body" hidden>
+  <div class="tt-label">タイマー（1問25秒）</div>
+  <div class="tt-body" id="tt-body">
     <div class="tt-bar"><div class="tt-fill" id="tt-fill"></div></div>
     <span class="tt-text" id="tt-text"></span>
   </div>
   <script>
   (function () {
     var box = document.getElementById('test-timer');
-    var enable = document.getElementById('tt-enable');
-    var body = document.getElementById('tt-body');
     var fill = document.getElementById('tt-fill');
     var text = document.getElementById('tt-text');
     var total = Number(box.dataset.total);
     var loadedAt = Date.now();
     var remainingAtLoad = Number(box.dataset.remaining);
-    var KEY = 'prostaTimerOn';
-    var timerId = null;
     var done = false;
 
     function remaining() { return Math.max(0, remainingAtLoad - (Date.now() - loadedAt)); }
@@ -43,17 +39,8 @@
       if (ms <= 0) expire();
     }
 
-    function apply() {
-      var on = enable.checked;
-      localStorage.setItem(KEY, on ? '1' : '0');
-      body.hidden = !on;
-      if (timerId) { clearInterval(timerId); timerId = null; }
-      if (on) { tick(); timerId = setInterval(tick, 250); }
-    }
-
-    enable.checked = localStorage.getItem(KEY) === '1';
-    enable.addEventListener('change', apply);
-    apply();
+    tick();
+    setInterval(tick, 250);
   })();
   </script>
 </div>

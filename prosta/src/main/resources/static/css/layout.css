@@ -51,7 +51,6 @@ header .header-container {
 	align-items:center;
 /*	width:90%;*/
 	margin:0 auto;
-	max-width:1280px;
 	border-bottom:1.5px solid #0B346E;
 	box-sizing: border-box;
 	justify-content: space-between;
@@ -87,7 +86,7 @@ aside {
   position: sticky;
   top: 0;
   float: left;
-  padding: 5px 20px 0 0;  /* %指定からpx指定に変えて幅を安定させます */
+  padding: 5px 20px 0 16px;  /* %指定からpx指定に変えて幅を安定させます */
   width: 20%;
   max-height: 100vh;      /* 高さを画面全体の高さ（最大値）に制限 */
   overflow-y: auto;       /* 縦方向にはみ出たらスクロール */
@@ -223,12 +222,11 @@ aside .sidebar-search{
 }
 /* ---- メイン ---- */
 .contents{
-	width: 90%;
+	width: 100%;
 	justify-content: center;
 	display: flex;
 	flex: 1;
 	margin:0 auto;
-	max-width: 1280px;
 	overflow: hidden;
 }
 .content{
@@ -244,8 +242,9 @@ aside .sidebar-search{
 article.main{
     width: 80%;
     height: 100%;
-    padding: 20px 0 20px 3%;
+    padding: 20px 24px 20px 3%;
     overflow-y: auto;
+    overflow-x: hidden;
     box-sizing: border-box;
 }
 
@@ -271,7 +270,7 @@ footer {
 	line-height: 30px;
 	display:flex;
 	align-items:center;
-	width:90%;
+	width:100%;
 	margin:0 auto;
 	border-top:1.5px solid #0B346E;
 }
@@ -309,7 +308,7 @@ footer {
 /* ---- スマホ: サイドバー開閉 ---- */
 .sidebar-toggle { display: none; }
 
-@media (max-width: 700px) {
+@media (max-width: 1184px) {
   .sidebar-toggle {
     display: block;
     margin: 6px 8px 0;
@@ -353,9 +352,44 @@ footer {
   .contents aside.is-open { display: block; }
   article.main { width: 100%; padding-left: 10px; padding-right: 10px; }
 }
+/* ------------------
+   レベル背景
+------------------ */
+
+body.bg-grass{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_grass.jpg");
+}
+
+body.bg-sky{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_sky.jpg");
+}
+
+body.bg-forest{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_forest.jpg");
+}
+
+body.bg-castle{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_castle.jpg");
+}
 
 /* ---- スマホ: メイン領域の中央寄せ（PCは変更なし） ---- */
-@media (max-width: 700px) {
+@media (max-width: 1184px) {
   .contents {
     width: 100%;
     justify-content: center;
@@ -411,4 +445,4 @@ footer {
     margin-left: auto;
     margin-right: auto;
   }
-}
+ }

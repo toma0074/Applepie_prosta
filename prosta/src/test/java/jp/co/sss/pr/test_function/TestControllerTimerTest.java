@@ -78,12 +78,25 @@ class TestControllerTimerTest {
         lenient().when(weakQuestionService.pick(any(), eq(15))).thenReturn(List.of(
                 new WeakQuestion(question(10), 3, 0), new WeakQuestion(question(11), 2, 1)));
 
-        mockMvc.perform(get("/test/weak/start"))
+        mockMvc.perform(get("/test/weak/start").param("timer", "true"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("timerRemainingMillis"))
                 .andExpect(model().attribute("timerTotalMillis", 50_000L));
 
         verify(session).setAttribute(eq(TestController.TIMER_LIMIT), eq(50_000L));
+    }
+
+    @Test
+    void weakStartWithoutTimerOptionHasNoTimer() throws Exception {
+        lenient().when(weakQuestionService.pick(any(), eq(15))).thenReturn(List.of(
+                new WeakQuestion(question(10), 3, 0)));
+
+        mockMvc.perform(get("/test/weak/start"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeDoesNotExist("timerRemainingMillis"));
+
+        verify(session).removeAttribute(TestController.TIMER_START);
+        verify(session, never()).setAttribute(eq(TestController.TIMER_START), any());
     }
 
     @Test
@@ -119,7 +132,7 @@ class TestControllerTimerTest {
                 .param("results[0].questionId", "10").param("results[0].correctOption", "1")
                 .param("results[0].ansOption", "1")
                 .param("results[1].questionId", "11").param("results[1].correctOption", "2"))
-                .andExpect(status().isOk());
+                .andExpect(status().is3xxRedirection());
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<AnswerForm>> saved = ArgumentCaptor.forClass(List.class);

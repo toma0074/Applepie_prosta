@@ -47,11 +47,11 @@
 ===================== */
 /* 前へ・次へのページ送りボタン */
 .btn-pagination {
-    padding: 3px 8px;
+    padding: 6px 16px;
     background-color: rgba(15, 37, 64, 0.8);
     color: rgb(255, 255, 255);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 15px;
     border: none;
     opacity: 0.7;
 }
@@ -64,9 +64,9 @@
 /*question_list.html*/
 .pagination-container {
     display: flex;
-    gap: 5px;
+    gap: 10px;
     justify-content: center;
-    margin-top: 5px;
+    margin-top: 8px;
 }
 
 /* 完了・通知メッセージ */
@@ -86,6 +86,22 @@
  **********************/
 .button-area {
     margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.button-area .inputselect {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.button-area input[type="submit"],
+.button-area input[type="button"],
+.button-area button {
+    min-width: 110px;
+    padding: 8px 20px;
+    font-size: 15px;
 }
 
 .error-message {
