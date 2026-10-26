@@ -20,6 +20,16 @@
     filter: drop-shadow(0 4px 8px rgba(11, 52, 110, 0.18));
 }
 
+/* ---- 進化後のキャラクター画像（PNG） ---- */
+.char-image {
+    display: block;
+    width: 100px;
+    height: 100px;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 3px 5px rgba(11, 52, 110, 0.18));
+}
+
 .char-stage {
     display: flex;
     flex-direction: column;
@@ -47,7 +57,7 @@
 
 /* キャラクター名 */
 .char-name {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: bold;
     color: #4a2eb0;
     letter-spacing: 0.05em;
@@ -789,6 +799,12 @@ table.friends-ranking-table {
 
 .ach-char-mini .char-svg {
     width: 80px;
+    height: 100px;
+}
+
+/* 実績ページの進化後キャラクター画像 */
+.ach-char-mini .char-image {
+    width: 100px;
     height: 100px;
 }
 
