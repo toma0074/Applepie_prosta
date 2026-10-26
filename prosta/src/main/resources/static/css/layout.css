@@ -353,6 +353,41 @@ footer {
   .contents aside.is-open { display: block; }
   article.main { width: 100%; padding-left: 10px; padding-right: 10px; }
 }
+/* ------------------
+   レベル背景
+------------------ */
+
+body.bg-grass{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_grass.jpg");
+}
+
+body.bg-sky{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_sky.jpg");
+}
+
+body.bg-forest{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_forest.jpg");
+}
+
+body.bg-castle{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_castle.jpg");
+}
 
 /* ---- スマホ: メイン領域の中央寄せ（PCは変更なし） ---- */
 @media (max-width: 700px) {
@@ -411,4 +446,4 @@ footer {
     margin-left: auto;
     margin-right: auto;
   }
-}
+ }

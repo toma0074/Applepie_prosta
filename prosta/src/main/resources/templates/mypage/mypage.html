@@ -16,9 +16,11 @@
          th:if="${pendingFriendRequestCount != null and pendingFriendRequestCount > 0}"
          class="notify-badge" th:text="${pendingFriendRequestCount}">1</span></a>
       <a class="btn" th:href="@{/user/update/input}">ユーザー更新</a>
-      <a class="btn" th:href="@{/achievement}">実績一覧<span
-         th:if="${unreadAchievementCount != null and unreadAchievementCount > 0}"
-         class="notify-badge">NEW</span></a>
+      <a class="btn" th:href="@{/achievement}">実績一覧</a>
+      <a class="btn" th:href="@{/background}">背景変更</a>
+<!--</a>-->
+<!--         th:if="${unreadAchievementCount != null and unreadAchievementCount > 0}"-->
+<!--         class="notify-badge">NEW</span></a>-->
     </div>
   </div>
 
