@@ -85,6 +85,48 @@ class ChatServiceTest {
         assertTrue(reply.text().contains("正答率：50%"));
     }
 
+    @Test
+    void explainFindsQuestionByKeywordAndShowsExplanation() {
+        Question q = new Question();
+        q.setQuestionText("Javaの継承について正しいものはどれか");
+        q.setOptionA("a");
+        q.setOptionB("b");
+        q.setOptionC("c");
+        q.setCorrectOption(2);
+        q.setExplanation("extendsで親クラスを継承します。");
+        when(answerRepository.findAllByCustomerOrderByAnsIdDesc(user)).thenReturn(List.of());
+        when(questionRepository.findAll()).thenReturn(List.of(q));
+
+        ChatService.Reply reply = chatService.reply(user, "継承の解説をして", "/prosta");
+
+        assertTrue(reply.text().contains("【正解】B"));
+        assertTrue(reply.text().contains("extendsで親クラスを継承します。"));
+    }
+
+    @Test
+    void explainWithoutKeywordUsesLatestAnsweredQuestion() {
+        Question q = new Question();
+        q.setQuestionText("最新の問題");
+        Answer a = answer(false);
+        a.setQuestion(q);
+        when(answerRepository.findAllByCustomerOrderByAnsIdDesc(user)).thenReturn(List.of(a));
+
+        ChatService.Reply reply = chatService.reply(user, "解説", "/prosta");
+
+        assertTrue(reply.text().contains("最新の問題"));
+        assertTrue(reply.text().contains("解説はまだ登録されていません"));
+    }
+
+    @Test
+    void reviewModeLinksToReviewPage() {
+        when(weakQuestionService.pickRecentMistakes(user, WeakQuestionService.MAX_QUESTIONS))
+                .thenReturn(List.of(new Question()));
+
+        ChatService.Reply reply = chatService.reply(user, "復習モードを教えて", "/prosta");
+
+        assertEquals("/prosta/test/review", reply.links().get(0).url());
+    }
+
     private Answer answer(Boolean correct) {
         Answer a = new Answer();
         a.setCorrectFlag(correct);

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{common/layout_5block :: layout(~{::body/content()})}">
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
 <head>
 <title>ユーザー一覧</title>
 <meta charset="UTF-8" />
@@ -43,15 +43,14 @@
     <tr th:each="user : ${customerForm}">
       <td th:text="${user.userId}"></td>
       <td th:text="${user.userName}"></td>
-      <td th:if="${user.permission == 1}">一般</td>
-      <td th:if="${user.permission == 2}">管理者</td>
+      <td th:if="${user.permission == 0}">一般</td>
+      <td th:if="${user.permission == 1}">管理者</td>
       <td th:if="${!user.deleteFlag}">アクティブ</td>
       <td th:if="${user.deleteFlag}">削除済み</td>
       <td class="button">
         <form class="text-center" th:action="@{/user/update/input}" method="get">
           <input type="hidden" name="userId"     th:value="${user.userId}" />
           <input type="hidden" name="userName"   th:value="${user.userName}" />
-          <input type="hidden" name="userPass"   th:value="${user.userPass}" />
           <input type="hidden" name="permission" th:value="${user.permission}" />
           <input type="hidden" name="deleteFlag" th:value="${user.deleteFlag}" />
           <input type="submit" value="変更" />
@@ -61,7 +60,6 @@
         <form class="text-center" th:action="@{/user/delete/check}" method="post">
           <input type="hidden" name="userId"     th:value="${user.userId}" />
           <input type="hidden" name="userName"   th:value="${user.userName}" />
-          <input type="hidden" name="userPass"   th:value="${user.userPass}" />
           <input type="hidden" name="permission" th:value="${user.permission}" />
           <input type="hidden" name="deleteFlag" th:value="${user.deleteFlag}" />
           <input type="submit" value="削除" />
@@ -71,7 +69,6 @@
         <form class="text-center" th:action="@{/user/restore/check}" method="post">
           <input type="hidden" name="userId"     th:value="${user.userId}" />
           <input type="hidden" name="userName"   th:value="${user.userName}" />
-          <input type="hidden" name="userPass"   th:value="${user.userPass}" />
           <input type="hidden" name="permission" th:value="${user.permission}" />
           <input type="hidden" name="deleteFlag" th:value="${user.deleteFlag}" />
           <input type="submit" value="復元" />

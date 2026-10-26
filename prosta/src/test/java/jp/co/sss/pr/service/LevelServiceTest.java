@@ -96,7 +96,7 @@ class LevelServiceTest {
         Customer customer = new Customer();
         customer.setUserId(1);
         customer.setDeleteFlag(false);
-        customer.setPermission(1);
+        customer.setPermission(0);
         customer.setLoginDate(lastLoginDate);
         customer.setLoginCount(loginCount);
         customer.setConsecutiveLoginDays(streak);

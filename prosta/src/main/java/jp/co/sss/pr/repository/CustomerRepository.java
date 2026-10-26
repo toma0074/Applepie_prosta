@@ -11,7 +11,7 @@ import jp.co.sss.pr.entity.Customer;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
-    List<Customer> findAllByUserNameAndUserPass(String userName, String userPass);
+    List<Customer> findAllByUserName(String userName);
 
     Customer findByUserName(String userName);
 

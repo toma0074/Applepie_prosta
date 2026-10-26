@@ -2,7 +2,7 @@ package jp.co.sss.pr.util;
 
 public class Constant {
     /** 権限の初期値 */
-    public static final Integer DEFAULT_PERMISSION = 1;
+    public static final Integer DEFAULT_PERMISSION = 0;
 
     /** 削除フラグの初期値 */
     public static final Integer DEFAULT_DELETE_FLAG = 1;

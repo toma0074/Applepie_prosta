@@ -1,6 +1,9 @@
 package jp.co.sss.pr.form;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -8,8 +11,12 @@ public class QuestionForm {
 
     private Integer questionId;
 
+    @NotNull(message = "カテゴリーを選択してください")
     private Integer category;
 
+    @NotNull(message = "難易度を選択してください")
+    @Min(value = 1, message = "難易度を選択してください")
+    @Max(value = 3, message = "難易度を選択してください")
     private Integer difficulty;
 
     @NotBlank
@@ -32,7 +39,16 @@ public class QuestionForm {
     @Pattern(regexp = "^(?!　+$).+$", message = "全角スペースのみの入力はできません")
     private String optionC;
 
+    @NotNull(message = "正解を選択してください")
+    @Min(value = 1, message = "正解を選択してください")
+    @Max(value = 3, message = "正解を選択してください")
     private Integer correctOption;
+
+    @Size(max = 1000, message = "解説は1000文字以内で入力してください")
+    private String explanation;
+
+    public String getExplanation() { return explanation; }
+    public void setExplanation(String explanation) { this.explanation = explanation; }
 
     // --- getters / setters ---
 

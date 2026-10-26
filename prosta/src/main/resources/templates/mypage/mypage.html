@@ -12,11 +12,13 @@
     <h3>My Page</h3>
     <div class="mypage-links">
       <a class="btn" th:href="@{/friends}"
-         th:if="${session.user != null and session.user.permission == 1}">フレンド<span
+         th:if="${session.user != null and session.user.permission == 0}">フレンド<span
          th:if="${pendingFriendRequestCount != null and pendingFriendRequestCount > 0}"
          class="notify-badge" th:text="${pendingFriendRequestCount}">1</span></a>
       <a class="btn" th:href="@{/user/update/input}">ユーザー更新</a>
-      <a class="btn" th:href="@{/achievement}">実績一覧</a>
+      <a class="btn" th:href="@{/achievement}">実績一覧<span
+         th:if="${unreadAchievementCount != null and unreadAchievementCount > 0}"
+         class="notify-badge">NEW</span></a>
     </div>
   </div>
 
@@ -106,6 +108,7 @@
                   th:data-option-c="${ans.question.optionC}"
                   th:data-correct="${ans.correctOption}"
                   th:data-chosen="${ans.ansOption}"
+                  th:data-explanation="${ans.question.explanation}"
                   th:text="${ans.question.questionText}"></button>
         </td>
         <td class="center" th:switch="${ans.ansOption}">
@@ -131,6 +134,7 @@
       <p id="question-modal-text" class="question-modal-text"></p>
       <ul id="question-modal-options" class="question-modal-options"></ul>
       <p id="question-modal-result" class="question-modal-result"></p>
+      <p id="question-modal-explanation" class="question-modal-explanation"></p>
     </div>
   </div>
 
@@ -185,6 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const textEl = document.getElementById('question-modal-text');
     const optionsEl = document.getElementById('question-modal-options');
     const resultEl = document.getElementById('question-modal-result');
+    const explanationEl = document.getElementById('question-modal-explanation');
 
     function closeModal() {
       modal.hidden = true;
@@ -219,6 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
         resultEl.textContent = chosen === correct ? '正解でした' : '不正解でした';
       }
       resultEl.className = 'question-modal-result ' + (chosen === correct ? 'ok' : 'ng');
+      explanationEl.textContent = '解説：' + (btn.dataset.explanation || '解説はまだ登録されていません。');
       modal.hidden = false;
     }
 

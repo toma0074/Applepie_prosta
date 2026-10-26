@@ -36,8 +36,61 @@ class LoginControllerTest {
     @Mock
     private LevelService levelService;
 
+    @Mock
+    private jakarta.servlet.http.HttpServletRequest request;
+
+    @org.mockito.Spy
+    private jp.co.sss.pr.service.PasswordService passwordService = new jp.co.sss.pr.service.PasswordService();
+
     @InjectMocks
     private LoginController loginController;
+
+    @Test
+    void upgradesLegacyPlainPasswordToHashOnLogin() {
+        CustomerForm form = new CustomerForm();
+        form.setUserName("testuser");
+        form.setUserPass("pass1234");
+        Customer customer = activeCustomer(1);
+        BindingResult bindingResult = mock(BindingResult.class);
+        Model model = mock(Model.class);
+        when(customerRepository.findAllByUserName("testuser")).thenReturn(List.of(customer));
+        when(levelService.processLogin(customer)).thenReturn(List.of());
+
+        loginController.login(form, bindingResult, session, model);
+
+        assertEquals(true, passwordService.matches("pass1234", customer.getUserPass()));
+        assertEquals(false, "pass1234".equals(customer.getUserPass()));
+        verify(customerRepository).save(customer);
+    }
+
+    @Test
+    void keepsLegacyPasswordAndStillLogsInWhenHashDoesNotFitTheColumn() {
+        CustomerForm form = new CustomerForm();
+        form.setUserName("testuser");
+        form.setUserPass("pass1234");
+        Customer customer = activeCustomer(1);
+        BindingResult bindingResult = mock(BindingResult.class);
+        Model model = mock(Model.class);
+        when(customerRepository.findAllByUserName("testuser")).thenReturn(List.of(customer));
+        when(customerRepository.save(customer)).thenThrow(new RuntimeException("ORA-12899"));
+        when(levelService.processLogin(customer)).thenReturn(List.of());
+
+        assertEquals("redirect:/mypage", loginController.login(form, bindingResult, session, model));
+        assertEquals("pass1234", customer.getUserPass());
+    }
+
+    @Test
+    void rejectsWrongPassword() {
+        CustomerForm form = new CustomerForm();
+        form.setUserName("testuser");
+        form.setUserPass("wrong");
+        BindingResult bindingResult = mock(BindingResult.class);
+        Model model = mock(Model.class);
+        when(customerRepository.findAllByUserName("testuser")).thenReturn(List.of(activeCustomer(1)));
+
+        assertEquals("login/login", loginController.login(form, bindingResult, session, model));
+        verify(session, never()).setAttribute(eq("user"), any());
+    }
 
     @Test
     void showsHelpfulErrorWhenCredentialsMatchMultipleActiveCustomers() {
@@ -48,7 +101,7 @@ class LoginControllerTest {
         Customer secondCustomer = activeCustomer(2);
         BindingResult bindingResult = mock(BindingResult.class);
         Model model = mock(Model.class);
-        when(customerRepository.findAllByUserNameAndUserPass("testuser", "pass1234"))
+        when(customerRepository.findAllByUserName("testuser"))
                 .thenReturn(List.of(firstCustomer, secondCustomer));
         when(bindingResult.hasErrors()).thenReturn(false);
 
@@ -71,7 +124,7 @@ class LoginControllerTest {
         deletedCustomer.setDeleteFlag(true);
         BindingResult bindingResult = mock(BindingResult.class);
         Model model = mock(Model.class);
-        when(customerRepository.findAllByUserNameAndUserPass("testuser", "pass1234"))
+        when(customerRepository.findAllByUserName("testuser"))
                 .thenReturn(List.of(activeCustomer, deletedCustomer));
         when(bindingResult.hasErrors()).thenReturn(false);
         when(levelService.processLogin(activeCustomer)).thenReturn(List.of());
@@ -87,7 +140,7 @@ class LoginControllerTest {
         customer.setUserId(userId);
         customer.setUserName("testuser");
         customer.setUserPass("pass1234");
-        customer.setPermission(1);
+        customer.setPermission(0);
         customer.setDeleteFlag(false);
         return customer;
     }

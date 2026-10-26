@@ -256,3 +256,51 @@ footer {
     0% { transform: translateY(0px); }
     100% { transform: translateY(4px); }
 }
+
+/* ---- スマホ（ログイン・新規登録・ログアウト画面） ---- */
+@media (max-width: 480px) {
+    body {
+        background-attachment: scroll;
+    }
+    .site-header,
+    footer {
+        width: 94%;
+    }
+    .main-content {
+        padding: 12px 0;
+    }
+    form {
+        width: 92%;
+        padding: 20px 14px;
+    }
+    .head-form h2 {
+        font-size: 180%;
+    }
+    .head-form p {
+        font-size: 14px;
+    }
+    .input-flex {
+        max-width: 100%;
+    }
+    #txt-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto !important;
+    }
+    #pwd {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto !important;
+    }
+    .input-item,
+    #eye {
+        flex: 0 0 40px;
+    }
+    .error-text {
+        width: 100%;
+    }
+    button {
+        width: 100%;
+        max-width: 280px;
+    }
+}

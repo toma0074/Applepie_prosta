@@ -7,7 +7,7 @@
 </head>
 <body>
 <h3>ユーザー情報更新完了</h3>
-<form th:if="${pm == 1}" th:action="@{/mypage}">
+<form th:if="${pm == 0}" th:action="@{/mypage}">
   <div class="message">
     <p class="text-center">更新を完了しました。</p>
   </div>
@@ -17,7 +17,7 @@
     </div>
   </div>
 </form>
-<form th:if="${pm == 2}" th:action="@{/user/list}">
+<form th:if="${pm == 1}" th:action="@{/user/list}">
   <div class="message">
     <p class="text-center">更新を完了しました。</p>
   </div>

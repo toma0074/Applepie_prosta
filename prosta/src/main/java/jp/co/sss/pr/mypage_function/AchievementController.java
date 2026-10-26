@@ -49,6 +49,15 @@ public class AchievementController {
         // 全実績マスター
         List<Achievement> allAchievements = achievementRepository.findAll();
 
+        // 未確認の実績を控えてから確認済みにする（今回のページでNEW表示するため）
+        List<UserAchievement> unseen = userAchievementRepository.findByCustomerAndSeenFalse(user);
+        List<Integer> newIds = new ArrayList<>();
+        for (UserAchievement ua : unseen) {
+            newIds.add(ua.getAchievement().getAchievementId());
+            ua.setSeen(true);
+        }
+        userAchievementRepository.saveAll(unseen);
+
         // 解除済み実績
         List<UserAchievement> unlockedList =
                 userAchievementRepository.findByCustomerOrderByUnlockedDateDesc(user);
@@ -67,6 +76,8 @@ public class AchievementController {
         model.addAttribute("allAchievements",  allAchievements);
         model.addAttribute("unlockedList",     unlockedList);
         model.addAttribute("unlockedIds",      unlockedIds);
+        model.addAttribute("newAchievementIds", newIds);
+        model.addAttribute("unreadAchievementCount", 0L);
         model.addAttribute("currentLevel",     currentLevel);
         model.addAttribute("loginCount",       loginCount);
         model.addAttribute("perfectCount",     perfectCount);

@@ -85,6 +85,8 @@ public class TestController {
         session.setAttribute("ans", ansList);
         session.setAttribute("question", quesList);
         session.setAttribute("testFlag", 1);
+        startTimer(quesList.size());
+        addTimer(model);
 
         return "test/show_test";
     }
@@ -125,6 +127,8 @@ public class TestController {
         model.addAttribute("answerListForm", new AnswerListForm());
         session.setAttribute("ans", ansList);
         session.setAttribute("question", quesList);
+        startTimer(quesList.size());
+        addTimer(model);
 
         return "test/show_test";
     }
@@ -154,6 +158,36 @@ public class TestController {
         model.addAttribute("answerListForm", new AnswerListForm());
         session.setAttribute("ans", buildAnswerFormList(quesList.size()));
         session.setAttribute("question", quesList);
+        startTimer(quesList.size());
+        addTimer(model);
+        return "test/show_test";
+    }
+
+    // 復習問題（直近で間違えた問題）の一覧画面
+    @RequestMapping(path = "/test/review", method = RequestMethod.GET)
+    public String selectReview(Model model) {
+        session.removeAttribute("question");
+        session.removeAttribute("ans");
+        session.removeAttribute("testFlag");
+
+        model.addAttribute("reviewList",
+                weakQuestionService.pickRecentMistakes(currentUser(), MAX_QUESTIONS));
+        return "test/select_review";
+    }
+
+    // 復習問題テスト解答画面
+    @RequestMapping(path = "/test/review/start", method = RequestMethod.GET)
+    public String startReview(Model model) {
+        List<Question> quesList = weakQuestionService.pickRecentMistakes(currentUser(), MAX_QUESTIONS);
+        if (quesList.isEmpty()) {
+            return "redirect:/test/review";
+        }
+        Collections.shuffle(quesList);
+
+        model.addAttribute("answerListForm", new AnswerListForm());
+        session.setAttribute("ans", buildAnswerFormList(quesList.size()));
+        session.setAttribute("question", quesList);
+        clearTimer();
         return "test/show_test";
     }
 
@@ -162,6 +196,7 @@ public class TestController {
     public String checkTest(@Valid @ModelAttribute AnswerListForm answerForm,
                             BindingResult result, Model model) {
         session.setAttribute("ans", answerForm.getResults());
+        addTimer(model);
 
         if (result.hasErrors()) {
             return "test/show_test";
@@ -171,8 +206,27 @@ public class TestController {
 
     // テスト解答画面に戻る
     @RequestMapping(path = "/test/back", method = RequestMethod.POST)
-    public String backTest(@ModelAttribute AnswerListForm ans) {
+    public String backTest(@ModelAttribute AnswerListForm ans, Model model) {
+        addTimer(model);
         return "test/show_test";
+    }
+
+    // 制限時間切れ：未回答は「わからない」として、そのまま採点する
+    @RequestMapping(path = "/test/timeup", method = RequestMethod.POST)
+    public String timeUp(@ModelAttribute AnswerListForm answerForm, Model model) {
+        List<?> questions = (List<?>) session.getAttribute("question");
+        List<AnswerForm> results = answerForm.getResults();
+        if (session.getAttribute(TIMER_START) == null || questions == null
+                || results == null || results.size() != questions.size()) {
+            return "redirect:/mypage";
+        }
+        for (AnswerForm a : results) {
+            if (a.getAnsOption() == null || a.getAnsOption() < 1 || a.getAnsOption() > 4) {
+                a.setAnsOption(4);
+            }
+        }
+        session.setAttribute("ans", results);
+        return resulttTest(model, new AnswerListForm());
     }
 
     // 解答結果確認画面
@@ -191,7 +245,14 @@ public class TestController {
         int[] categCount = {0, 0, 0, 0};
         LocalDate today = LocalDate.now();
 
+        Map<Integer, String> explanations = new LinkedHashMap<>();
+        for (Question q : quesRpstry.findAllById(
+                results.stream().map(AnswerForm::getQuestionId).toList())) {
+            explanations.put(q.getQuestionId(), q.getExplanation());
+        }
+
         for (AnswerForm aForm : results) {
+            aForm.setExplanation(explanations.get(aForm.getQuestionId()));
             boolean isCorrect = aForm.getAnsOption() != null
                     && aForm.getAnsOption().equals(aForm.getCorrectOption());
 
@@ -242,6 +303,7 @@ public class TestController {
 
         session.removeAttribute("question");
         session.removeAttribute("ans");
+        clearTimer();
 
         return "test/result_test";
     }
@@ -252,17 +314,41 @@ public class TestController {
         return customerRepository.getReferenceById(userBean.getUserId());
     }
 
-    private static final int MAX_QUESTIONS = 15;
+    static final int MAX_QUESTIONS = 15;
+    static final int SECONDS_PER_QUESTION = 25;
+    static final String TIMER_START = "timerStartMillis";
+    static final String TIMER_LIMIT = "timerLimitMillis";
+
+    private void startTimer(int questionCount) {
+        session.setAttribute(TIMER_START, System.currentTimeMillis());
+        session.setAttribute(TIMER_LIMIT, questionCount * SECONDS_PER_QUESTION * 1000L);
+    }
+
+    private void clearTimer() {
+        session.removeAttribute(TIMER_START);
+        session.removeAttribute(TIMER_LIMIT);
+    }
+
+    // タイマー対象のテストのときだけ、残り時間をテンプレートに渡す
+    private void addTimer(Model model) {
+        Long start = (Long) session.getAttribute(TIMER_START);
+        Long limit = (Long) session.getAttribute(TIMER_LIMIT);
+        if (start == null || limit == null) {
+            return;
+        }
+        model.addAttribute("timerTotalMillis", limit);
+        model.addAttribute("timerRemainingMillis", Math.max(0L, start + limit - System.currentTimeMillis()));
+    }
 
     // 全件の中からランダムに最大15問を抽出（出題順もランダム）
-    private List<Question> pickRandom(List<Question> all) {
+    static List<Question> pickRandom(List<Question> all) {
         List<Question> shuffled = new ArrayList<>(all);
         Collections.shuffle(shuffled);
         return shuffled.size() > MAX_QUESTIONS ? new ArrayList<>(shuffled.subList(0, MAX_QUESTIONS)) : shuffled;
     }
 
     // カテゴリごとにシャッフルし、順番に1問ずつ取り出して偏りを防ぐ
-    private List<Question> pickBalanced(List<Question> all) {
+    static List<Question> pickBalanced(List<Question> all) {
         Map<Integer, List<Question>> byCategory = new LinkedHashMap<>();
         for (Question q : all) {
             byCategory.computeIfAbsent(q.getCategory().getCategoryId(), k -> new ArrayList<>()).add(q);

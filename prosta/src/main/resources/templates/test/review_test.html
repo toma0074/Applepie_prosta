@@ -7,6 +7,7 @@
 </head>
 <body>
 <h3>問題確認画面</h3>
+<div th:replace="~{common/timer :: timer('confirm')}"></div>
 <div>
   <form th:action="@{/test/result}" method="post" id="question-table">
     <div class="form_group" th:each="a,count : ${session.ans}">

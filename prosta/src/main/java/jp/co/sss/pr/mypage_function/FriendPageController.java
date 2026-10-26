@@ -23,7 +23,7 @@ public class FriendPageController {
         if (user == null) {
             return "redirect:/";
         }
-        if (!Integer.valueOf(1).equals(user.getPermission())) {
+        if (!Integer.valueOf(0).equals(user.getPermission())) {
             return "redirect:/mypage";
         }
 

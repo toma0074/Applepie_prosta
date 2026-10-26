@@ -21,6 +21,19 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 
     List<Answer> findAllByQuestion(Question question);
 
+    boolean existsByQuestion(Question question);
+
+    /** 全ユーザー分の問題別の解答回数・正解回数 */
+    @Query("""
+            SELECT a.question.questionId AS questionId,
+                   COUNT(a.ansId) AS attemptCount,
+                   COALESCE(SUM(CASE WHEN a.correctFlag = true THEN 1 ELSE 0 END), 0) AS correctCount
+            FROM Answer a
+            WHERE a.question.questionId IN :questionIds
+            GROUP BY a.question.questionId
+            """)
+    List<QuestionAttemptStat> summarizeByQuestionIds(@Param("questionIds") List<Integer> questionIds);
+
     /**
      * 指定ユーザーの正解件数（correct_flag = true）を返す。
      */

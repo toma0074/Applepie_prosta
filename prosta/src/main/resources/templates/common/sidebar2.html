@@ -5,7 +5,7 @@
 </head>
 <body>
 <aside th:fragment="layout-sidebar"
-       th:class="${session.user == null or session.user.permission == 2} ? 'search' : 'admin_menu'">
+       th:class="${session.user == null or session.user.permission == 1} ? 'search' : 'admin_menu'">
   <div class="title">MENU</div>
   <div>
     <ul style="list-style:none; padding-left:0;">
@@ -19,7 +19,7 @@
         <a th:href="@{/test/diagnostic}"><span>苦手範囲特定問題</span></a>
       </li>
       <li class="sbt">
-        <a th:href="@{/question/regist/input}"><span>新規問題登録</span></a>
+        <a th:href="@{/admin/questions/new}"><span>新規問題登録</span></a>
       </li>
       <li class="sbt">
         <a th:href="@{/question}"><span>問題検索</span></a>
@@ -42,8 +42,8 @@
       <form th:action="@{/user/list/permission}" method="post">
         <div class="input">
           <select class="permission" name="permission">
-            <option value="1">一般</option>
-            <option value="2">管理者</option>
+            <option value="0">一般</option>
+            <option value="1">管理者</option>
           </select>
           <input type="submit" value="検索" />
         </div>

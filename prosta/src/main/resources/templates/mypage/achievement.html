@@ -51,7 +51,8 @@
         <div class="ach-card-icon" th:text="${ach.icon}">🏆</div>
         <div class="ach-card-name" th:text="${ach.achievementName}">名称</div>
         <div class="ach-card-desc" th:text="${ach.description}">説明</div>
-        <div class="ach-card-badge">✔ 解除済み</div>
+        <div class="ach-card-badge">✔ 解除済み
+          <span th:if="${#lists.contains(newAchievementIds, ach.achievementId)}" class="notify-badge">NEW</span></div>
       </div>
 
       <!-- 未解除 -->

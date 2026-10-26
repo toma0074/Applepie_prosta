@@ -38,6 +38,18 @@ public class UserAchievement {
     @Column(nullable = false)
     private LocalDate unlockedDate;
 
+    // 実績一覧を開いて確認済みなら true（新規解除は未確認）
+    @Column(name = "seen_flag", nullable = false)
+    private boolean seen = false;
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
+    }
+
     // --- getters / setters ---
 
     public Integer getUserAchId() {

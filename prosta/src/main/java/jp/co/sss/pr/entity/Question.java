@@ -43,6 +43,16 @@ public class Question {
     @Column(name = "correct_option", nullable = false)
     private Integer correctOption;
 
+    @Column(name = "explanation", length = 1000)
+    private String explanation;
+
+    public String getExplanation() {
+        return explanation;
+    }
+
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
+    }
 
     // --- getters / setters ---
 

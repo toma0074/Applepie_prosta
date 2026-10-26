@@ -75,7 +75,7 @@ class AnswerRepositoryTest {
         Customer customer = new Customer();
         customer.setUserName(name);
         customer.setUserPass("password");
-        customer.setPermission(1);
+        customer.setPermission(0);
         customer.setDeleteFlag(false);
         customer.setUserLevel(1);
         return customer;

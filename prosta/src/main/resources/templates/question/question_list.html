@@ -9,8 +9,8 @@
 <div class="forms">
   <p class="label">検索：「<strong th:text="${QuestionResult}"></strong>」</p>
 </div>
-<div th:if="${session.user != null and session.user.permission == 2}">
-  <p class="btn"><a th:href="@{/question/regist/input}">新規問題登録</a></p>
+<div th:if="${session.user != null and session.user.permission == 1}">
+  <p class="btn"><a th:href="@{/admin/questions/new}">新規問題登録</a></p>
 </div>
 <div id="pagination-container" style="display:flex;gap:5px;justify-content:center;margin-top:5px;"></div>
 
@@ -28,7 +28,6 @@
       <th class="category">カテゴリ</th>
       <th class="difficulty">難易度</th>
       <th class="questionText">問題文</th>
-      <th th:if="${session.user != null and session.user.permission == 2}" class="questionUD" colspan="2">操作</th>
     </tr>
   </thead>
   <tbody>
@@ -40,25 +39,6 @@
         <span th:case="3">★★★</span>
       </td>
       <td class="qtext" th:text="${q.questionText}"></td>
-      <td th:if="${session.user != null and session.user.permission == 2}">
-        <form class="center" th:action="@{/question/update/input}" method="post">
-          <input type="hidden" name="questionId" th:value="${q.questionId}">
-          <input type="submit" value="更新" />
-        </form>
-      </td>
-      <td th:if="${session.user != null and session.user.permission == 2}">
-        <form class="center" th:action="@{/question/delrest/check}" method="post">
-          <input type="hidden" name="questionId" th:value="${q.questionId}">
-          <th:block th:if="${q.questionDelete == 0}">
-            <input type="hidden" name="mode" value="delete">
-            <input type="submit" value="削除" />
-          </th:block>
-          <th:block th:if="${q.questionDelete == 1}">
-            <input type="hidden" name="mode" value="restore">
-            <input type="submit" value="復元" />
-          </th:block>
-        </form>
-      </td>
     </tr>
   </tbody>
 </table>

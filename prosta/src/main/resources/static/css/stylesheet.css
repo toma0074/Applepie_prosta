@@ -156,8 +156,8 @@ option{
 }
 
 /* ---- ボタン---- */
-input[type=submit] {
-	display       : inline-block;
+input[type=submit],
+.aq-form input[type=button] {
 	border-radius : 20%;          /* 角丸       */
 	border-style  : 0.5px solid rgba(15, 37, 64, 0.5);
 	font-size     : 10pt;        /* 文字サイズ */
@@ -173,7 +173,8 @@ input[type=submit] {
 	backdrop-filter: blur(5px);
 
 }
-input[type=submit]:hover{
+input[type=submit]:hover,
+.aq-form input[type=button]:hover{
 box-shadow    : none;        /* カーソル時の影消去 */
   color         : #ffff;     /* 背景色     */
   background    : rgba(15, 37, 64, 1);

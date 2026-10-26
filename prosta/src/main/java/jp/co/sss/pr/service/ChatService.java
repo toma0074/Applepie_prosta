@@ -51,6 +51,12 @@ public class ChatService {
     public Reply reply(Customer user, String message, String contextPath) {
         String m = message == null ? "" : message.trim().toLowerCase();
 
+        if (containsAny(m, "解説", "なぜ", "理由", "どうして", "答えの意味")) {
+            return explain(user, message, contextPath);
+        }
+        if (containsAny(m, "復習モード", "直近", "最近間違")) {
+            return reviewMode(user, contextPath);
+        }
         if (containsAny(m, "弱点問題", "弱点から", "出題", "復習", "間違えた問題")) {
             return weakQuiz(user, contextPath);
         }
@@ -112,6 +118,89 @@ public class ChatService {
                 new Link("弱点から出題", ctx + "/test/weak"),
                 new Link("カテゴリ別問題", ctx + "/test/category"),
                 new Link("苦手範囲特定問題", ctx + "/test/diagnostic")));
+    }
+
+    private Reply reviewMode(Customer user, String ctx) {
+        List<Question> mistakes = weakQuestionService.pickRecentMistakes(user, WeakQuestionService.MAX_QUESTIONS);
+        if (mistakes.isEmpty()) {
+            return new Reply("復習が必要な問題はありません。直近の解答はすべて正解です。",
+                    List.of(new Link("カテゴリ別問題", ctx + "/test/category")));
+        }
+        return new Reply("直近で間違えた問題が" + mistakes.size() + "問あります。\n「復習モード」でまとめて解き直せます。",
+                List.of(new Link("復習モード", ctx + "/test/review")));
+    }
+
+    private static final String[] EXPLAIN_NOISE = {
+        "を", "は", "が", "の", "に", "って", "について", "とは", "なぜ", "どうして", "理由",
+        "解説", "説明", "して", "ください", "下さい", "教えて", "おしえて", "お願い", "問題", "最後", "直前",
+        "？", "?", "。", "、", " ", "　"
+    };
+
+    /** 「解説」「○○の解説」などへの返答。キーワードがなければ直近に解いた問題を対象にする。 */
+    private Reply explain(Customer user, String message, String ctx) {
+        String keyword = message == null ? "" : message.trim();
+        for (String noise : EXPLAIN_NOISE) {
+            keyword = keyword.replace(noise, " ");
+        }
+        keyword = keyword.trim();
+
+        List<Answer> answers = answerRepository.findAllByCustomerOrderByAnsIdDesc(user);
+        Question target = null;
+        if (keyword.isEmpty()) {
+            for (Answer a : answers) {
+                if (a.getQuestion() != null) {
+                    target = a.getQuestion();
+                    break;
+                }
+            }
+        } else {
+            String k = keyword.toLowerCase();
+            for (Answer a : answers) {
+                Question q = a.getQuestion();
+                if (q != null && q.getQuestionText() != null && q.getQuestionText().toLowerCase().contains(k)) {
+                    target = q;
+                    break;
+                }
+            }
+            if (target == null) {
+                for (Question q : questionRepository.findAll()) {
+                    if (q.getQuestionText() != null && q.getQuestionText().toLowerCase().contains(k)) {
+                        target = q;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (target == null) {
+            String text = keyword.isEmpty()
+                    ? "まだ解答履歴がありません。問題を解いてから聞いてみてください。"
+                    : "「" + keyword + "」を含む問題が見つかりませんでした。問題文の一部を入れて聞いてみてください。\n例：「継承の解説」";
+            return new Reply(text, List.of(new Link("問題検索", ctx + "/question")));
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("【問題】").append(target.getQuestionText()).append("\n");
+        sb.append("A. ").append(target.getOptionA()).append("\n");
+        sb.append("B. ").append(target.getOptionB()).append("\n");
+        sb.append("C. ").append(target.getOptionC()).append("\n");
+        sb.append("【正解】").append(optionLabel(target.getCorrectOption())).append("\n");
+        String explanation = target.getExplanation();
+        sb.append("【解説】").append(explanation == null || explanation.isBlank()
+                ? "この問題の解説はまだ登録されていません。" : explanation);
+        return new Reply(sb.toString(), List.of());
+    }
+
+    private String optionLabel(Integer option) {
+        if (option == null) {
+            return "不明";
+        }
+        return switch (option) {
+            case 1 -> "A";
+            case 2 -> "B";
+            case 3 -> "C";
+            default -> "不明";
+        };
     }
 
     private Reply weakQuiz(Customer user, String ctx) {
@@ -220,6 +309,8 @@ public class ChatService {
         return "次のようなことを聞けます。\n"
                 + "・苦手な分野は？\n"
                 + "・弱点問題を出して\n"
+                + "・復習モード（直近で間違えた問題）\n"
+                + "・「継承の解説」など、問題の解説\n"
                 + "・次に何をやればいい？\n"
                 + "・成績（正答率）を教えて\n"
                 + "・レベルについて\n"

@@ -47,7 +47,7 @@ class FriendPageTemplateTest {
         when(friendConnectionRepository.countIncomingPending(customer)).thenReturn(3L);
         CustomerBean user = new CustomerBean();
         user.setUserId(1);
-        user.setPermission(1);
+        user.setPermission(0);
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", user);
 
@@ -61,7 +61,7 @@ class FriendPageTemplateTest {
         when(categoryRepository.findAll()).thenReturn(List.of());
         CustomerBean user = new CustomerBean();
         user.setUserId(1);
-        user.setPermission(1);
+        user.setPermission(0);
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", user);
 

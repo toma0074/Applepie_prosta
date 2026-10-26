@@ -73,7 +73,7 @@ class MypageHistoryTemplateTest {
 
         CustomerBean bean = new CustomerBean();
         bean.setUserId(1);
-        bean.setPermission(1);
+        bean.setPermission(0);
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", bean);
 

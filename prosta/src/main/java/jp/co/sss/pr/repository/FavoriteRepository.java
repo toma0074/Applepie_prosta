@@ -16,5 +16,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Integer> {
 
     boolean existsByCustomerAndQuestion(Customer customer, Question question);
 
+    boolean existsByQuestion(Question question);
+
     void deleteByCustomerAndQuestion(Customer customer, Question question);
 }

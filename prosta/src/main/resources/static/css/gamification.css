@@ -315,6 +315,15 @@ table.mypage-table {
     font-weight: bold;
 }
 
+.question-modal-explanation {
+    margin: 10px 0 0;
+    padding: 8px 10px;
+    background: #f3f6fb;
+    border-left: 4px solid #0B346E;
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
 .question-modal-result.ok {
     color: #1e8e3e;
 }
@@ -934,3 +943,43 @@ table.weak-table {
     border: 1px solid #ccd6e5;
     text-align: left;
 }
+/* ---- 管理者: 問題管理 ---- */
+.aq-wrap { width: 100%; max-width: 980px; margin: 0 auto; box-sizing: border-box; }
+.aq-filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+.aq-filter input[type=text] { width: 180px; }
+.aq-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.aq-table th, .aq-table td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: top; }
+.aq-table th { background: #f3f3f3; }
+.aq-table td.num { text-align: center; white-space: nowrap; }
+.aq-msg { padding: 8px 12px; border-radius: 6px; margin: 8px 0; }
+.aq-msg.ok { background: #e6f6e6; color: #1b5e20; }
+.aq-msg.ng { background: #fdeaea; color: #b71c1c; }
+.aq-actions { display: flex; gap: 6px; align-items: center; justify-content: center; }
+.aq-actions form { margin: 0; }
+.aq-pager { display: flex; gap: 12px; justify-content: center; margin: 12px 0; align-items: center; }
+.aq-page-btn { padding: 3px 8px; background-color: rgba(15, 37, 64, 0.8); color: #fff !important; font-size: 12px; text-decoration: none !important; opacity: 0.7; }
+.aq-page-btn.disabled { opacity: 0.2; pointer-events: none; cursor: not-allowed; }
+
+/* テストのタイマー */
+.tt-box { max-width: 520px; margin: 6px auto 12px; text-align: center; }
+.tt-toggle { font-size: 13px; cursor: pointer; }
+.tt-body { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.tt-body[hidden] { display: none; }
+.tt-bar { flex: 1; height: 12px; border-radius: 6px; background: rgba(15, 37, 64, 0.15); overflow: hidden; }
+.tt-fill { height: 100%; width: 100%; background: #2e7d32; transition: width 0.25s linear; }
+.tt-text { min-width: 80px; font-size: 14px; font-weight: bold; color: #0B346E; }
+.tt-danger .tt-fill { background: #d93025; }
+.tt-danger .tt-text { color: #d93025; }
+.aq-scroll { overflow-x: auto; }
+
+.aq-form { width: 100%; max-width: 720px; margin: 0 auto; box-sizing: border-box; }
+.aq-form .row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+.aq-form .row > label, .aq-form .row > span:first-child { display: block; font-weight: 600; }
+.aq-form input[type=text], .aq-form textarea, .aq-form select {
+  display: block; width: 100%; max-width: 100%; box-sizing: border-box; padding: 8px;
+  border: 1px solid #ccc; border-radius: 6px; font: inherit; background: #fff; }
+.aq-form textarea { resize: vertical; }
+.aq-form .err { color: #b71c1c; font-size: 13px; }
+.aq-form .inline { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+.aq-form .inline label { display: inline-flex; align-items: center; gap: 4px; font-weight: normal; }
+.aq-form .buttons { display: flex; gap: 16px; align-items: center; margin-top: 8px; }

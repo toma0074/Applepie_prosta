@@ -2,7 +2,8 @@ package jp.co.sss.pr.login_function;
 
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jp.co.sss.pr.bean.CustomerBean;
@@ -19,6 +21,7 @@ import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.form.CustomerForm;
 import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.service.LevelService;
+import jp.co.sss.pr.service.PasswordService;
 
 @Controller
 public class LoginController {
@@ -31,6 +34,14 @@ public class LoginController {
 
     @Autowired
     LevelService levelService;
+
+    @Autowired
+    PasswordService passwordService;
+
+    @Autowired
+    HttpServletRequest request;
+
+    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public String index(@ModelAttribute CustomerForm customerForm) {
@@ -50,21 +61,16 @@ public class LoginController {
             return "login/login";
         }
 
-        List<Customer> matchingCustomers = customerRepository.findAllByUserNameAndUserPass(
-                customerForm.getUserName(), customerForm.getUserPass());
-        List<Customer> activeCustomers = matchingCustomers.stream()
+        List<Customer> activeCustomers = customerRepository.findAllByUserName(customerForm.getUserName()).stream()
                 .filter(customer -> !Boolean.TRUE.equals(customer.getDeleteFlag()))
+                .filter(customer -> passwordService.matches(customerForm.getUserPass(), customer.getUserPass()))
                 .toList();
 
         if (activeCustomers.size() == 1) {
             Customer customer = activeCustomers.get(0);
-            CustomerBean customerBean = new CustomerBean();
-            customerBean.setUserId(customer.getUserId());
-            customerBean.setUserName(customer.getUserName());
-            customerBean.setUserPass(customer.getUserPass());
-            customerBean.setPermission(customer.getPermission());
-            customerBean.setDeleteFlag(customer.getDeleteFlag());
-            session.setAttribute("user", customerBean);
+            upgradeLegacyPassword(customer, customerForm.getUserPass());
+            request.changeSessionId();
+            session.setAttribute("user", toBean(customer));
 
             List<Achievement> newAchievements = levelService.processLogin(customer);
             if (!newAchievements.isEmpty()) {
@@ -121,8 +127,9 @@ public class LoginController {
         }
 
         Customer customer = new Customer();
-        BeanUtils.copyProperties(customerForm, customer);
-        customer.setPermission(1);
+        customer.setUserName(customerForm.getUserName());
+        customer.setUserPass(passwordService.encode(customerForm.getUserPass()));
+        customer.setPermission(0);
         customer.setDeleteFlag(false);
         customer.setLoginCount(0);
         customer.setLoginFlag(false);
@@ -130,15 +137,36 @@ public class LoginController {
         customer = customerRepository.save(customer);
         levelService.processLogin(customer);
 
+        request.changeSessionId();
+        session.setAttribute("user", toBean(customer));
+
+        return "redirect:/mypage";
+    }
+
+    // パスワードは保持しない
+    private CustomerBean toBean(Customer customer) {
         CustomerBean customerBean = new CustomerBean();
         customerBean.setUserId(customer.getUserId());
         customerBean.setUserName(customer.getUserName());
-        customerBean.setUserPass(customer.getUserPass());
         customerBean.setPermission(customer.getPermission());
         customerBean.setDeleteFlag(customer.getDeleteFlag());
-        session.setAttribute("user", customerBean);
+        return customerBean;
+    }
 
-        return "redirect:/mypage";
+    // 平文保存の旧データは、ログインに成功した時点でハッシュ化し直す
+    private void upgradeLegacyPassword(Customer customer, String rawPassword) {
+        if (!passwordService.isLegacy(customer.getUserPass())) {
+            return;
+        }
+        String original = customer.getUserPass();
+        try {
+            customer.setUserPass(passwordService.encode(rawPassword));
+            customerRepository.save(customer);
+        } catch (RuntimeException e) {
+            // 後続の保存処理に未ハッシュ化の値を持ち越さないよう元に戻す
+            customer.setUserPass(original);
+            log.warn("パスワードのハッシュ化に失敗しました。customer.user_pass の列幅を確認してください。", e);
+        }
     }
 
     @RequestMapping(path = "/login/error", method = RequestMethod.GET)

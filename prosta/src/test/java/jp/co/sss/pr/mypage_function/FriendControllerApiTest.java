@@ -184,7 +184,7 @@ class FriendControllerApiTest {
         Customer customer = new Customer();
         customer.setUserId(userId);
         customer.setUserName(userName);
-        customer.setPermission(1);
+        customer.setPermission(0);
         customer.setDeleteFlag(false);
         customer.setConsecutiveLoginDays(0);
         return customer;

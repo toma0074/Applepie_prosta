@@ -120,11 +120,27 @@ class WeakQuestionServiceTest {
         assertTrue(service.pick(me, 15).isEmpty());
     }
 
+    @Test
+    void recentMistakesUseOnlyTheLatestAnswerOfEachQuestion() {
+        Question fixed = question("fixed");
+        Question stillWrong = question("stillWrong");
+        Question newlyWrong = question("newlyWrong");
+        answers(me, fixed, false, true);
+        answers(me, stillWrong, false, false);
+        answers(me, newlyWrong, true, false);
+
+        List<String> result = service.pickRecentMistakes(me, 15).stream()
+                .map(Question::getQuestionText).toList();
+
+        assertEquals(List.of("newlyWrong", "stillWrong"), result);
+        assertEquals(1, service.pickRecentMistakes(me, 1).size());
+    }
+
     private Customer customer(String name) {
         Customer customer = new Customer();
         customer.setUserName(name);
         customer.setUserPass("password");
-        customer.setPermission(1);
+        customer.setPermission(0);
         customer.setDeleteFlag(false);
         customer.setUserLevel(1);
         return customer;

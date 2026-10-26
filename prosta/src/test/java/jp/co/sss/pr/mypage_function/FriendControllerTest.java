@@ -93,7 +93,7 @@ class FriendControllerTest {
         Customer customer = new Customer();
         customer.setUserId(userId);
         customer.setUserName("user" + userId);
-        customer.setPermission(1);
+        customer.setPermission(0);
         customer.setDeleteFlag(false);
         return customer;
     }

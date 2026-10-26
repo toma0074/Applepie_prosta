@@ -341,7 +341,11 @@ footer {
     z-index: 1000;
     width: 80%;
     max-width: 300px;
-    max-height: none;
+    max-height: calc(100vh - 60px);
+    max-height: calc(100dvh - 60px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     padding-top: 40px;
     background: rgba(255, 255, 255, 0.96);
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);

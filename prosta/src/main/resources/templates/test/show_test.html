@@ -7,8 +7,9 @@
 </head>
 <body>
 <h3>問題解答画面</h3>
+<div th:replace="~{common/timer :: timer('answer')}"></div>
 <div>
-  <form th:action="@{/test/check}" method="post" th:object="${answerListForm}">
+  <form id="answer-form" th:action="@{/test/check}" method="post" th:object="${answerListForm}">
     <p class="error-message">
       <th:block th:each="error,status : *{results}">
         <span th:if="${#fields.hasErrors('results[' + status.index + '].ansOption')}"

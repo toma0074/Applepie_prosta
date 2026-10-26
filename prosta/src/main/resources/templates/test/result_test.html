@@ -48,6 +48,7 @@
                 th:data-option-c="${ans.optionC}"
                 th:data-correct="${ans.correctOption}"
                 th:data-chosen="${ans.ansOption}"
+                th:data-explanation="${ans.explanation}"
                 th:text="${ans.questionText}"></button>
       </div>
       <div class="ans_row">
@@ -94,6 +95,7 @@
     <p id="question-modal-text" class="question-modal-text"></p>
     <ul id="question-modal-options" class="question-modal-options"></ul>
     <p id="question-modal-result" class="question-modal-result"></p>
+    <p id="question-modal-explanation" class="question-modal-explanation"></p>
   </div>
 </div>
 
@@ -106,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const textEl = document.getElementById('question-modal-text');
     const optionsEl = document.getElementById('question-modal-options');
     const resultEl = document.getElementById('question-modal-result');
+    const explanationEl = document.getElementById('question-modal-explanation');
     const closeModal = () => { modal.hidden = true; };
 
     function openModal(btn) {
@@ -125,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       resultEl.textContent = chosen === 4 ? '解答：わからない' : (chosen === correct ? '正解でした' : '不正解でした');
       resultEl.className = 'question-modal-result ' + (chosen === correct ? 'ok' : 'ng');
+      explanationEl.textContent = '解説：' + (btn.dataset.explanation || '解説はまだ登録されていません。');
       modal.hidden = false;
     }
 

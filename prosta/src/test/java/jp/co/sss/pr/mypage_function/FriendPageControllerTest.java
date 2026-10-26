@@ -36,7 +36,7 @@ class FriendPageControllerTest {
                 new FriendPageController(categoryRepository)).build();
         CustomerBean user = new CustomerBean();
         user.setUserId(1);
-        user.setPermission(1);
+        user.setPermission(0);
         session = new MockHttpSession();
         session.setAttribute("user", user);
     }
@@ -64,7 +64,7 @@ class FriendPageControllerTest {
     void redirectsAdministratorsAwayFromFriendPage() throws Exception {
         CustomerBean admin = new CustomerBean();
         admin.setUserId(2);
-        admin.setPermission(2);
+        admin.setPermission(1);
         MockHttpSession adminSession = new MockHttpSession();
         adminSession.setAttribute("user", admin);
 

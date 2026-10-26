@@ -24,12 +24,12 @@
         <th>パスワード</th>
         <td><input type="password" th:field="*{userPass}"></td>
       </tr>
-      <tr th:if="${session.user.permission == 2}">
+      <tr th:if="${session.user.permission == 1}">
         <th>権限</th>
         <td>
           <select class="permission" th:field="*{permission}">
-            <option value="1">一般</option>
-            <option value="2">管理者</option>
+            <option value="0">一般</option>
+            <option value="1">管理者</option>
           </select>
         </td>
       </tr>
@@ -37,7 +37,7 @@
   </div>
 
   <input type="hidden" name="userId"     th:value="${user.userId}">
-  <input th:if="${session.user.permission == 1}" type="hidden" name="permission" th:value="${user.permission}">
+  <input th:if="${session.user.permission == 0}" type="hidden" name="permission" th:value="${user.permission}">
   <input type="hidden" name="deleteFlag" th:value="${user.deleteFlag}">
 
   <div class="inputform">
@@ -47,14 +47,14 @@
   </div>
 </form>
 
-<div th:if="${session.user.permission == 1}">
+<div th:if="${session.user.permission == 0}">
     <div class="button-area">
         <a class="btn" th:href="@{/mypage}">
             戻る
         </a>
     </div>
 </div>
-<div th:if="${session.user.permission == 2}">
+<div th:if="${session.user.permission == 1}">
     <div class="button-area">
         <a class="btn" th:href="@{/user/list}">
             戻る

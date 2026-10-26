@@ -24,7 +24,7 @@ public class Customer {
     @Column(name = "user_name", nullable = false, length = 20)
     private String userName;
  
-    @Column(name = "user_pass", nullable = false, length = 16)
+    @Column(name = "user_pass", nullable = false, length = 100)
     private String userPass;
  
     @Column(name = "permission", nullable = false)

@@ -145,7 +145,7 @@ public class FriendController {
         if (currentUser.getUserId().equals(targetUserId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "自分自身には申請できません");
         }
-        if (Boolean.TRUE.equals(target.getDeleteFlag()) || !Integer.valueOf(1).equals(target.getPermission())) {
+        if (Boolean.TRUE.equals(target.getDeleteFlag()) || !Integer.valueOf(0).equals(target.getPermission())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザーが見つかりません");
         }
 
@@ -306,7 +306,7 @@ public class FriendController {
         }
         Customer user = customerRepository.findById(userBean.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です"));
-        if (Boolean.TRUE.equals(user.getDeleteFlag()) || !Integer.valueOf(1).equals(user.getPermission())) {
+        if (Boolean.TRUE.equals(user.getDeleteFlag()) || !Integer.valueOf(0).equals(user.getPermission())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "一般ユーザーのみ利用できます");
         }
         return user;

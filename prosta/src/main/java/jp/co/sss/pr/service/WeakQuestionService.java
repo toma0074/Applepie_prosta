@@ -2,8 +2,10 @@ package jp.co.sss.pr.service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.co.sss.pr.entity.Answer;
 import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.entity.Question;
 import jp.co.sss.pr.repository.AnswerRepository;
@@ -42,6 +45,24 @@ public class WeakQuestionService {
 
     @Autowired
     private QuestionRepository questionRepository;
+
+    /** 各問題の直近の解答が不正解（「わからない」含む）だった問題を、新しい順に最大 limit 件返す。 */
+    @Transactional(readOnly = true)
+    public List<Question> pickRecentMistakes(Customer user, int limit) {
+        int max = Math.max(0, Math.min(limit, MAX_QUESTIONS));
+        Set<Integer> seen = new HashSet<>();
+        List<Question> result = new ArrayList<>();
+        for (Answer a : answerRepository.findAllByCustomerOrderByAnsIdDesc(user)) {
+            Question q = a.getQuestion();
+            if (q == null || !seen.add(q.getQuestionId())) {
+                continue;
+            }
+            if (!Boolean.TRUE.equals(a.getCorrectFlag()) && result.size() < max) {
+                result.add(q);
+            }
+        }
+        return result;
+    }
 
     /** 正答率が低い順（同率なら解答回数が多い順）に、最大 limit 件返す。全問正解の問題は含めない。 */
     @Transactional(readOnly = true)

@@ -2,7 +2,11 @@ package jp.co.sss.pr.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import jp.co.sss.pr.entity.Category;
@@ -33,4 +37,19 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     /** 複数カテゴリ・難易度が一致する問題を取得（苦手範囲特定テスト用） */
     List<Question> findAllByCategoryInAndDifficulty(
             List<Category> categories, Integer difficulty);
+
+    /** 管理者画面用の絞り込み検索（keyword は LIKE パターン） */
+    @Query("""
+            SELECT q FROM Question q
+            WHERE (:categoryId IS NULL OR q.category.categoryId = :categoryId)
+              AND (:difficulty IS NULL OR q.difficulty = :difficulty)
+              AND q.questionText LIKE :keyword
+              AND (:noExplanation = false OR q.explanation IS NULL OR q.explanation = '')
+            ORDER BY q.questionId DESC
+            """)
+    Page<Question> search(@Param("categoryId") Integer categoryId,
+            @Param("difficulty") Integer difficulty,
+            @Param("keyword") String keyword,
+            @Param("noExplanation") boolean noExplanation,
+            Pageable pageable);
 }

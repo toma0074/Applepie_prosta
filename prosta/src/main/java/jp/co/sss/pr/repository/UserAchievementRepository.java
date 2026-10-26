@@ -18,4 +18,8 @@ public interface UserAchievementRepository extends JpaRepository<UserAchievement
     Optional<UserAchievement> findByCustomerAndAchievement(Customer customer, Achievement achievement);
 
     boolean existsByCustomerAndAchievement(Customer customer, Achievement achievement);
+
+    long countByCustomerAndSeenFalse(Customer customer);
+
+    List<UserAchievement> findByCustomerAndSeenFalse(Customer customer);
 }
