@@ -1,8 +1,13 @@
 package jp.co.sss.pr.mypage_function;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +20,7 @@ import jp.co.sss.pr.entity.Answer;
 import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.entity.UserAchievement;
 import jp.co.sss.pr.repository.AnswerRepository;
+import jp.co.sss.pr.repository.CategoryRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.repository.UserAchievementRepository;
 import jp.co.sss.pr.service.LevelService;
@@ -22,8 +28,13 @@ import jp.co.sss.pr.service.LevelService;
 @Controller
 public class MypageController {
 
+    private static final int HISTORY_PAGE_SIZE = 6;
+
     @Autowired
     AnswerRepository answerRepository;
+
+    @Autowired
+    CategoryRepository categoryRepository;
 
     @Autowired
     CustomerRepository customerRepository;
@@ -36,7 +47,14 @@ public class MypageController {
 
     @RequestMapping(path = "/mypage", method = RequestMethod.GET)
     public String mypage(Model model, HttpSession session,
-                         @RequestParam(name = "sort", required = false) Integer sort) {
+                         @RequestParam(name = "sort", required = false) Integer sort,
+                         @RequestParam(required = false) Integer categoryId,
+                         @RequestParam(required = false) Integer difficulty,
+                         @RequestParam(required = false) String keyword,
+                         @RequestParam(required = false) Integer correct,
+                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                         @RequestParam(defaultValue = "0") int page) {
 
         CustomerBean userBean = (CustomerBean) session.getAttribute("user");
         if (userBean == null) {
@@ -45,18 +63,24 @@ public class MypageController {
 
         Customer user = customerRepository.getReferenceById(userBean.getUserId());
 
-        // 解答履歴取得
-        List<Answer> ansList;
-        if (sort == null || sort == 1) {
-            sort = 1;
-            ansList = answerRepository.findAllByCustomerOrderByAnsIdDesc(user);
-        } else if (sort == 2) {
-            ansList = answerRepository.findAllByCustomerOrderByAnsIdAsc(user);
-            model.addAttribute("sort", 2);
-        } else {
-            ansList = answerRepository.findAllByCustomerOrderByAnsIdDesc(user);
-        }
-        model.addAttribute("answerlist", ansList);
+        // 解答履歴取得（絞り込み＋ページング）
+        int sortType = (sort != null && sort == 2) ? 2 : 1;
+        String kw = keyword == null ? "" : keyword.trim();
+        Integer correctFilter = (correct != null && (correct == 0 || correct == 1)) ? correct : null;
+        Sort order = sortType == 2 ? Sort.by("ansId").ascending() : Sort.by("ansId").descending();
+        Page<Answer> result = answerRepository.searchHistory(user, categoryId, difficulty,
+                "%" + kw + "%", correctFilter, fromDate, toDate,
+                PageRequest.of(Math.max(page, 0), HISTORY_PAGE_SIZE, order));
+        model.addAttribute("answerlist", result.getContent());
+        model.addAttribute("historyPage", result);
+        model.addAttribute("sort", sortType);
+        model.addAttribute("categories", categoryRepository.findAll());
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("difficulty", difficulty);
+        model.addAttribute("keyword", kw);
+        model.addAttribute("correct", correctFilter);
+        model.addAttribute("fromDate", fromDate);
+        model.addAttribute("toDate", toDate);
 
         // レベル・ログイン情報（customer テーブルから直接取得）
         int currentLevel  = user.getUserLevel();

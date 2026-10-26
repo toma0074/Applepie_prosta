@@ -27,16 +27,9 @@
     <div id="pagination-container" class="pagination-container"></div>
     <div class="button-area">
     <div class="inputselect">
+        <input type="submit" th:formaction="@{/test/back}" formmethod="post" value="戻る" />
         <input type="submit" value="送信" />
     </div>
-    </div>
-  </form>
-
-  <form th:action="@{/test/back}" method="post">
-    <div class="button-area">
-        <div class="inputselect">
-            <input type="submit" value="戻る" />
-        </div>
     </div>
   </form>
 </div>
