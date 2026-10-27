@@ -12,7 +12,10 @@
 <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
 <title>PROSTA</title>
 </head>
-<body th:class="${session.backgroundClass != null ? session.backgroundClass : 'bg-grass'}">
+<body
+	th:class="${session.backgroundClass != null ? session.backgroundClass : 'bg-default'}"
+	th:style="${session.backgroundColor != null ?
+	'background-color:' + session.backgroundColor + ';background-image:none;' : ''}">
 <!--/* ヘッダー */-->
 <header>
 <div th:replace="~{common/header :: layout-header}">
@@ -36,28 +39,25 @@
 </body>
 </html>
 
-<script th:src="@{/js/background-heartbeat.js}">
-
+<script th:inline="javascript">
 document.addEventListener("DOMContentLoaded", function () {
-    // 5分（300,000ミリ秒）おきにサーバーに「ログイン中だよ」と通信する
-    const INTERVAL_TIME = 300000;
- 
+    const INTERVAL_TIME = 60000;
+    const heartbeatUrl = /*[[@{/api/login-status/heartbeat}]]*/ '/api/login-status/heartbeat';
+
     function sendHeartbeat() {
-        fetch('/api/login-status/heartbeat', { method: 'POST' })
+        fetch(heartbeatUrl, { method: 'POST', credentials: 'same-origin' })
             .then(response => {
                 if (!response.ok) {
-                    // もしセッションが切れていたらログイン画面に飛ばすなどの制御も可能
                     console.warn("セッションが切れている可能性があります");
                 }
             })
             .catch(error => console.error("状態同期エラー:", error));
     }
- 
-    // 画面が開かれた瞬間にまず1回実行する
-    sendHeartbeat();
- 
-    //その後、5分ごとに定期実行を開始する
-    setInterval(sendHeartbeat, INTERVAL_TIME);
-});
 
+    sendHeartbeat();
+    setInterval(sendHeartbeat, INTERVAL_TIME);
+    document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) sendHeartbeat();
+    });
+});
 </script>

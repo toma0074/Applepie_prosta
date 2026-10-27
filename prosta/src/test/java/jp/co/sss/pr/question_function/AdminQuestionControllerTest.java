@@ -3,6 +3,7 @@ package jp.co.sss.pr.question_function;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpSession;
@@ -135,6 +137,21 @@ class AdminQuestionControllerTest {
                 .andExpect(redirectedUrl("/admin/questions"));
         verify(questionRepository).save(argThat(
                 (Question q) -> "because".equals(q.getExplanation()) && q.getCorrectOption() == 3));
+    }
+
+    @Test
+    void saveWhenSequenceIsOutOfSyncShowsValidationError() throws Exception {
+        when(categoryRepository.findById(1)).thenReturn(Optional.of(category()));
+        doThrow(new DataIntegrityViolationException("ORA-00001")).when(questionRepository).flush();
+
+        mockMvc.perform(post("/admin/questions/save").session(adminSession())
+                .param("category", "1").param("difficulty", "2")
+                .param("questionText", "valid question text")
+                .param("optionA", "a").param("optionB", "b").param("optionC", "c")
+                .param("correctOption", "3").param("explanation", "because"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/question_form"))
+                .andExpect(content().string(Matchers.containsString("SEQ_QUESTION")));
     }
 
     @Test

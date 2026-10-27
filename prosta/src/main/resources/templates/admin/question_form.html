@@ -9,6 +9,7 @@
 <div class="aq-form">
   <h3 th:text="${creating} ? '新規問題登録' : '問題編集'"></h3>
   <form th:action="@{/admin/questions/save}" th:object="${questionForm}" method="post">
+    <p class="err" th:if="${#fields.hasGlobalErrors()}" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></p>
     <input type="hidden" th:field="*{questionId}" />
 
     <div class="row">

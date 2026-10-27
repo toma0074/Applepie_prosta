@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROSTA | 学習カレンダー</title>
+</head>
+<body>
+<main class="suku study-calendar-page">
+  <div class="study-calendar-header">
+    <div>
+      <h3>学習カレンダー・予定表</h3>
+      <p>日ごとの学習記録を確認し、学習予定を登録できます。</p>
+    </div>
+    <a class="btn" th:href="@{/mypage}">マイページに戻る</a>
+  </div>
+
+  <div th:if="${planMessage != null}" class="study-calendar-message" th:text="${planMessage}"></div>
+  <div th:if="${planError != null}" class="study-calendar-error" th:text="${planError}"></div>
+
+  <section class="study-calendar-card" aria-label="月間学習カレンダー">
+    <div class="study-calendar-month-nav">
+      <a class="btn" th:href="@{/study-calendar(month=${previousMonth})}" aria-label="前の月">‹ 前月</a>
+      <h4 th:text="${monthLabel}">2026-10</h4>
+      <a class="btn" th:href="@{/study-calendar(month=${nextMonth})}" aria-label="次の月">翌月 ›</a>
+    </div>
+
+    <div class="study-calendar-grid">
+      <div class="study-calendar-weekday">月</div>
+      <div class="study-calendar-weekday">火</div>
+      <div class="study-calendar-weekday">水</div>
+      <div class="study-calendar-weekday">木</div>
+      <div class="study-calendar-weekday">金</div>
+      <div class="study-calendar-weekday">土</div>
+      <div class="study-calendar-weekday">日</div>
+      <th:block th:each="week : ${weeks}">
+        <a th:each="day : ${week}"
+           class="study-calendar-day"
+           th:classappend="${!day.currentMonth ? 'is-outside-month' : ''} + ${day.today ? ' is-today' : ''} + ${day.selected ? ' is-selected' : ''}"
+           th:href="@{/study-calendar(month=${#temporals.format(day.date, 'yyyy-MM')},date=${day.date})}"
+           th:attr="aria-label=${#temporals.format(day.date, 'yyyy年M月d日') + '、学習' + day.answerCount + '問、予定' + day.planCount + '件'}">
+          <span class="study-calendar-day-number" th:text="${day.dayNumber}">1</span>
+          <span class="study-calendar-count" th:if="${day.answerCount > 0}"
+                th:text="${'学習 ' + day.answerCount + '問'}">学習 3問</span>
+          <span class="study-calendar-plan-count" th:if="${day.planCount > 0}"
+                th:text="${'予定 ' + day.planCount + '件'}">予定 1件</span>
+        </a>
+      </th:block>
+    </div>
+    <div class="study-calendar-legend">
+      <span><i class="study-legend-dot study-legend-study"></i>学習記録</span>
+      <span><i class="study-legend-dot study-legend-plan"></i>予定</span>
+    </div>
+  </section>
+
+  <section class="study-calendar-detail">
+    <div class="study-calendar-detail-header">
+      <div>
+        <h4 th:text="${#temporals.format(selectedDate, 'yyyy年M月d日')}">2026年10月1日</h4>
+        <p>学習 <strong th:text="${answerCount}">0</strong>問
+          （正解 <strong th:text="${correctCount}">0</strong>問・不正解
+          <strong th:text="${incorrectCount}">0</strong>問）</p>
+      </div>
+    </div>
+
+    <div class="study-plan-list" th:if="${!#lists.isEmpty(selectedPlans)}">
+      <article class="study-plan-item" th:each="plan : ${selectedPlans}">
+        <div class="study-plan-text">
+          <strong th:text="${plan.title}">予定タイトル</strong>
+          <p th:if="${plan.details != null and !plan.details.isBlank()}" th:text="${plan.details}">予定詳細</p>
+        </div>
+        <div class="study-plan-actions">
+          <a class="btn" th:href="@{/study-calendar(month=${month},date=${selectedDate},edit=${plan.studyPlanId})}">編集</a>
+          <form th:action="@{/study-calendar/plans/{id}/delete(id=${plan.studyPlanId})}" method="post">
+            <button type="submit" class="study-plan-delete"
+                    onclick="return confirm('この学習予定を削除しますか？')">削除</button>
+          </form>
+        </div>
+      </article>
+    </div>
+    <p class="study-plan-empty" th:if="${#lists.isEmpty(selectedPlans)}">この日の予定はありません。</p>
+
+    <form class="study-plan-form"
+          th:action="${editingPlan == null} ? @{/study-calendar/plans} : @{/study-calendar/plans/{id}(id=${editingPlan.studyPlanId})}"
+          method="post">
+      <h5 th:text="${editingPlan == null} ? '学習予定を追加' : '学習予定を編集'">学習予定を追加</h5>
+      <label for="plan-date">日付</label>
+      <input id="plan-date" type="date" name="planDate" required th:value="${selectedDate}">
+      <label for="plan-title">予定タイトル</label>
+      <input id="plan-title" type="text" name="title" maxlength="100" required
+             placeholder="例：Javaの問題を10問解く"
+             th:value="${editingPlan == null ? '' : editingPlan.title}">
+      <label for="plan-details">詳細（任意）</label>
+      <textarea id="plan-details" name="details" maxlength="500" rows="3"
+                placeholder="学習内容や目標をメモできます"
+                th:text="${editingPlan == null ? '' : editingPlan.details}"></textarea>
+      <div class="study-plan-form-actions">
+        <button type="submit" class="study-plan-submit"
+                th:text="${editingPlan == null} ? '予定を登録' : '変更を保存'">予定を登録</button>
+        <a class="btn" th:if="${editingPlan != null}"
+           th:href="@{/study-calendar(month=${month},date=${selectedDate})}">編集をキャンセル</a>
+      </div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

@@ -14,7 +14,7 @@ html, body {
 body {
 /*	margin: 0;*/
 /*	padding: 0;*/
-	background-image: linear-gradient( rgba(255,255,255,0.5),rgba(255,255,255,0.5)),url('../images/sta.jpg');
+/*	background-image: linear-gradient( rgba(255,255,255,0.5),rgba(255,255,255,0.5)),url('../images/sta.jpg');*/
 	background-position: left bottom; /* 元のオブジェクトポジションの代わり */
 	background-repeat: no-repeat; /* 画像の繰り返しを防止 */
 	background-attachment: fixed;
@@ -26,7 +26,59 @@ body {
 	box-sizing: border-box;
 	
 }
+body.bg-default{
+	background-image:
+	linear-gradient(
+		rgba(255,255,255,0.5),
+		rgba(255,255,255,0.5)),
+	url('../images/sta.jpg');
+}
+.color-preview{
 
+	width:100%;
+	height:170px;
+
+	border-radius:8px;
+
+	background:#0B346E;
+
+	border:1px solid rgba(11,52,110,0.2);
+
+	display:block;
+
+}
+.color-card input[type="color"]{
+	position:absolute;
+	opacity:0;
+	width:0;
+	height:0;
+}
+.color-card{
+	width:280px;
+	height:260px;
+
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+
+	padding:12px;
+
+	border:none;
+	border-radius:12px;
+
+	background:rgba(255,255,255,0.65);
+
+	backdrop-filter: blur(8px);
+
+	box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+.background-list form{
+	display:flex;
+	flex-wrap:wrap;
+	gap:20px;
+	align-items:flex-start;
+}
 .scroll-area{
 	overflow-y: auto;
 	height: 100%;
@@ -183,11 +235,11 @@ aside .sidebar-search{
     box-shadow: 2px 2px 4px gray;
     text-decoration: none;
 }
-/*.sidebar-link a:hover {*/
-/*    background: rgba(15, 37, 64, 0.3);*/
-/*    color: #ffff;*/
-/*    box-shadow: none;*/
-/*}*/
+.sidebar-link:hover  {
+    background: rgba(15, 37, 64, 0.3);
+    color: #ffff;
+    box-shadow: none;
+}
 .sidebar-link:before,
 .sidebar-link:after {
   box-sizing: inherit;
@@ -387,7 +439,107 @@ body.bg-castle{
 	rgba(255,255,255,0.5)),
 	url("../images/bg_castle.jpg");
 }
+body.bg-mori{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/mori.jpg");
+}
 
+body.bg-game{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/game.jpg");
+}
+
+.bg-card{
+	width:280px;
+	padding:8px;
+
+	border:none;
+	border-radius:12px;
+
+	background:rgba(255,255,255,0.85);
+
+	backdrop-filter:blur(8px);
+
+	box-shadow:0 4px 10px rgba(0,0,0,0.08);
+
+	cursor:pointer;
+
+	transition:all .2s ease;
+}
+
+.bg-card{
+
+	appearance:none;
+	-webkit-appearance:none;
+
+}
+
+.bg-card:hover{
+
+	transform:translateY(-3px);
+
+	box-shadow:
+		0 0 5px rgba(11,52,110,0.25),
+		0 0 15px rgba(11,52,110,0.35);
+
+}
+
+.bg-card img{
+	width:100%;
+	height:180px;
+	object-fit:cover;
+	border-radius:8px;
+	display:block;
+}
+
+.bg-card span{
+
+	display:block;
+
+	text-align:center;
+
+	margin-top:10px;
+
+	font-family:"MODI", sans-serif;
+
+	font-size:16px;
+
+	color:#0B346E;
+
+}
+.background-grid{
+	display:grid;
+
+	grid-template-columns:repeat(3, 280px);
+
+	gap:20px;
+
+	justify-content:start;
+}
+.bg-locked-card{
+
+	width:280px;
+	height:260px;
+
+	display:flex;
+	flex-direction:column;
+
+	align-items:center;
+	justify-content:center;
+
+	box-sizing:border-box;
+
+}
+.bg-card{
+	width:280px;
+	height:260px;
+}
 /* ---- スマホ: メイン領域の中央寄せ（PCは変更なし） ---- */
 @media (max-width: 1184px) {
   .contents {

@@ -1,5 +1,7 @@
 package jp.co.sss.pr.login_function;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -71,6 +73,7 @@ public class LoginController {
             upgradeLegacyPassword(customer, customerForm.getUserPass());
             request.changeSessionId();
             session.setAttribute("user", toBean(customer));
+            restoreBackground(customer, session);
 
             List<Achievement> newAchievements = levelService.processLogin(customer);
             if (!newAchievements.isEmpty()) {
@@ -131,14 +134,17 @@ public class LoginController {
         customer.setUserPass(passwordService.encode(customerForm.getUserPass()));
         customer.setPermission(0);
         customer.setDeleteFlag(false);
-        customer.setLoginCount(0);
-        customer.setLoginFlag(false);
+        customer.setLoginDate(LocalDate.now());
+        customer.setLoginCount(1);
+        customer.setLoginFlag(true);
         customer.setUserLevel(1);
+        customer.setConsecutiveLoginDays(1);
+        customer.setLastSeenAt(LocalDateTime.now());
         customer = customerRepository.save(customer);
-        levelService.processLogin(customer);
 
         request.changeSessionId();
         session.setAttribute("user", toBean(customer));
+        restoreBackground(customer, session);
 
         return "redirect:/mypage";
     }
@@ -151,6 +157,30 @@ public class LoginController {
         customerBean.setPermission(customer.getPermission());
         customerBean.setDeleteFlag(customer.getDeleteFlag());
         return customerBean;
+    }
+
+    private void restoreBackground(Customer customer, HttpSession session) {
+        String backgroundClass = customer.getBackgroundClass();
+        String backgroundColor = customer.getBackgroundColor();
+        if ("bg-color".equals(backgroundClass) && isHexColor(backgroundColor)) {
+            session.setAttribute("backgroundClass", backgroundClass);
+            session.setAttribute("backgroundColor", backgroundColor);
+        } else if (isImageBackground(backgroundClass)) {
+            session.setAttribute("backgroundClass", backgroundClass);
+            session.removeAttribute("backgroundColor");
+        } else {
+            session.removeAttribute("backgroundClass");
+            session.removeAttribute("backgroundColor");
+        }
+    }
+
+    private boolean isImageBackground(String value) {
+        return "bg-grass".equals(value) || "bg-sea".equals(value) || "bg-sky".equals(value)
+                || "bg-sakura".equals(value) || "bg-forest".equals(value) || "bg-space".equals(value);
+    }
+
+    private boolean isHexColor(String value) {
+        return value != null && value.matches("#[0-9A-Fa-f]{6}");
     }
 
     // 平文保存の旧データは、ログインに成功した時点でハッシュ化し直す

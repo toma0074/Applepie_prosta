@@ -3,6 +3,7 @@ package jp.co.sss.pr.login_function;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
+import jp.co.sss.pr.bean.CustomerBean;
 import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.form.CustomerForm;
 import jp.co.sss.pr.repository.CustomerRepository;
@@ -51,6 +53,8 @@ class LoginControllerTest {
         form.setUserName("testuser");
         form.setUserPass("pass1234");
         Customer customer = activeCustomer(1);
+        customer.setBackgroundClass("bg-color");
+        customer.setBackgroundColor("#AABBCC");
         BindingResult bindingResult = mock(BindingResult.class);
         Model model = mock(Model.class);
         when(customerRepository.findAllByUserName("testuser")).thenReturn(List.of(customer));
@@ -120,6 +124,8 @@ class LoginControllerTest {
         form.setUserName("testuser");
         form.setUserPass("pass1234");
         Customer activeCustomer = activeCustomer(1);
+        activeCustomer.setBackgroundClass("bg-color");
+        activeCustomer.setBackgroundColor("#AABBCC");
         Customer deletedCustomer = activeCustomer(2);
         deletedCustomer.setDeleteFlag(true);
         BindingResult bindingResult = mock(BindingResult.class);
@@ -133,6 +139,35 @@ class LoginControllerTest {
 
         assertEquals("redirect:/mypage", view);
         verify(session).setAttribute(eq("user"), any());
+        verify(session).setAttribute("backgroundClass", "bg-color");
+        verify(session).setAttribute("backgroundColor", "#AABBCC");
+    }
+
+    @Test
+    void registersNewUserWithRequiredInitialLoginFields() {
+        CustomerForm form = new CustomerForm();
+        form.setUserName("newuser");
+        form.setUserPass("pass1234");
+        BindingResult bindingResult = mock(BindingResult.class);
+        Model model = mock(Model.class);
+        when(customerRepository.findByUserName("newuser")).thenReturn(null);
+        when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> {
+            Customer customer = invocation.getArgument(0);
+            customer.setUserId(4);
+            return customer;
+        });
+
+        String view = loginController.checkRegist(form, bindingResult, model);
+
+        assertEquals("redirect:/mypage", view);
+        verify(customerRepository).save(argThat(customer ->
+                customer.getLoginDate() != null
+                        && customer.getLoginCount() == 1
+                        && customer.getLoginFlag()
+                        && customer.getConsecutiveLoginDays() == 1
+                        && customer.getLastSeenAt() != null));
+        verify(levelService, never()).processLogin(any(Customer.class));
+        verify(session).setAttribute(eq("user"), any(CustomerBean.class));
     }
 
     private Customer activeCustomer(int userId) {

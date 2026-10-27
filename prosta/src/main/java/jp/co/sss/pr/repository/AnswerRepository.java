@@ -68,6 +68,48 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     int countByCustomerAndCorrectFlagTrue(Customer customer);
 
     @Query("""
+            SELECT c.categoryId AS categoryId,
+                   c.categoryName AS categoryName,
+                   COUNT(a.ansId) AS answerCount,
+                   COALESCE(SUM(CASE WHEN a.correctFlag = true THEN 1 ELSE 0 END), 0) AS correctCount
+            FROM Answer a
+            JOIN a.question q
+            JOIN q.category c
+            WHERE a.customer = :customer
+            GROUP BY c.categoryId, c.categoryName
+            ORDER BY c.categoryId
+            """)
+    List<CategoryStudySummary> summarizeByCategory(@Param("customer") Customer customer);
+
+    @Query("""
+            SELECT a.ansDate AS studyDate,
+                   c.categoryName AS categoryName,
+                   q.questionText AS questionText,
+                   a.correctFlag AS correctFlag
+            FROM Answer a
+            JOIN a.question q
+            JOIN q.category c
+            WHERE a.customer = :customer
+            ORDER BY a.ansId DESC
+            """)
+    Page<RecentStudyActivity> findRecentActivities(
+            @Param("customer") Customer customer, Pageable pageable);
+
+    @Query("""
+            SELECT a.ansDate AS studyDate,
+                   COUNT(a.ansId) AS answerCount,
+                   COALESCE(SUM(CASE WHEN a.correctFlag = true THEN 1 ELSE 0 END), 0) AS correctCount
+            FROM Answer a
+            WHERE a.customer = :customer
+              AND a.ansDate BETWEEN :fromDate AND :toDate
+            GROUP BY a.ansDate
+            """)
+    List<DailyStudySummary> summarizeDailyStudy(
+            @Param("customer") Customer customer,
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate);
+
+    @Query("""
             SELECT c.userId AS userId,
                    COUNT(a.ansId) AS answerCount,
                    COALESCE(SUM(CASE WHEN a.correctFlag = true THEN 1 ELSE 0 END), 0) AS correctCount

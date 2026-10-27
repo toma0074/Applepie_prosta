@@ -135,7 +135,18 @@ public class AdminQuestionController {
         q.setCorrectOption(form.getCorrectOption());
         String explanation = form.getExplanation() == null ? "" : form.getExplanation().trim();
         q.setExplanation(explanation.isEmpty() ? null : explanation);
-        questionRepository.save(q);
+        try {
+            questionRepository.save(q);
+            questionRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            if (creating) {
+                result.reject("saveFailed",
+                        "問題の登録に失敗しました。連番の不整合が疑われます。管理者にSEQ_QUESTIONの値を確認してください。");
+            } else {
+                result.reject("saveFailed", "問題の更新に失敗しました。入力値を確認して再実行してください。");
+            }
+            return form(model, form, creating);
+        }
 
         redirect.addFlashAttribute("message", creating ? "問題を登録しました。" : "問題を更新しました。");
         return "redirect:/admin/questions";

@@ -62,6 +62,11 @@ END;
 
    CREATE SEQUENCE  "PROSTA_USER"."SEQ_QUESTION"  MINVALUE 1 MAXVALUE 9999 INCREMENT BY 1 START WITH 61 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL ;
 --------------------------------------------------------
+--  DDL for Sequence SEQ_STUDY_PLAN
+--------------------------------------------------------
+
+   CREATE SEQUENCE  "PROSTA_USER"."SEQ_STUDY_PLAN"  MINVALUE 1 MAXVALUE 9999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL ;
+--------------------------------------------------------
 --  DDL for Sequence SEQ_USER
 --------------------------------------------------------
 
@@ -150,7 +155,9 @@ END;
 	"LOGIN_FLAG" NUMBER(1,0), 
 	"USER_LEVEL" NUMBER(10,0), 
 	"CONSECUTIVE_LOGIN_DAYS" NUMBER(10,0) DEFAULT 0, 
-	"LAST_SEEN_AT" TIMESTAMP (6)
+	"LAST_SEEN_AT" TIMESTAMP (6),
+	"BACKGROUND_CLASS" VARCHAR2(32 CHAR),
+	"BACKGROUND_COLOR" VARCHAR2(7 CHAR)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -168,6 +175,8 @@ END;
    COMMENT ON COLUMN "PROSTA_USER"."CUSTOMER"."LOGIN_COUNT" IS 'ログイン日数';
    COMMENT ON COLUMN "PROSTA_USER"."CUSTOMER"."LOGIN_FLAG" IS 'ログインフラグ';
    COMMENT ON COLUMN "PROSTA_USER"."CUSTOMER"."USER_LEVEL" IS 'レベル';
+   COMMENT ON COLUMN "PROSTA_USER"."CUSTOMER"."BACKGROUND_CLASS" IS '選択中の背景クラス';
+   COMMENT ON COLUMN "PROSTA_USER"."CUSTOMER"."BACKGROUND_COLOR" IS 'カスタム背景色';
    COMMENT ON TABLE "PROSTA_USER"."CUSTOMER"  IS 'ユーザーテーブル';
 --------------------------------------------------------
 --  DDL for Table FAVORITE
@@ -202,6 +211,27 @@ END;
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
   TABLESPACE "USERS" ;
+--------------------------------------------------------
+--  DDL for Table STUDY_PLAN
+--------------------------------------------------------
+
+  CREATE TABLE "PROSTA_USER"."STUDY_PLAN"
+   ( "STUDY_PLAN_ID" NUMBER(10,0),
+     "USER_ID" NUMBER(5,0),
+     "PLAN_DATE" DATE,
+     "TITLE" VARCHAR2(100 CHAR),
+     "DETAILS" VARCHAR2(500 CHAR)
+   ) SEGMENT CREATION IMMEDIATE
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255
+ NOCOMPRESS LOGGING
+  TABLESPACE "USERS";
+
+   COMMENT ON COLUMN "PROSTA_USER"."STUDY_PLAN"."STUDY_PLAN_ID" IS '学習予定ID';
+   COMMENT ON COLUMN "PROSTA_USER"."STUDY_PLAN"."USER_ID" IS 'ユーザーID';
+   COMMENT ON COLUMN "PROSTA_USER"."STUDY_PLAN"."PLAN_DATE" IS '予定日';
+   COMMENT ON COLUMN "PROSTA_USER"."STUDY_PLAN"."TITLE" IS '予定タイトル';
+   COMMENT ON COLUMN "PROSTA_USER"."STUDY_PLAN"."DETAILS" IS '予定詳細';
+   COMMENT ON TABLE "PROSTA_USER"."STUDY_PLAN" IS '学習予定';
 --------------------------------------------------------
 --  DDL for Table QUESTION
 --------------------------------------------------------
@@ -677,6 +707,17 @@ Insert into PROSTA_USER.USER_ACHIEVEMENT (USER_ACH_ID,USER_ID,ACHIEVEMENT_ID,UNL
   BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
   TABLESPACE "USERS"  ENABLE;
 --------------------------------------------------------
+--  Constraints for Table STUDY_PLAN
+--------------------------------------------------------
+
+  ALTER TABLE "PROSTA_USER"."STUDY_PLAN" MODIFY ("STUDY_PLAN_ID" NOT NULL ENABLE);
+  ALTER TABLE "PROSTA_USER"."STUDY_PLAN" MODIFY ("USER_ID" NOT NULL ENABLE);
+  ALTER TABLE "PROSTA_USER"."STUDY_PLAN" MODIFY ("PLAN_DATE" NOT NULL ENABLE);
+  ALTER TABLE "PROSTA_USER"."STUDY_PLAN" MODIFY ("TITLE" NOT NULL ENABLE);
+  ALTER TABLE "PROSTA_USER"."STUDY_PLAN" ADD CONSTRAINT "PK_STUDY_PLAN" PRIMARY KEY ("STUDY_PLAN_ID")
+  USING INDEX TABLESPACE "USERS" ENABLE;
+
+--------------------------------------------------------
 --  Constraints for Table CATEGORY
 --------------------------------------------------------
 
@@ -713,6 +754,13 @@ Insert into PROSTA_USER.USER_ACHIEVEMENT (USER_ACH_ID,USER_ID,ACHIEVEMENT_ID,UNL
 	  REFERENCES "PROSTA_USER"."CUSTOMER" ("USER_ID") ENABLE;
   ALTER TABLE "PROSTA_USER"."FRIEND_CONNECTION" ADD CONSTRAINT "FK_FRIEND_CONNECTION_REQUESTER" FOREIGN KEY ("REQUESTED_BY_ID")
 	  REFERENCES "PROSTA_USER"."CUSTOMER" ("USER_ID") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table STUDY_PLAN
+--------------------------------------------------------
+
+  ALTER TABLE "PROSTA_USER"."STUDY_PLAN" ADD CONSTRAINT "FK_STUDY_PLAN_USER" FOREIGN KEY ("USER_ID")
+      REFERENCES "PROSTA_USER"."CUSTOMER" ("USER_ID") ENABLE;
+
 --------------------------------------------------------
 --  Ref Constraints for Table QUESTION
 --------------------------------------------------------
