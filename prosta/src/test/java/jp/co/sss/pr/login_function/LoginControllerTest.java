@@ -53,6 +53,8 @@ class LoginControllerTest {
         form.setUserName("testuser");
         form.setUserPass("pass1234");
         Customer customer = activeCustomer(1);
+        customer.setBackgroundClass("bg-color");
+        customer.setBackgroundColor("#AABBCC");
         BindingResult bindingResult = mock(BindingResult.class);
         Model model = mock(Model.class);
         when(customerRepository.findAllByUserName("testuser")).thenReturn(List.of(customer));
@@ -122,6 +124,8 @@ class LoginControllerTest {
         form.setUserName("testuser");
         form.setUserPass("pass1234");
         Customer activeCustomer = activeCustomer(1);
+        activeCustomer.setBackgroundClass("bg-color");
+        activeCustomer.setBackgroundColor("#AABBCC");
         Customer deletedCustomer = activeCustomer(2);
         deletedCustomer.setDeleteFlag(true);
         BindingResult bindingResult = mock(BindingResult.class);
@@ -135,6 +139,8 @@ class LoginControllerTest {
 
         assertEquals("redirect:/mypage", view);
         verify(session).setAttribute(eq("user"), any());
+        verify(session).setAttribute("backgroundClass", "bg-color");
+        verify(session).setAttribute("backgroundColor", "#AABBCC");
     }
 
     @Test
