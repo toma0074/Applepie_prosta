@@ -14,7 +14,7 @@
 }
 
 .char-svg {
-    width: 120px;
+    width: 150px;
     height: 150px;
     overflow: visible;
     filter: drop-shadow(0 4px 8px rgba(11, 52, 110, 0.18));
@@ -23,8 +23,8 @@
 /* ---- 進化後のキャラクター画像（PNG） ---- */
 .char-image {
     display: block;
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     max-width: 100%;
     object-fit: contain;
     filter: drop-shadow(0 3px 5px rgba(11, 52, 110, 0.18));
@@ -825,14 +825,14 @@ table.friends-ranking-table {
 }
 
 .ach-char-mini .char-svg {
-    width: 80px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
 }
 
 /* 実績ページの進化後キャラクター画像 */
 .ach-char-mini .char-image {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
 }
 
 .level-badge-sm {
@@ -1056,3 +1056,369 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
 .aq-form .inline { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
 .aq-form .inline label { display: inline-flex; align-items: center; gap: 4px; font-weight: normal; }
 .aq-form .buttons { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
+
+
+/* =========================================================
+   試験画面：タイマーとキャラクターの固定表示
+   ========================================================= */
+
+/* タイマーとキャラクターをまとめるコンテナ */
+.exam-fixed-tools {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    width: 150px;
+    max-width: calc(100vw - 24px);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    z-index: 1200;
+    box-sizing: border-box;
+}
+
+/* タイマーをコンパクトにする */
+.exam-fixed-tools #test-timer.tt-box {
+    position: static;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 8px 10px;
+
+    box-sizing: border-box;
+    text-align: left;
+
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #0B346E;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(11, 52, 110, 0.16);
+}
+
+/* タイマーの見出し */
+.exam-fixed-tools #test-timer .tt-label {
+    margin-bottom: 4px;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+/* 残り時間とバー */
+.exam-fixed-tools #test-timer .tt-body {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 0;
+}
+
+.exam-fixed-tools #test-timer .tt-bar {
+    height: 7px;
+}
+
+.exam-fixed-tools #test-timer .tt-text {
+    min-width: 58px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* 試験中キャラクター */
+.exam-character {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100px;
+    max-width: 100%;
+    margin: 0;
+}
+
+.exam-character img {
+    display: block;
+    width: 100%;
+    max-height: 105px;
+    height: auto;
+    object-fit: contain;
+
+    filter: drop-shadow(
+        0 3px 5px rgba(11, 52, 110, 0.16)
+    );
+}
+
+/* スマートフォンなどの狭い画面 */
+@media (max-width: 600px) {
+    .exam-fixed-tools {
+        top: 8px;
+        right: 8px;
+        width: 118px;
+        gap: 4px;
+    }
+
+    .exam-fixed-tools #test-timer.tt-box {
+        padding: 6px 7px;
+    }
+
+    .exam-fixed-tools #test-timer .tt-label {
+        font-size: 10px;
+    }
+
+    .exam-fixed-tools #test-timer .tt-text {
+        min-width: 52px;
+        font-size: 10px;
+    }
+
+    .exam-character {
+        width: 78px;
+    }
+
+    .exam-character img {
+        max-height: 85px;
+    }
+}
+/* 問題選択画面の先生キャラクター */
+.selection-guide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 8px auto 16px;
+}
+
+.selection-guide img {
+    display: block;
+    width: 100px;
+    max-height: 115px;
+    object-fit: contain;
+}
+
+/* テスト結果：レベル変化とキャラクター */
+.result-level-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 12px auto 20px;
+}
+
+.result-level-change {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: #0B346E;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.level-value {
+    white-space: nowrap;
+}
+
+.level-arrow {
+    font-size: 22px;
+    color: #1a5cba;
+}
+
+.result-level-character {
+    display: block;
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+}
+
+/* 正解率に応じた結果キャラクター */
+.result-character {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 16px auto;
+}
+
+.result-character img {
+    display: block;
+    width: 120px;
+    height: 120px;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(
+        0 3px 5px rgba(11, 52, 110, 0.16)
+    );
+}
+
+@media (max-width: 600px) {
+    .result-level-change {
+        font-size: 15px;
+        gap: 5px;
+    }
+
+    .result-level-character {
+        width: 70px;
+        height: 70px;
+    }
+
+    .result-character img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .selection-guide img {
+        width: 85px;
+    }
+}
+/* 選択画面の先生キャラクター：右寄せ＋浮遊 */
+.selection-guide {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 8px 24px 16px 0;
+    animation: charFloat 3s ease-in-out infinite;
+}
+
+.selection-guide img {
+    display: block;
+    width: 100px;
+    max-height: 115px;
+    object-fit: contain;
+}
+
+/* 試験中のキャラクター：右上固定 */
+.exam-fixed-tools {
+    position: fixed;
+    top: 105px;
+    right: 16px;
+    width: 140px;
+    max-width: calc(100vw - 32px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 1200;
+    box-sizing: border-box;
+}
+
+/* 既存タイマーを小型化 */
+.exam-fixed-tools #test-timer.tt-box {
+    position: static;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 7px 9px;
+    box-sizing: border-box;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #0B346E;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(11, 52, 110, 0.16);
+}
+
+.exam-fixed-tools #test-timer .tt-label {
+    margin-bottom: 4px;
+    font-size: 10px;
+}
+
+.exam-fixed-tools #test-timer .tt-body {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 0;
+}
+
+.exam-fixed-tools #test-timer .tt-bar {
+    height: 6px;
+}
+
+.exam-fixed-tools #test-timer .tt-text {
+    min-width: 53px;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+/* 学習キャラクター */
+.exam-character {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 94px;
+    animation: charFloat 3s ease-in-out infinite;
+}
+
+.exam-character img {
+    display: block;
+    width: 100%;
+    max-height: 100px;
+    height: auto;
+    object-fit: contain;
+    transform-origin: bottom center;
+    animation: studyWave 2.4s ease-in-out infinite;
+    filter: drop-shadow(0 3px 5px rgba(11, 52, 110, 0.16));
+}
+
+/* 小さな左右の揺れ：手を振るような印象 */
+@keyframes studyWave {
+    0%, 100% { transform: rotate(-1deg); }
+    50%      { transform: rotate(1.5deg); }
+}
+
+/* 結果画面のキャラクター */
+.result-level-character {
+    display: block;
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    animation: charFloat 3s ease-in-out infinite;
+}
+
+@media (max-width: 600px) {
+    .selection-guide {
+        margin-right: 12px;
+    }
+
+    .selection-guide img {
+        width: 85px;
+    }
+
+    .exam-fixed-tools {
+        top: 95px;
+        right: 8px;
+        width: 115px;
+        gap: 4px;
+    }
+
+    .exam-fixed-tools #test-timer.tt-box {
+        padding: 6px 7px;
+    }
+
+    .exam-character {
+        width: 76px;
+    }
+
+    .exam-character img {
+        max-height: 80px;
+    }
+
+    .result-level-character {
+        width: 70px;
+        height: 70px;
+    }
+}
+/* 実績一覧：マイページに戻るボタンを中央配置 */
+.achievement-back-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 24px auto 32px;
+}
+
+.achievement-back-area .btn {
+    margin: 0;
+}
+
+.level-up-message {
+    margin: 8px 0 12px;
+    color: #7c5cd8;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    animation: charFloat 2s ease-in-out infinite;
+}

@@ -7,6 +7,10 @@
 </head>
 <body>
 <h3>苦手範囲特定問題選択画面</h3>
+<div class="selection-guide">
+    <img th:src="@{/images/suta_teach.png}"
+         alt="問題選択を案内するキャラクター">
+</div>
 <div class="test_select">
   <form th:action="@{/test/diagnostic/start}" method="get">
     <p class="error">

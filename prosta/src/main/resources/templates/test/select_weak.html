@@ -7,6 +7,10 @@
 </head>
 <body>
 <h3>弱点問題選択画面</h3>
+<div class="selection-guide">
+    <img th:src="@{/images/suta_teach.png}"
+         alt="問題選択を案内するキャラクター">
+</div>
 <div class="test_select">
   <p>これまでの解答履歴から、正答率の低い問題を最大15問出題します。<br/>
      （<span th:text="${minAttempts}">2</span>回以上解答していて、全問正解ではない問題が対象です）</p>

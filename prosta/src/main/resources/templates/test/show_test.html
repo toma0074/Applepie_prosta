@@ -7,7 +7,21 @@
 </head>
 <body>
 <h3>問題解答画面</h3>
-<div th:replace="~{common/timer :: timer('answer')}"></div>
+
+<!-- タイマーと試験中キャラクターを右上に固定 -->
+<div class="exam-fixed-tools">
+
+    <!-- タイマー：有効な場合だけ表示 -->
+    <div th:replace="~{common/timer :: timer('answer')}"></div>
+
+    <!-- 試験中のキャラクター -->
+    <div class="exam-character">
+        <img th:src="@{/images/suta_learn.png}"
+             alt="学習中のキャラクター">
+    </div>
+
+</div>
+
 <div>
   <form id="answer-form" th:action="@{/test/check}" method="post" th:object="${answerListForm}">
     <p class="error-message">
