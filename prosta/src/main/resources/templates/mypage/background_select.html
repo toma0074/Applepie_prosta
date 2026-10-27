@@ -12,6 +12,18 @@
 
 <div class="background-list">
 
+<form th:action="@{/background/default}" method="post">
+
+    <button
+        type="submit"
+        class="btn">
+
+        デフォルトに戻す
+
+    </button>
+
+</form>
+
 <p>カスタムカラーを設定</p>
 
 <form th:action="@{/background/changeColor}" method="post">
@@ -37,84 +49,180 @@
 </form>
 
 <p>背景を画像から選択</p>
-    <form th:action="@{/background/change}" method="post">
-
+     <form th:action="@{/background/change}"
+      method="post"
+      class="background-grid">
+      
         <!-- Lv1～ -->
-    <button
-        type="submit"
-        name="background"
-        value="bg-grass"
-        class="bg-card">
-
-        <img th:src="@{/images/bg_grass.jpg}">
-        <span>草原</span>
-
-    </button>
-
-        <!-- Lv10～ -->
-    <button
-        th:if="${level >= 10}"
-        type="submit"
-        name="background"
-        value="bg-sea"
-        class="bg-card">
-
-        <img th:src="@{/images/bg_sea.jpg}">
-        <span>海</span>
-
-    </button>
-
-        <!-- Lv25～ -->
-    <button
-        th:if="${level >= 25}"
+   <button
         type="submit"
         name="background"
         value="bg-sky"
         class="bg-card">
 
         <img th:src="@{/images/bg_sky.jpg}">
-        <span>青空</span>
+        <span>キラキラ（ピンク）</span>
 
     </button>
 
-        <!-- Lv50～ -->
-    <button
-        th:if="${level >= 50}"
-        type="submit"
-        name="background"
-        value="bg-sakura"
-        class="bg-card">
+<!-- Lv10～ -->
+       <th:block th:if="${level >= 10}">
+        <button
+            type="submit"
+            name="background"
+            value="bg-castle"
+            class="bg-card">
 
-        <img th:src="@{/images/bg_sakura.jpg}">
-        <span>桜</span>
+            <img th:src="@{/images/bg_castle.jpg}">
+            <span>キラキラ（青）</span>
 
-    </button>
+        </button>
+        </th:block>
+        <th:block th:unless="${level >= 10}">
+        <div class="bg-card ach-locked bg-locked-card">
 
-        <!-- Lv75～ -->
+        <div class="ach-card-icon ach-locked-icon">🔒</div>
+
+        <div class="ach-card-name">???</div>
+
+        <div class="ach-card-desc">
+            Lv10で解放
+        </div>
+
+       <div class="ach-card-badge ach-badge-locked">
+        未解除
+       </div>
+
+       </div>
+       </th:block>
+
+<!-- Lv25～ -->
+        <th:block th:if="${level >= 25}">
+        <button
+            type="submit"
+            name="background"
+            value="bg-grass"
+            class="bg-card">
+
+            <img th:src="@{/images/bg_grass.jpg}">
+            <span>宇宙（ピンク）</span>
+
+        </button>
+        </th:block>
+        
+        <th:block th:unless="${level >= 25}">
+        <div class="bg-card ach-locked bg-locked-card">
+
+        <div class="ach-card-icon ach-locked-icon">🔒</div>
+
+        <div class="ach-card-name">???</div>
+
+        <div class="ach-card-desc">
+            Lv25で解放
+        </div>
+
+       <div class="ach-card-badge ach-badge-locked">
+        未解除
+       </div>
+
+       </div>
+       </th:block>
+
+<!-- Lv50～ -->
+    <th:block th:if="${level >= 50}">
+        <button
+            type="submit"
+            name="background"
+            value="bg-forest"
+            class="bg-card">
+
+            <img th:src="@{/images/bg_forest.jpg}">
+            <span>宇宙（青）</span>
+
+        </button>
+        </th:block>
+        <th:block th:unless="${level >= 50}">
+        <div class="bg-card ach-locked bg-locked-card">
+
+        <div class="ach-card-icon ach-locked-icon">🔒</div>
+
+        <div class="ach-card-name">???</div>
+
+        <div class="ach-card-desc">
+            Lv50で解放
+        </div>
+
+       <div class="ach-card-badge ach-badge-locked">
+        未解除
+       </div>
+
+       </div>
+       </th:block>
+
+<!-- Lv75～ -->
+    <th:block th:if="${level >= 75}">
     <button
         th:if="${level >= 75}"
         type="submit"
         name="background"
-        value="bg-forest"
+        value="bg-mori"
         class="bg-card">
 
-        <img th:src="@{/images/bg_forest.jpg}">
-        <span>魔法の森</span>
+        <img th:src="@{/images/mori.jpg}">
+        <span>森</span>
 
     </button>
+    </th:block>
+    <th:block th:unless="${level >= 75}">
+        <div class="bg-card ach-locked bg-locked-card">
 
-        <!-- Lv100～ -->
-    <button
-        th:if="${level >= 100}"
-        type="submit"
-        name="background"
-        value="bg-space"
-        class="bg-card">
+        <div class="ach-card-icon ach-locked-icon">🔒</div>
 
-        <img th:src="@{/images/bg_space.jpg}">
-        <span>星界</span>
+        <div class="ach-card-name">???</div>
 
-    </button>
+        <div class="ach-card-desc">
+            Lv75で解放
+        </div>
+
+       <div class="ach-card-badge ach-badge-locked">
+        未解除
+       </div>
+
+       </div>
+    </th:block>
+
+<!-- Lv100～ -->
+        <th:block th:if="${level >= 100}">
+        <button
+            th:if="${level >= 100}"
+            type="submit"
+            name="background"
+            value="bg-game"
+            class="bg-card">
+
+            <img th:src="@{/images/game.jpg}">
+            <span>ゲーム</span>
+        
+        </button>
+        </th:block>
+        
+        <th:block th:unless="${level >= 100}">
+        <div class="bg-card ach-locked bg-locked-card">
+
+        <div class="ach-card-icon ach-locked-icon">🔒</div>
+
+        <div class="ach-card-name">???</div>
+
+        <div class="ach-card-desc">
+            Lv100で解放
+        </div>
+
+       <div class="ach-card-badge ach-badge-locked">
+        未解除
+       </div>
+
+       </div>
+       </th:block>
 
 
     </form>
