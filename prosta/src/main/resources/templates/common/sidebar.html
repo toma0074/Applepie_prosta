@@ -11,6 +11,8 @@
 		<div>
 			<ul class="sidebar-menu">
 				<li><a class="sidebar-link" th:href="@{/mypage}">MyPage</a></li>
+				<li><a class="sidebar-link" th:href="@{/learning-status}">学習状況</a></li>
+				<li><a class="sidebar-link" th:href="@{/study-calendar}">学習カレンダー</a></li>
 				<li th:if="${session.user != null and session.user.permission == 0}">
 					<a class="sidebar-link" th:href="@{/friends}">フレンド
 						<span th:if="${pendingFriendRequestCount != null and pendingFriendRequestCount > 0}"

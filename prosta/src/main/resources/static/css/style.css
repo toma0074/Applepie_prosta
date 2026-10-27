@@ -73,7 +73,8 @@ header nav ul li a:hover{
 	width:90%;
 	margin:0 auto;
 	max-width:1280px;
-	height:640px;
+	height:100vh;
+	height:100svh;
 	position:relative;
 	padding-top: 100px;
 }
@@ -388,7 +389,6 @@ footer ul li a:hover{
 	}
 
 	.main_visual .container {
-		height: 520px;
 		padding-top: 80px;
 	}
 	.main_visual .title {
@@ -449,6 +449,7 @@ footer ul li a:hover{
 	}
 	.category_grid {
 		gap: 16px 4%;
+		max-width: 620px;
 	}
 	.section2 .col {
 		width: 48%;
