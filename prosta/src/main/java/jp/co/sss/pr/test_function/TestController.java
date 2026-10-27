@@ -242,9 +242,15 @@ public class TestController {
     @RequestMapping(path = "/test/result", method = RequestMethod.POST)
     public String resulttTest(Model model, AnswerListForm ans) {
 
-        CustomerBean userBean = (CustomerBean) session.getAttribute("user");
-        Customer user = customerRepository.getReferenceById(userBean.getUserId());
+        CustomerBean userBean =
+                (CustomerBean) session.getAttribute("user");
 
+        Customer user =
+                customerRepository.getReferenceById(userBean.getUserId());
+
+        // 再計算前のレベル
+        int previousLevel = user.getUserLevel();
+        
         @SuppressWarnings("unchecked")
         List<AnswerForm> results = (List<AnswerForm>) session.getAttribute("ans");
         if (results == null || results.isEmpty() || session.getAttribute("question") == null) {
@@ -299,10 +305,57 @@ public class TestController {
         }
 
         // 最新レベルを取得（processTestResult 内で save 済み）
-        Customer updatedUser = customerRepository.getReferenceById(user.getUserId());
+        Customer updatedUser =
+                customerRepository.getReferenceById(user.getUserId());
+
         int currentLevel = updatedUser.getUserLevel();
         boolean isPerfect = qCount > 0 && caCount == qCount;
 
+       
+        // 現在のレベルと、レベルアップしたかどうかを判定
+
+        boolean leveledUp = currentLevel > previousLevel;
+
+        // 正解率に応じたキャラクターとメッセージ
+        String scoreCharacter = null;
+        String characterMessage = "";
+
+        if (qCount > 0) {
+            if (caCount == qCount) {
+                // 満点
+                scoreCharacter = "suta_v_happy.png";
+                characterMessage = "満点！すばらしいね！努力が実ったね！";
+
+            } else if (caCount * 4 <= qCount) {
+                // 正解率25%以下
+                scoreCharacter = "suta_sad.png";
+                characterMessage = "大丈夫！ここから一歩ずつ成長していこう！";
+
+            } else if (caCount * 2 <= qCount) {
+                // 正解率25%超～50%以下
+                scoreCharacter = "suta_cry.png";
+                characterMessage = "惜しい！間違えた問題を復習して、次はもっと正解しよう！";
+
+            } else if (caCount * 4 < qCount * 3) {
+                // 正解率50%超～75%未満
+                scoreCharacter = "suta_amaze.png";
+                characterMessage = "いい調子！もう少しでさらに上を目指せるよ！";
+
+            } else {
+                // 正解率75%以上、満点未満
+                scoreCharacter = "suta_happy.png";
+                characterMessage = "すごい！この調子で満点を目指そう！";
+            }
+        }
+
+        // レベルアップ時は、専用キャラクターとメッセージを優先
+        String displayCharacter =
+                leveledUp ? "suta_star.png" : scoreCharacter;
+
+        if (leveledUp) {
+            characterMessage = "レベルアップ！毎日の努力が実ったね！";
+        }
+                      
         Map<String, Object> view = new LinkedHashMap<>();
         view.put("cateCorrect",    categCount);
         view.put("cateCount",      cateCount);
@@ -310,9 +363,14 @@ public class TestController {
         view.put("ca",             caCount);
         view.put("ans",            results);
         view.put("currentLevel",   currentLevel);
-        view.put("loginCount",     updatedUser.getLoginCount());
         view.put("isPerfect",      isPerfect);
         view.put("newAchievements", newAchievements);
+        view.put("previousLevel", previousLevel);
+        view.put("displayCharacter", displayCharacter);
+        
+        view.put("leveledUp", leveledUp);
+        view.put("characterMessage", characterMessage);
+        
         session.setAttribute(RESULT_VIEW, view);
 
         session.removeAttribute("question");
@@ -321,6 +379,8 @@ public class TestController {
 
         // 再読み込みやブラウザバックでの二重登録を防ぐため、リダイレクトで結果を表示する
         return "redirect:/test/result";
+        
+        
     }
 
     // 解答結果の表示（保存済みの結果をセッションから読む）

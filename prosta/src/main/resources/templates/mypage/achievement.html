@@ -33,13 +33,10 @@
     </div>
   </div>
 
-  <!-- ===== 現在のキャラクター（小） ===== -->
-  <div class="ach-char-mini">
+<!-- ===== 現在のキャラクター（小） ===== -->
+<div class="ach-char-mini">
     <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
-    <div class="ach-level-info">
-      <span class="level-badge-sm">Lv.<strong th:text="${currentLevel}">1</strong></span>
-    </div>
-  </div>
+</div>
 
   <!-- ===== 実績カードグリッド ===== -->
   <div class="ach-grid">
@@ -90,9 +87,11 @@
     </table>
   </div>
 
-  <div class="mypage-links">
-    <p class="btn"><a th:href="@{/mypage}">マイページに戻る</a></p>
-  </div>
+<div class="achievement-back-area">
+    <p class="btn">
+        <a th:href="@{/mypage}">マイページに戻る</a>
+    </p>
+</div>
 
 </main>
 </body>

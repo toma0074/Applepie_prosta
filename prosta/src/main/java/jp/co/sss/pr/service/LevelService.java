@@ -109,12 +109,28 @@ public class LevelService {
      * @return 今回新しく解除された実績リスト
      */
     @Transactional
-    public List<Achievement> processTestResult(Customer customer, int correctCount, int totalCount) {
-        // レベル再計算（answerテーブルの全履歴を参照）
+    public List<Achievement> processTestResult(
+            Customer customer, int correctCount, int totalCount) {
+
+        // 1回のテストで満点なら、満点回数を1増やす
+        if (totalCount > 0 && correctCount == totalCount) {
+            customer.setPerfectTestCount(
+                    customer.getPerfectTestCount() + 1);
+        }
+
+        // レベル再計算
         recalcLevel(customer);
         customerRepository.save(customer);
 
-        return checkAchievements(customer);
+        // 通常の実績をチェック
+        List<Achievement> newlyUnlocked = checkAchievements(customer);
+
+        // 実績ID 15：1回のテストで0問正解
+        if (totalCount > 0 && correctCount == 0) {
+            tryUnlock(customer, 15, newlyUnlocked);
+        }
+
+        return newlyUnlocked;
     }
 
     // ----------------------------------------------------------------
@@ -126,28 +142,33 @@ public class LevelService {
      *
      * <p>レベル = ログイン日数 + 連続ログインボーナス + (総正解数 × 2) + (満点回数 × 5)
      * <ul>
-     *   <li>ログイン日数 : customer.login_count（1日1カウント）</li>
-     * <li>連続ログインボーナス : consecutive_login_days が 7の倍数のとき +10</li>
+     *   <li>ログイン日数 : 2日につき1ポイント</li>
+     * <li>連続ログインボーナス :7日ごとに5ポイント</li>
      *   <li>総正解数   : answer テーブルの correct_flag=true の件数</li>
      *   <li>満点回数   : 同一 ans_date に全問正解した日の回数</li>
      * </ul>
      * 最小値は 1。
      */
     private void recalcLevel(Customer customer) {
+
         int loginCount = customer.getLoginCount();
 
-        // 連続ログインボーナス（7の倍数ごとに+10）
-        int streakBonus = (customer.getConsecutiveLoginDays() / 7) * 10;
+        // ログイン日数：2日につき1ポイント
+        int loginBonus = loginCount / 2;
 
-        // 正解数（answer.correct_flag = true の件数）
-        int totalCorrect = answerRepository.countByCustomerAndCorrectFlagTrue(customer);
+        // 連続ログイン：7日ごとに5ポイント
+        int streakBonus =
+                (customer.getConsecutiveLoginDays() / 7) * 5;
 
-        // 満点回数（1日内で全問正解した回数）
-        int perfectDays = answerRepository.countPerfectDaysByCustomer(customer);
+        // 総正解数
+        int totalCorrect =
+                answerRepository.countByCustomerAndCorrectFlagTrue(customer);
 
-        int level = loginCount + streakBonus + (totalCorrect * 2) + (perfectDays * 5);
-        level = Math.max(1, level);
+        // 満点だった日数（従来のレベル計算用）
+        int perfectDays =
+                answerRepository.countPerfectDaysByCustomer(customer);
 
+        int level = (int) (customer.getTotalExp() / 15) + 1;
         customer.setUserLevel(level);
     }
 
@@ -180,32 +201,84 @@ public class LevelService {
         List<Achievement> newlyUnlocked = new ArrayList<>();
 
         int consecutiveLoginDays = customer.getConsecutiveLoginDays();
-        int level       = customer.getUserLevel();
-        int perfectDays = answerRepository.countPerfectDaysByCustomer(customer);
+        int loginCount = customer.getLoginCount();
+        int level = customer.getUserLevel();
 
-        // 実績ID 1: 連続7日ログイン
+        // テスト単位で集計した累計満点回数
+        int perfectTestCount = customer.getPerfectTestCount();
+
+        // 累計正解数
+        int totalCorrect =
+                answerRepository.countByCustomerAndCorrectFlagTrue(customer);
+
+        // ID 1: 連続7日ログイン
         if (consecutiveLoginDays >= 7) {
             tryUnlock(customer, 1, newlyUnlocked);
         }
-        // 実績ID 2: 満点1回
-        if (perfectDays >= 1) {
+
+        // ID 2: 満点1回
+        if (perfectTestCount >= 1) {
             tryUnlock(customer, 2, newlyUnlocked);
         }
-        // 実績ID 3: 満点3回
-        if (perfectDays >= 3) {
+
+        // ID 3: 満点3回
+        if (perfectTestCount >= 3) {
             tryUnlock(customer, 3, newlyUnlocked);
         }
-        // 実績ID 4: 満点7回
-        if (perfectDays >= 7) {
+
+        // ID 4: 満点7回
+        if (perfectTestCount >= 7) {
             tryUnlock(customer, 4, newlyUnlocked);
         }
-        // 実績ID 5: レベル10
+
+        // ID 5: レベル10
         if (level >= 10) {
             tryUnlock(customer, 5, newlyUnlocked);
         }
-        // 実績ID 6: レベル50
+
+        // ID 6: レベル50
         if (level >= 50) {
             tryUnlock(customer, 6, newlyUnlocked);
+        }
+
+        // ID 7: レベル25
+        if (level >= 25) {
+            tryUnlock(customer, 7, newlyUnlocked);
+        }
+
+        // ID 8: レベル75
+        if (level >= 75) {
+            tryUnlock(customer, 8, newlyUnlocked);
+        }
+
+        // ID 9: レベル100
+        if (level >= 100) {
+            tryUnlock(customer, 9, newlyUnlocked);
+        }
+
+        // ID 10: 正解100問
+        if (totalCorrect >= 100) {
+            tryUnlock(customer, 10, newlyUnlocked);
+        }
+
+        // ID 11: 正解500問
+        if (totalCorrect >= 500) {
+            tryUnlock(customer, 11, newlyUnlocked);
+        }
+
+        // ID 12: 満点10回
+        if (perfectTestCount >= 10) {
+            tryUnlock(customer, 12, newlyUnlocked);
+        }
+
+        // ID 13: 30日連続ログイン
+        if (consecutiveLoginDays >= 30) {
+            tryUnlock(customer, 13, newlyUnlocked);
+        }
+
+        // ID 14: 累計ログイン100日
+        if (loginCount >= 100) {
+            tryUnlock(customer, 14, newlyUnlocked);
         }
 
         return newlyUnlocked;
@@ -234,9 +307,8 @@ public class LevelService {
      * 満点回数を返す（AchievementController などの表示用）。
      */
     public int getPerfectCount(Customer customer) {
-        return answerRepository.countPerfectDaysByCustomer(customer);
+        return customer.getPerfectTestCount();
     }
-
     /**
      * 総正解数を返す（表示用）。
      */

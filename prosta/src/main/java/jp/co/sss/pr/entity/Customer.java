@@ -51,6 +51,12 @@ public class Customer {
     @Column(name = "last_seen_at")
     private LocalDateTime lastSeenAt;
 
+    @Column(name = "perfect_test_count", nullable = false)
+    private Integer perfectTestCount = 0;
+    
+    @Column(name = "total_exp", nullable = false)
+    private Long totalExp = 0L;
+    
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
     public String getUserName() { return userName; }
@@ -73,4 +79,14 @@ public class Customer {
     public void setConsecutiveLoginDays(Integer consecutiveLoginDays) { this.consecutiveLoginDays = consecutiveLoginDays; }
     public LocalDateTime getLastSeenAt() { return lastSeenAt; }
     public void setLastSeenAt(LocalDateTime lastSeenAt) { this.lastSeenAt = lastSeenAt; }
+    public Integer getPerfectTestCount() {
+        return perfectTestCount == null ? 0 : perfectTestCount;}
+    public void setPerfectTestCount(Integer perfectTestCount) {
+        this.perfectTestCount = perfectTestCount;}
+    public Long getTotalExp() {
+        return totalExp == null ? 0L : totalExp;
+    }
+    public void setTotalExp(Long totalExp) {
+        this.totalExp = totalExp;
+    }
 }

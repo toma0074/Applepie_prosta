@@ -19,19 +19,49 @@
   </div>
 </div>
 
-<!-- ===== レベルパネル ===== -->
+<!-- ===== レベル変化パネル ===== -->
 <div class="result-status-panel">
-  <div class="result-exp-gained">
-    <span class="exp-gained-icon">✨</span>
-    <span>現在レベル：<strong th:text="${currentLevel}">1</strong></span>
-    <span th:if="${isPerfect}" class="perfect-badge">🌟 満点！</span>
-  </div>
-  <div class="stats-row" style="justify-content:center;margin-top:8px;">
-    <div class="stat-chip">
-      <span class="stat-icon">📅</span>
-      ログイン日数 <strong th:text="${loginCount}">0</strong>日
+<!-- レベル変化とキャラクター -->
+<div class="result-level-row">
+
+    <div class="result-level-change">
+        <span>
+            レベル<strong th:text="${previousLevel}">1</strong>
+        </span>
+
+        <span class="level-arrow" aria-label="から">→</span>
+
+        <span>
+            レベル<strong th:text="${currentLevel}">2</strong>
+        </span>
     </div>
-  </div>
+
+    <!-- 結果画面にはキャラクターを1体だけ表示 -->
+    <img th:if="${displayCharacter != null}"
+         class="result-level-character"
+         th:src="@{/images/{filename}(filename=${displayCharacter})}"
+         alt="テスト結果キャラクター">
+
+</div>
+
+<div class="result-exp-gained">
+    <span th:if="${isPerfect}" class="perfect-badge">
+        🌟 満点！
+    </span>
+</div>
+</div>
+
+<p th:if="${leveledUp}" class="level-up-message">
+    🎉 レベルアップしました！
+</p>
+
+<!-- ===== 正解率に応じたキャラクター ===== -->
+<div class="result-character"
+     th:if="${resultCharacter != null}">
+
+    <img th:src="@{/images/{filename}(filename=${resultCharacter})}"
+         alt="テスト結果キャラクター">
+
 </div>
 
 <!-- ===== 解答結果 ===== -->
