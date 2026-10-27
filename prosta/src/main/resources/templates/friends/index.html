@@ -333,6 +333,18 @@
       showMessage(error.message, true);
       replaceWithEmpty(friendsList, '友達情報を読み込めませんでした。');
     });
+
+  const PRESENCE_REFRESH_INTERVAL = 60000;
+  setInterval(() => {
+    if (!document.hidden) {
+      loadFriends().catch((error) => showMessage(error.message, true));
+    }
+  }, PRESENCE_REFRESH_INTERVAL);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      loadFriends().catch((error) => showMessage(error.message, true));
+    }
+  });
 })();
 </script>
 </body>

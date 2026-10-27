@@ -21,6 +21,12 @@
     transition: 0.2s;
 }
 
+.btn a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
 .btn:hover {
     color: #fff;
     background-color: rgba(15, 37, 64, 0.5);

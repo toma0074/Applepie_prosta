@@ -38,7 +38,7 @@ import jp.co.sss.pr.repository.FriendStudySummary;
 @RequestMapping("/api/friends")
 public class FriendController {
 
-    private static final int ONLINE_WINDOW_MINUTES = 10;
+    private static final int ONLINE_WINDOW_MINUTES = 5;
     private static final int MAX_COMPARISON_DAYS = 366;
     private static final int MAX_USER_SEARCH_RESULTS = 20;
 
@@ -70,7 +70,7 @@ public class FriendController {
 
         return customerRepository.findByDeleteFlagAndPermissionAndUserNameContaining(
                         false,
-                        1,
+                        0,
                         normalizedQuery,
                         PageRequest.of(0, MAX_USER_SEARCH_RESULTS + 1, Sort.by("userName").ascending()))
                 .stream()
