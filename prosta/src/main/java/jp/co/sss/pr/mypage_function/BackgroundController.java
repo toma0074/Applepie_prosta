@@ -67,4 +67,13 @@ public class BackgroundController {
 
         return "redirect:/background";
     }
+    @PostMapping("/background/default")
+    public String defaultBackground(
+            HttpSession session) {
+
+        session.removeAttribute("backgroundClass");
+        session.removeAttribute("backgroundColor");
+
+        return "redirect:/background";
+    }
 }

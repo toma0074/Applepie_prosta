@@ -437,50 +437,40 @@ body.bg-castle{
 	rgba(255,255,255,0.5)),
 	url("../images/bg_castle.jpg");
 }
-body.bg-sea{
+body.bg-mori{
 	background-image:
 	linear-gradient(
 	rgba(255,255,255,0.5),
 	rgba(255,255,255,0.5)),
-	url("../images/bg_sea.jpg");
+	url("../images/mori.jpg");
 }
 
-body.bg-sakura{
+body.bg-game{
 	background-image:
 	linear-gradient(
 	rgba(255,255,255,0.5),
 	rgba(255,255,255,0.5)),
-	url("../images/bg_sakura.jpg");
+	url("../images/game.jpg");
 }
 
-body.bg-space{
-	background-image:
-	linear-gradient(
-	rgba(255,255,255,0.5),
-	rgba(255,255,255,0.5)),
-	url("../images/bg_space.jpg");
-}
 .bg-card{
-
-	width:220px;
-
-	padding:12px;
+	width:280px;
+	padding:8px;
 
 	border:none;
 	border-radius:12px;
 
-	background:rgba(255,255,255,0.65);
+	background:rgba(255,255,255,0.85);
 
-	backdrop-filter: blur(8px);
+	backdrop-filter:blur(8px);
 
-	box-shadow:
-		0 4px 10px rgba(0,0,0,0.08);
+	box-shadow:0 4px 10px rgba(0,0,0,0.08);
 
 	cursor:pointer;
 
 	transition:all .2s ease;
-
 }
+
 .bg-card{
 
 	appearance:none;
@@ -499,17 +489,11 @@ body.bg-space{
 }
 
 .bg-card img{
-
 	width:100%;
-
-	height:130px;
-
+	height:180px;
 	object-fit:cover;
-
 	border-radius:8px;
-
 	display:block;
-
 }
 
 .bg-card span{
@@ -527,7 +511,15 @@ body.bg-space{
 	color:#0B346E;
 
 }
+.background-grid{
+	display:grid;
 
+	grid-template-columns:repeat(3, 280px);
+
+	gap:20px;
+
+	justify-content:start;
+}
 /* ---- スマホ: メイン領域の中央寄せ（PCは変更なし） ---- */
 @media (max-width: 1184px) {
   .contents {

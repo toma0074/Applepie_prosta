@@ -37,8 +37,10 @@
 </form>
 
 <p>背景を画像から選択</p>
-    <form th:action="@{/background/change}" method="post">
-
+     <form th:action="@{/background/change}"
+      method="post"
+      class="background-grid">
+      
         <!-- Lv1～ -->
     <button
         type="submit"
@@ -47,7 +49,7 @@
         class="bg-card">
 
         <img th:src="@{/images/bg_grass.jpg}">
-        <span>草原</span>
+        <span>宇宙</span>
 
     </button>
 
@@ -56,11 +58,11 @@
         th:if="${level >= 10}"
         type="submit"
         name="background"
-        value="bg-sea"
+        value="bg-mori"
         class="bg-card">
 
-        <img th:src="@{/images/bg_sea.jpg}">
-        <span>海</span>
+        <img th:src="@{/images/mori.jpg}">
+        <span>森</span>
 
     </button>
 
@@ -82,11 +84,11 @@
         th:if="${level >= 50}"
         type="submit"
         name="background"
-        value="bg-sakura"
+        value="bg-game"
         class="bg-card">
 
-        <img th:src="@{/images/bg_sakura.jpg}">
-        <span>桜</span>
+        <img th:src="@{/images/game.jpg}">
+        <span>ゲーム</span>
 
     </button>
 
@@ -108,10 +110,10 @@
         th:if="${level >= 100}"
         type="submit"
         name="background"
-        value="bg-space"
+        value="bg-castle"
         class="bg-card">
 
-        <img th:src="@{/images/bg_space.jpg}">
+        <img th:src="@{/images/bg-castle.jpg}">
         <span>星界</span>
 
     </button>
