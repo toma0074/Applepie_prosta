@@ -12,7 +12,10 @@
 <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
 <title>PROSTA</title>
 </head>
-<body th:class="${session.backgroundClass != null ? session.backgroundClass : 'bg-grass'}">
+<body
+	th:class="${session.backgroundClass != null ? session.backgroundClass : 'bg-default'}"
+	th:style="${session.backgroundColor != null ?
+	'background-color:' + session.backgroundColor + ';background-image:none;' : ''}">
 <!--/* ヘッダー */-->
 <header >
 <div th:replace="~{common/header :: layout-header}">

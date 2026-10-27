@@ -12,38 +12,143 @@
 
 <div class="background-list">
 
+<p>カスタムカラーを設定</p>
+
+<form th:action="@{/background/changeColor}" method="post">
+
+    <label class="bg-card color-card">
+
+        <input
+            type="color"
+            id="backgroundColor"
+            name="backgroundColor"
+            value="#0B346E">
+
+        <div class="color-preview" id="colorPreview"></div>
+
+        <span>好きな色</span>
+
+    </label>
+
+    <button type="submit" class="btn">
+        適用
+    </button>
+
+</form>
+
+<p>背景を画像から選択</p>
     <form th:action="@{/background/change}" method="post">
 
-        <button type="submit"
-                name="background"
-                value="bg-grass">
-            草原
-        </button>
+        <!-- Lv1～ -->
+    <button
+        type="submit"
+        name="background"
+        value="bg-grass"
+        class="bg-card">
 
-        <button th:if="${level >= 10}"
-                type="submit"
-                name="background"
-                value="bg-sky">
-            青空
-        </button>
+        <img th:src="@{/images/bg_grass.jpg}">
+        <span>草原</span>
 
-        <button th:if="${level >= 25}"
-                type="submit"
-                name="background"
-                value="bg-forest">
-            魔法の森
-        </button>
+    </button>
 
-        <button th:if="${level >= 50}"
-                type="submit"
-                name="background"
-                value="bg-castle">
-            王国
-        </button>
+        <!-- Lv10～ -->
+    <button
+        th:if="${level >= 10}"
+        type="submit"
+        name="background"
+        value="bg-sea"
+        class="bg-card">
+
+        <img th:src="@{/images/bg_sea.jpg}">
+        <span>海</span>
+
+    </button>
+
+        <!-- Lv25～ -->
+    <button
+        th:if="${level >= 25}"
+        type="submit"
+        name="background"
+        value="bg-sky"
+        class="bg-card">
+
+        <img th:src="@{/images/bg_sky.jpg}">
+        <span>青空</span>
+
+    </button>
+
+        <!-- Lv50～ -->
+    <button
+        th:if="${level >= 50}"
+        type="submit"
+        name="background"
+        value="bg-sakura"
+        class="bg-card">
+
+        <img th:src="@{/images/bg_sakura.jpg}">
+        <span>桜</span>
+
+    </button>
+
+        <!-- Lv75～ -->
+    <button
+        th:if="${level >= 75}"
+        type="submit"
+        name="background"
+        value="bg-forest"
+        class="bg-card">
+
+        <img th:src="@{/images/bg_forest.jpg}">
+        <span>魔法の森</span>
+
+    </button>
+
+        <!-- Lv100～ -->
+    <button
+        th:if="${level >= 100}"
+        type="submit"
+        name="background"
+        value="bg-space"
+        class="bg-card">
+
+        <img th:src="@{/images/bg_space.jpg}">
+        <span>星界</span>
+
+    </button>
+
 
     </form>
 
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
+    const colorCard =
+        document.querySelector(".color-card");
+
+    const colorPicker =
+        document.getElementById("backgroundColor");
+
+    const preview =
+        document.getElementById("colorPreview");
+
+    preview.style.backgroundColor =
+        colorPicker.value;
+
+    colorCard.addEventListener("click", () => {
+
+        colorPicker.click();
+
+    });
+
+    colorPicker.addEventListener("change", () => {
+
+        preview.style.backgroundColor =
+            colorPicker.value;
+
+    });
+
+});
+</script>
 </body>
 </html>

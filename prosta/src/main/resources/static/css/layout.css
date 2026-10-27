@@ -14,7 +14,7 @@ html, body {
 body {
 /*	margin: 0;*/
 /*	padding: 0;*/
-	background-image: linear-gradient( rgba(255,255,255,0.5),rgba(255,255,255,0.5)),url('../images/sta.jpg');
+/*	background-image: linear-gradient( rgba(255,255,255,0.5),rgba(255,255,255,0.5)),url('../images/sta.jpg');*/
 	background-position: left bottom; /* 元のオブジェクトポジションの代わり */
 	background-repeat: no-repeat; /* 画像の繰り返しを防止 */
 	background-attachment: fixed;
@@ -26,7 +26,57 @@ body {
 	box-sizing: border-box;
 	
 }
+body.bg-default{
+	background-image:
+	linear-gradient(
+		rgba(255,255,255,0.5),
+		rgba(255,255,255,0.5)),
+	url('../images/sta.jpg');
+}
+.color-preview{
 
+	width:100%;
+	height:130px;
+
+	border-radius:8px;
+
+	background:#0B346E;
+
+	display:block;
+
+}
+.color-card input[type="color"]{
+	position:absolute;
+	opacity:0;
+	width:0;
+	height:0;
+}
+.color-card{
+	width:220px;
+    margin-bottom:15px;
+
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+
+	padding:12px;
+
+	border:none;
+	border-radius:12px;
+
+	background:rgba(255,255,255,0.65);
+
+	backdrop-filter: blur(8px);
+
+	box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+.background-list form{
+	display:flex;
+	flex-wrap:wrap;
+	gap:20px;
+	align-items:flex-start;
+}
 .scroll-area{
 	overflow-y: auto;
 	height: 100%;
@@ -386,6 +436,96 @@ body.bg-castle{
 	rgba(255,255,255,0.5),
 	rgba(255,255,255,0.5)),
 	url("../images/bg_castle.jpg");
+}
+body.bg-sea{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_sea.jpg");
+}
+
+body.bg-sakura{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_sakura.jpg");
+}
+
+body.bg-space{
+	background-image:
+	linear-gradient(
+	rgba(255,255,255,0.5),
+	rgba(255,255,255,0.5)),
+	url("../images/bg_space.jpg");
+}
+.bg-card{
+
+	width:220px;
+
+	padding:12px;
+
+	border:none;
+	border-radius:12px;
+
+	background:rgba(255,255,255,0.65);
+
+	backdrop-filter: blur(8px);
+
+	box-shadow:
+		0 4px 10px rgba(0,0,0,0.08);
+
+	cursor:pointer;
+
+	transition:all .2s ease;
+
+}
+.bg-card{
+
+	appearance:none;
+	-webkit-appearance:none;
+
+}
+
+.bg-card:hover{
+
+	transform:translateY(-3px);
+
+	box-shadow:
+		0 0 5px rgba(11,52,110,0.25),
+		0 0 15px rgba(11,52,110,0.35);
+
+}
+
+.bg-card img{
+
+	width:100%;
+
+	height:130px;
+
+	object-fit:cover;
+
+	border-radius:8px;
+
+	display:block;
+
+}
+
+.bg-card span{
+
+	display:block;
+
+	text-align:center;
+
+	margin-top:10px;
+
+	font-family:"MODI", sans-serif;
+
+	font-size:16px;
+
+	color:#0B346E;
+
 }
 
 /* ---- スマホ: メイン領域の中央寄せ（PCは変更なし） ---- */

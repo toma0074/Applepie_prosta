@@ -51,9 +51,19 @@ public class BackgroundController {
             @RequestParam String background,
             HttpSession session) {
 
-        session.setAttribute(
-                "backgroundClass",
-                background);
+        session.setAttribute("backgroundClass", background);
+        session.removeAttribute("backgroundColor");
+
+        return "redirect:/background";
+    }
+    
+    @PostMapping("/background/changeColor")
+    public String changeColor(
+            @RequestParam String backgroundColor,
+            HttpSession session) {
+
+        session.setAttribute("backgroundColor", backgroundColor);
+        session.setAttribute("backgroundClass", "bg-color");
 
         return "redirect:/background";
     }
