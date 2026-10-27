@@ -1,5 +1,7 @@
 package jp.co.sss.pr.login_function;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -131,11 +133,13 @@ public class LoginController {
         customer.setUserPass(passwordService.encode(customerForm.getUserPass()));
         customer.setPermission(0);
         customer.setDeleteFlag(false);
-        customer.setLoginCount(0);
-        customer.setLoginFlag(false);
+        customer.setLoginDate(LocalDate.now());
+        customer.setLoginCount(1);
+        customer.setLoginFlag(true);
         customer.setUserLevel(1);
+        customer.setConsecutiveLoginDays(1);
+        customer.setLastSeenAt(LocalDateTime.now());
         customer = customerRepository.save(customer);
-        levelService.processLogin(customer);
 
         request.changeSessionId();
         session.setAttribute("user", toBean(customer));

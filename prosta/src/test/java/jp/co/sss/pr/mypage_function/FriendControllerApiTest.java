@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -96,6 +97,39 @@ class FriendControllerApiTest {
                 .andExpect(jsonPath("$[0].consecutiveLoginDays").value(5))
                 .andExpect(jsonPath("$[0].answerCount").value(12))
                 .andExpect(jsonPath("$[0].correctCount").value(9));
+    }
+
+    @Test
+    void marksFriendOfflineWhenLastSeenIsMoreThanFiveMinutesAgo() throws Exception {
+        when(customerRepository.findById(1)).thenReturn(Optional.of(currentUser));
+        when(friendConnectionRepository.findAllForUserAndStatus(
+                currentUser, FriendConnection.ACCEPTED)).thenReturn(List.of(acceptedConnection));
+        friend.setLastSeenAt(LocalDateTime.now().minusMinutes(6));
+        FriendStudySummary friendStudy = summary(2, 0, 0);
+        when(answerRepository.summarizeStudy(anyList(), isNull(), isNull(), isNull()))
+                .thenReturn(List.of(friendStudy));
+
+        mockMvc.perform(get("/api/friends").session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].online").value(false));
+    }
+
+    @Test
+    void searchesOnlyActiveGeneralUsersForFriendRequests() throws Exception {
+        when(customerRepository.findById(1)).thenReturn(Optional.of(currentUser));
+        when(customerRepository.findByDeleteFlagAndPermissionAndUserNameContaining(
+                eq(false), eq(0), eq("み"), any(Pageable.class)))
+                .thenReturn(List.of(friend));
+
+        mockMvc.perform(get("/api/friends/users")
+                        .param("query", "み")
+                        .session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].userId").value(2))
+                .andExpect(jsonPath("$[0].userName").value("みかん"));
+
+        verify(customerRepository).findByDeleteFlagAndPermissionAndUserNameContaining(
+                eq(false), eq(0), eq("み"), any(Pageable.class));
     }
 
     @Test
