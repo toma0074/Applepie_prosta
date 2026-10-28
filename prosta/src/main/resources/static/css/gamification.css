@@ -1538,3 +1538,10 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
     .selection-guide { margin-right: 12px; width: auto; }
     .selection-guide img { width: 76px; max-width: 100%; }
 }
+
+.friends-inline-form .friends-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
