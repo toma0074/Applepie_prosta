@@ -150,7 +150,7 @@ class LoginControllerTest {
         form.setUserPass("pass1234");
         BindingResult bindingResult = mock(BindingResult.class);
         Model model = mock(Model.class);
-        when(customerRepository.findByUserName("newuser")).thenReturn(null);
+        when(customerRepository.existsByUserName("newuser")).thenReturn(false);
         when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> {
             Customer customer = invocation.getArgument(0);
             customer.setUserId(4);

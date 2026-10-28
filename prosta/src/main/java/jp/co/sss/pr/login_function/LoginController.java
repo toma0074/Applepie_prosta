@@ -161,13 +161,12 @@ public class LoginController {
     @RequestMapping(path = "/regist/check", method = RequestMethod.POST)
     public String checkRegist(@Valid @ModelAttribute CustomerForm customerForm,
                               BindingResult result, Model model) {
-        Customer existingCustomer =
-                customerRepository.findByUserName(customerForm.getUserName());
+        boolean nameTaken = customerRepository.existsByUserName(customerForm.getUserName());
 
         if (result.hasErrors()) {
             return "login/user_regist";
         }
-        if (existingCustomer != null) {
+        if (nameTaken) {
             model.addAttribute("errMessage", "既に使用されているユーザー名です。");
             return "login/user_regist";
         }

@@ -75,6 +75,9 @@ public class TestController {
     @RequestMapping(path = "/test/category/start", method = RequestMethod.GET)
     public String startCategory(Model model, QuestionForm questionForm,
             @RequestParam(defaultValue = "false") boolean timer) {
+        if (questionForm.getCategory() == null || questionForm.getDifficulty() == null) {
+            return "redirect:/test/category";
+        }
         Category category = categoryRepository.getReferenceById(questionForm.getCategory());
         List<Question> quesList = pickRandom(quesRpstry
                 .findAllByCategoryAndDifficulty(

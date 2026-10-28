@@ -153,7 +153,6 @@ public class UserController {
     }
 
     private boolean isNameTaken(CustomerForm form, Customer target) {
-        Customer same = userRepository.findByUserName(form.getUserName());
-        return same != null && !same.getUserId().equals(target.getUserId());
+        return userRepository.existsByUserNameAndUserIdNot(form.getUserName(), target.getUserId());
     }
 }

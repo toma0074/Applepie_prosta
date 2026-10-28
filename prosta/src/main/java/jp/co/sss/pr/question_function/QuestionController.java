@@ -42,27 +42,15 @@ public class QuestionController {
     @RequestMapping(path = "/question/list/category")
     public String questionList(Model model, Integer category) {
 
-        String resultText = "全件検索";
-        if (category != null) {
-            resultText = categoryRepository.getReferenceById(category)
-                    .getCategoryName();
-        }
+        Category categoryEntity = category == null ? null : categoryRepository.findById(category).orElse(null);
 
-        model.addAttribute("QuestionResult", resultText);
-
-        if (category == null) {
-            List<Question> questionList =
-                    qRepository.findAllByOrderByDifficultyAscCategoryAsc();
-            model.addAttribute("Questions", questionList);
+        if (categoryEntity == null) {
+            model.addAttribute("QuestionResult", "全件検索");
+            model.addAttribute("Questions", qRepository.findAllByOrderByDifficultyAscCategoryAsc());
         } else {
-            Category categoryEntity =
-                    categoryRepository.getReferenceById(category);
-
-            List<Question> categoryList =
-                    qRepository.findByCategoryOrderByDifficultyAscCategoryAsc(
-                            categoryEntity);
-
-            model.addAttribute("Questions", categoryList);
+            model.addAttribute("QuestionResult", categoryEntity.getCategoryName());
+            model.addAttribute("Questions",
+                    qRepository.findByCategoryOrderByDifficultyAscCategoryAsc(categoryEntity));
         }
 
         return "question/question_list";

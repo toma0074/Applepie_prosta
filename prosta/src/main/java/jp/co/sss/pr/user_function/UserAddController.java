@@ -91,7 +91,11 @@ public class UserAddController {
     // ユーザー削除/復元完了
     @RequestMapping(path = "/user/delete/complete", method = RequestMethod.POST)
     public String userDeleteComp(Model model, Integer userId) {
-        Customer user = userRepository.findByUserId(userId);
+        Customer user = userId == null ? null : userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND);
+        }
         String m = "";
 
         if (!Boolean.TRUE.equals(user.getDeleteFlag())) {
