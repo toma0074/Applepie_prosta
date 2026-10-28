@@ -21,6 +21,7 @@
 <div th:replace="~{common/header :: layout-header}">
 </div>
 </header>
+<button type="button" class="sidebar-toggle" aria-label="メニューを開閉" aria-expanded="false">☰ MENU</button>
 <div class="contents">
 <!--/* サイドバー */-->
 <aside th:replace="~{common/sidebar2 :: layout-sidebar}">
@@ -36,6 +37,18 @@
 <div th:replace="~{common/footer :: layout-footer}">
 </div>
 </footer>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var btn = document.querySelector('.sidebar-toggle');
+  var side = document.querySelector('.contents aside');
+  if (!btn || !side) return;
+  btn.addEventListener('click', function () {
+    var open = side.classList.toggle('is-open');
+    side.style.top = btn.getBoundingClientRect().bottom + 'px';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+});
+</script>
 </body>
 </html>
 

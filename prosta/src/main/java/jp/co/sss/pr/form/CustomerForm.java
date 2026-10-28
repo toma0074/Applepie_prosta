@@ -19,7 +19,10 @@ public class CustomerForm {
 
     private Integer permission;
     private Boolean deleteFlag;
+    private String returnUrl;
 
+    public String getReturnUrl() { return returnUrl; }
+    public void setReturnUrl(String returnUrl) { this.returnUrl = returnUrl; }
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
     public String getUserName() { return userName; }

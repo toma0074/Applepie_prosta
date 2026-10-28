@@ -85,7 +85,13 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
             SELECT a.ansDate AS studyDate,
                    c.categoryName AS categoryName,
                    q.questionText AS questionText,
-                   a.correctFlag AS correctFlag
+                   a.correctFlag AS correctFlag,
+                   q.optionA AS optionA,
+                   q.optionB AS optionB,
+                   q.optionC AS optionC,
+                   q.explanation AS explanation,
+                   a.ansOption AS ansOption,
+                   a.correctOption AS correctOption
             FROM Answer a
             JOIN a.question q
             JOIN q.category c

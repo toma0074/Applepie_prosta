@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
 <head>
@@ -11,6 +11,7 @@
   <form th:action="@{/admin/questions/save}" th:object="${questionForm}" method="post">
     <p class="err" th:if="${#fields.hasGlobalErrors()}" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></p>
     <input type="hidden" th:field="*{questionId}" />
+    <input type="hidden" name="returnUrl" th:value="${returnUrl}" />
 
     <div class="row">
       <label for="category">カテゴリー</label>
@@ -70,7 +71,7 @@
     </div>
 
     <div class="buttons">
-      <input type="button" value="戻る" th:onclick="|location.href='@{/admin/questions}'|" />
+      <a class="btn" th:href="@{${returnUrl}}">戻る</a>
       <input type="submit" value="保存" />
     </div>
   </form>

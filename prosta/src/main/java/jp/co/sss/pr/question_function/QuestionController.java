@@ -42,17 +42,10 @@ public class QuestionController {
     @RequestMapping(path = "/question/list/category")
     public String questionList(Model model, Integer category) {
 
-        String resultText = "";
-        if (category == null) {
-            resultText = "全件検索";
-        } else if (category == 1) {
-            resultText = "Java";
-        } else if (category == 2) {
-            resultText = "Spring";
-        } else if (category == 3) {
-            resultText = "HTML";
-        } else {
-            resultText = "SQL";
+        String resultText = "全件検索";
+        if (category != null) {
+            resultText = categoryRepository.getReferenceById(category)
+                    .getCategoryName();
         }
 
         model.addAttribute("QuestionResult", resultText);

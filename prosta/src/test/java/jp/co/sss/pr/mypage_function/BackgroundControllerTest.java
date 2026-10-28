@@ -47,12 +47,12 @@ class BackgroundControllerTest {
     @Test
     void savesImageBackgroundToCustomerAndSession() {
         when(customerRepository.findById(7)).thenReturn(Optional.of(customer));
-        assertEquals("redirect:/background", controller.change("bg-sakura", session));
+        assertEquals("redirect:/background",         controller.change("bg-sky", session));
 
         verify(customerRepository).save(argThat(saved ->
-                "bg-sakura".equals(saved.getBackgroundClass())
+                "bg-sky".equals(saved.getBackgroundClass())
                         && saved.getBackgroundColor() == null));
-        assertEquals("bg-sakura", session.getAttribute("backgroundClass"));
+        assertEquals("bg-sky", session.getAttribute("backgroundClass"));
         org.junit.jupiter.api.Assertions.assertNull(session.getAttribute("backgroundColor"));
     }
 
@@ -74,7 +74,7 @@ class BackgroundControllerTest {
         customer.setUserLevel(24);
 
         assertThrows(ResponseStatusException.class,
-                () -> controller.change("bg-sky", session));
+                () -> controller.change("bg-grass", session));
         verify(customerRepository, org.mockito.Mockito.never())
                 .save(org.mockito.ArgumentMatchers.any(Customer.class));
     }

@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<title>管理者メニュー</title>
+<meta charset="UTF-8" />
+</head>
+<body>
+<div class="aq-wrap">
+  <h3>管理者メニュー</h3>
+  <div class="admin-tiles">
+    <a class="admin-tile" th:href="@{/admin/questions}"><span class="admin-tile-icon">📝</span>問題管理</a>
+    <a class="admin-tile" th:href="@{/admin/questions/new(returnUrl='/admin/menu')}"><span class="admin-tile-icon">➕</span>新規問題登録</a>
+    <a class="admin-tile" th:href="@{/user/list}"><span class="admin-tile-icon">👥</span>ユーザー一覧</a>
+  </div>
+</div>
+</body>
+</html>

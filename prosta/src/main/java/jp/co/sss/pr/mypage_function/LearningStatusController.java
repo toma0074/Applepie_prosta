@@ -23,7 +23,7 @@ import jp.co.sss.pr.repository.CustomerRepository;
 @Controller
 public class LearningStatusController {
 
-    private static final int RECENT_ACTIVITY_LIMIT = 20;
+    private static final int RECENT_ACTIVITY_LIMIT = 15;
     private static final int WEAK_CATEGORY_THRESHOLD = 60;
 
     private final AnswerRepository answerRepository;

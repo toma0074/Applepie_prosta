@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PROSTA | 解答履歴</title>
+</head>
+<body>
+<main class="suku">
+  <div class="mypage-header">
+    <h3>解答履歴</h3>
+    <div class="mypage-links">
+      <a class="btn" th:href="@{/mypage}">マイページに戻る</a>
+    </div>
+  </div>
+
+  <form class="friends-inline-form mypage-filter" th:action="@{/mypage/history}" method="get">
+    <select class="category" name="categoryId">
+      <option value="">カテゴリー(全て)</option>
+      <option th:each="c : ${categories}" th:value="${c.categoryId}" th:text="${c.categoryName}"
+              th:selected="${categoryId != null and categoryId == c.categoryId}"></option>
+    </select>
+    <select class="difficulty" name="difficulty">
+      <option value="">難易度(全て)</option>
+      <option value="1" th:selected="${difficulty != null and difficulty == 1}">★☆☆</option>
+      <option value="2" th:selected="${difficulty != null and difficulty == 2}">★★☆</option>
+      <option value="3" th:selected="${difficulty != null and difficulty == 3}">★★★</option>
+    </select>
+    <select class="mypage-sort" name="correct">
+      <option value="">正誤(全て)</option>
+      <option value="1" th:selected="${correct != null and correct == 1}">正解のみ</option>
+      <option value="0" th:selected="${correct != null and correct == 0}">不正解のみ</option>
+    </select>
+    <select class="mypage-sort" name="sort">
+      <option value="1" th:selected="${sort == 1}">新しい順</option>
+      <option value="2" th:selected="${sort == 2}">古い順</option>
+    </select>
+    <input type="text" name="keyword" th:value="${keyword}" placeholder="問題文キーワード" />
+    <div class="mypage-filter-row">
+    <span class="mypage-date-pair">
+    <label for="h-from">開始日</label>
+    <input id="h-from" type="date" name="fromDate" th:value="${fromDate}" />
+    </span>
+    <span class="mypage-date-pair">
+    <label for="h-to">終了日</label>
+    <input id="h-to" type="date" name="toDate" th:value="${toDate}" />
+    </span>
+    <button type="submit">検索</button>
+    <a class="friends-secondary-button mypage-reset" th:href="@{/mypage/history}">リセット</a>
+    </div>
+  </form>
+
+  <div class="aq-pager" th:if="${historyPage.totalPages > 1}">
+    <a class="aq-page-btn" th:classappend="${!historyPage.hasPrevious()} ? 'disabled'"
+       th:href="${historyPage.hasPrevious()} ? @{/mypage/history(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},correct=${correct},fromDate=${fromDate},toDate=${toDate},sort=${sort},page=${historyPage.number - 1})} : '#'">前へ</a>
+    <span th:text="${historyPage.number + 1} + ' / ' + ${historyPage.totalPages}"></span>
+    <a class="aq-page-btn" th:classappend="${!historyPage.hasNext()} ? 'disabled'"
+       th:href="${historyPage.hasNext()} ? @{/mypage/history(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},correct=${correct},fromDate=${fromDate},toDate=${toDate},sort=${sort},page=${historyPage.number + 1})} : '#'">次へ</a>
+  </div>
+
+  <table id="ans-table" class="mypage-table" th:if="${!#lists.isEmpty(answerlist)}">
+    <thead>
+      <tr>
+        <th class="category">カテゴリー</th>
+        <th class="questionId">問題</th>
+        <th class="ansOption">選択履歴</th>
+        <th class="correctOption">正解選択肢</th>
+        <th class="wrongCount">誤答回数</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="ans : ${answerlist}">
+        <td class="center"
+            th:switch="${ans.question.category.categoryId}">
+          <span th:case="1">Java</span>
+          <span th:case="2">Spring</span>
+          <span th:case="3">HTML</span>
+          <span th:case="4">SQL</span>
+        </td>
+        <td class="question-cell">
+          <button type="button" class="question-link"
+                  th:data-question="${ans.question.questionText}"
+                  th:data-option-a="${ans.question.optionA}"
+                  th:data-option-b="${ans.question.optionB}"
+                  th:data-option-c="${ans.question.optionC}"
+                  th:data-correct="${ans.correctOption}"
+                  th:data-chosen="${ans.ansOption}"
+                  th:data-explanation="${ans.question.explanation}"
+                  th:text="${ans.question.questionText}"></button>
+        </td>
+        <td class="center" th:switch="${ans.ansOption}">
+          <span th:case="1">A</span>
+          <span th:case="2">B</span>
+          <span th:case="3">C</span>
+          <span th:case="4">わからない</span>
+        </td>
+        <td class="center" th:switch="${ans.correctOption}">
+          <span th:case="1">A</span>
+          <span th:case="2">B</span>
+          <span th:case="3">C</span>
+        </td>
+        <td class="center"
+            th:text="${(wrongCounts != null and wrongCounts.get(ans.question.questionId) != null ? wrongCounts.get(ans.question.questionId) : 0) + '回'}">0回</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="center" th:if="${#lists.isEmpty(answerlist)}">履歴がありません。</p>
+
+  <div id="question-modal" class="question-modal" hidden>
+    <div class="question-modal-backdrop" data-close="true"></div>
+    <div class="question-modal-body" role="dialog" aria-modal="true" aria-labelledby="question-modal-text">
+      <button type="button" class="question-modal-close" data-close="true" aria-label="閉じる">×</button>
+      <p id="question-modal-text" class="question-modal-text"></p>
+      <ul id="question-modal-options" class="question-modal-options"></ul>
+      <p id="question-modal-result" class="question-modal-result"></p>
+      <p id="question-modal-explanation" class="question-modal-explanation"></p>
+    </div>
+  </div>
+
+  <div th:replace="~{common/chatbot :: chatbot}"></div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const modal = document.getElementById('question-modal');
+  if (!modal) return;
+  const labels = ['A', 'B', 'C'];
+  const textEl = document.getElementById('question-modal-text');
+  const optionsEl = document.getElementById('question-modal-options');
+  const resultEl = document.getElementById('question-modal-result');
+  const explanationEl = document.getElementById('question-modal-explanation');
+
+  function closeModal() {
+    modal.hidden = true;
+  }
+
+  function openModal(btn) {
+    const correct = Number(btn.dataset.correct);
+    const chosen = Number(btn.dataset.chosen);
+    const options = [btn.dataset.optionA, btn.dataset.optionB, btn.dataset.optionC];
+
+    textEl.textContent = btn.dataset.question;
+    optionsEl.replaceChildren();
+    options.forEach((text, i) => {
+      const no = i + 1;
+      const li = document.createElement('li');
+      const tags = [];
+      if (no === correct) {
+        li.classList.add('is-correct');
+        tags.push('正解');
+      }
+      if (no === chosen) {
+        li.classList.add('is-chosen');
+        tags.push('あなたの解答');
+      }
+      li.textContent = labels[i] + '. ' + text + (tags.length ? '  [' + tags.join(' / ') + ']' : '');
+      optionsEl.appendChild(li);
+    });
+
+    if (chosen === 4) {
+      resultEl.textContent = '解答：わからない';
+    } else {
+      resultEl.textContent = chosen === correct ? '正解でした' : '不正解でした';
+    }
+    resultEl.className = 'question-modal-result ' + (chosen === correct ? 'ok' : 'ng');
+    explanationEl.textContent = '解説：' + (btn.dataset.explanation || '解説はまだ登録されていません。');
+    modal.hidden = false;
+  }
+
+  document.querySelectorAll('.question-link').forEach((btn) => {
+    btn.addEventListener('click', () => openModal(btn));
+  });
+  modal.addEventListener('click', (e) => {
+    if (e.target.dataset.close) closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.hidden) closeModal();
+  });
+});
+</script>
+</body>
+</html>

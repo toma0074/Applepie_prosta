@@ -11,8 +11,6 @@
 		<div>
 			<ul class="sidebar-menu">
 				<li><a class="sidebar-link" th:href="@{/mypage}">MyPage</a></li>
-				<li><a class="sidebar-link" th:href="@{/learning-status}">学習状況</a></li>
-				<li><a class="sidebar-link" th:href="@{/study-calendar}">学習カレンダー</a></li>
 				<li th:if="${session.user != null and session.user.permission == 0}">
 					<a class="sidebar-link" th:href="@{/friends}">フレンド
 						<span th:if="${pendingFriendRequestCount != null and pendingFriendRequestCount > 0}"
@@ -25,11 +23,7 @@
 				<li><a class="sidebar-link" th:href="@{/test/review}">復習モード</a></li>
 				<li><a class="sidebar-link" th:href="@{/question}">問題検索</a></li>
 				<li th:if="${session.user != null and session.user.permission == 1}">
-					<a class="sidebar-link" th:href="@{/admin/questions}">問題管理</a></li>
-				<li><a class="sidebar-link" th:href="@{/achievement}">実績一覧
-					<span th:if="${unreadAchievementCount != null and unreadAchievementCount > 0}"
-					      class="notify-badge" th:text="'NEW'">NEW</span>
-				</a></li>
+					<a class="sidebar-link" th:href="@{/admin/menu}">管理者メニュー</a></li>
 			</ul>
 			
 			<div class="sidebar-search">
@@ -71,47 +65,6 @@
 					</form>
 				</div>
 
-				<th:block th:if="${session.user != null and session.user.permission == 1}">
-					<div class="sidebar-search-item">
-						<a class="sidebar-link" th:href="@{/user/list}">ユーザー一覧</a>
-					</div>
-
-					<div class="sidebar-search-item">
-						<form th:action="@{/user/list/text}" method="post">
-							<label for="sidebar-user-name">ユーザー名あいまい検索</label>
-							<div class="sidebar-search-controls">
-								<input id="sidebar-user-name" type="text" name="userName" class="qt" />
-								<input type="submit" value="検索" />
-							</div>
-						</form>
-					</div>
-
-					<div class="sidebar-search-item">
-						<form th:action="@{/user/list/permission}" method="post">
-							<label for="sidebar-user-permission">権限検索</label>
-							<div class="sidebar-search-controls">
-								<select id="sidebar-user-permission" class="category" name="permission">
-									<option value="0">一般</option>
-									<option value="1">管理者</option>
-								</select>
-								<input type="submit" value="検索" />
-							</div>
-						</form>
-					</div>
-
-					<div class="sidebar-search-item">
-						<form th:action="@{/user/list/delete}" method="post">
-							<label for="sidebar-user-delete">削除済みユーザー検索</label>
-							<div class="sidebar-search-controls">
-								<select id="sidebar-user-delete" class="category" name="deleteFlag">
-									<option value="false">アクティブ</option>
-									<option value="true">削除済み</option>
-								</select>
-								<input type="submit" value="検索" />
-							</div>
-						</form>
-					</div>
-				</th:block>
 			</div>
     </div>
   </div>

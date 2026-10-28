@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
 <head>
@@ -7,24 +7,13 @@
 </head>
 <body>
 <h3>ユーザー情報更新完了</h3>
-<form th:if="${pm == 0}" th:action="@{/mypage}">
+<form th:action="@{${returnUrl}}">
   <div class="message">
     <p class="text-center">更新を完了しました。</p>
   </div>
   <div class="button-area">
     <div class="inputselect">
-        <input type="submit" value="マイページ" />
-    </div>
-  </div>
-</form>
-<form th:if="${pm == 1}" th:action="@{/user/list}">
-  <div class="message">
-    <p class="text-center">更新を完了しました。</p>
-  </div>
-
-  <div class="button-area">
-    <div class="inputselect">
-      <input type="submit" value="ユーザー一覧" />
+      <input type="submit" th:value="${returnLabel}" />
     </div>
   </div>
 </form>

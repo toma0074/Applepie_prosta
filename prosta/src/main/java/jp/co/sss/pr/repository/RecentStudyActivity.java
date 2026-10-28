@@ -11,4 +11,16 @@ public interface RecentStudyActivity {
     String getQuestionText();
 
     Boolean getCorrectFlag();
+
+    String getOptionA();
+
+    String getOptionB();
+
+    String getOptionC();
+
+    String getExplanation();
+
+    Integer getAnsOption();
+
+    Integer getCorrectOption();
 }
