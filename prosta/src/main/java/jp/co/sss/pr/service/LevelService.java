@@ -118,6 +118,21 @@ public class LevelService {
                     customer.getPerfectTestCount() + 1);
         }
 
+     // 正解1問につき2 EXP
+        long earnedExp = correctCount * 2L;
+
+        // 満点の場合は追加で5 EXP
+        if (totalCount > 0 && correctCount == totalCount) {
+            earnedExp += 5L;
+        }
+
+        // 累計EXPに加算
+        customer.setTotalExp(customer.getTotalExp() + earnedExp);
+
+        // 新しいEXPからレベルを計算
+        recalcLevel(customer);
+        customerRepository.save(customer);
+        
         // レベル再計算
         recalcLevel(customer);
         customerRepository.save(customer);
@@ -137,38 +152,12 @@ public class LevelService {
     // レベル計算
     // ----------------------------------------------------------------
 
-    /**
-     * customer.user_level を再計算して customer オブジェクトに反映する（DBへの保存は呼び出し元が行う）。
-     *
-     * <p>レベル = ログイン日数 + 連続ログインボーナス + (総正解数 × 2) + (満点回数 × 5)
-     * <ul>
-     *   <li>ログイン日数 : 2日につき1ポイント</li>
-     * <li>連続ログインボーナス :7日ごとに5ポイント</li>
-     *   <li>総正解数   : answer テーブルの correct_flag=true の件数</li>
-     *   <li>満点回数   : 同一 ans_date に全問正解した日の回数</li>
-     * </ul>
-     * 最小値は 1。
-     */
     private void recalcLevel(Customer customer) {
+        long totalExp = customer.getTotalExp();
 
-        int loginCount = customer.getLoginCount();
+        // 15 EXPごとに1レベルアップ
+        int level = (int) (totalExp / 15L) + 1;
 
-        // ログイン日数：2日につき1ポイント
-        int loginBonus = loginCount / 2;
-
-        // 連続ログイン：7日ごとに5ポイント
-        int streakBonus =
-                (customer.getConsecutiveLoginDays() / 7) * 5;
-
-        // 総正解数
-        int totalCorrect =
-                answerRepository.countByCustomerAndCorrectFlagTrue(customer);
-
-        // 満点だった日数（従来のレベル計算用）
-        int perfectDays =
-                answerRepository.countPerfectDaysByCustomer(customer);
-
-        int level = (int) (customer.getTotalExp() / 15) + 1;
         customer.setUserLevel(level);
     }
 

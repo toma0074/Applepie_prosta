@@ -9,34 +9,38 @@
 <body>
 <main class="suku">
 
-  <h3>実績一覧</h3>
-
-  <!-- ===== 進捗サマリー ===== -->
-  <div class="ach-summary">
-    <div class="ach-summary-inner">
-      <div class="ach-summary-icon">🏆</div>
-      <div class="ach-summary-text">
-        <span class="ach-count">
-          <strong th:text="${unlockedCount}">0</strong>
-          /
-          <span th:text="${totalCount}">6</span>
-        </span>
-        <span class="ach-count-label">実績解除済み</span>
-      </div>
-      <div class="ach-summary-progress">
-        <div class="ach-progress-bg">
-          <div class="ach-progress-fill"
-               th:style="'width:' + (${totalCount > 0} ? (${unlockedCount * 100 / totalCount}) : 0) + '%'">
-          </div>
-        </div>
-      </div>
+    <!-- 現在のキャラクター：タイトルより上 -->
+    <div class="ach-char-mini">
+        <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
     </div>
-  </div>
 
-<!-- ===== 現在のキャラクター（小） ===== -->
-<div class="ach-char-mini">
-    <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
-</div>
+    <h3>実績一覧</h3>
+
+    <!-- 既存の進捗サマリー：このまま再利用 -->
+    <div class="ach-summary">
+        <div class="ach-summary-inner">
+            <div class="ach-summary-icon">🏆</div>
+
+            <div class="ach-summary-text">
+                <span class="ach-count">
+                    <strong th:text="${unlockedCount}">0</strong>
+                    /
+                    <span th:text="${totalCount}">20</span>
+                </span>
+                <span class="ach-count-label">実績解除済み</span>
+            </div>
+
+            <div class="ach-summary-progress">
+                <div class="ach-progress-bg">
+                    <div class="ach-progress-fill"
+                         th:style="'width:' + (${totalCount > 0} ? (${unlockedCount * 100 / totalCount}) : 0) + '%'">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- この下に、既存の実績カードグリッドを残す -->
 
   <!-- ===== 実績カードグリッド ===== -->
   <div class="ach-grid">

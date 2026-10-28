@@ -308,14 +308,27 @@ public class TestController {
         Customer updatedUser =
                 customerRepository.getReferenceById(user.getUserId());
 
+        // 現在のレベルと累計EXP
         int currentLevel = updatedUser.getUserLevel();
-        boolean isPerfect = qCount > 0 && caCount == qCount;
+        long totalExp = updatedUser.getTotalExp() == null
+                ? 0L
+                : updatedUser.getTotalExp();
 
-       
-        // 現在のレベルと、レベルアップしたかどうかを判定
+        // 現在のレベル内での進捗（0〜14 EXP）
+        int expInLevel = (int) (totalExp % 15L);
 
+        // 次のレベルまでに必要なEXP
+        int expRemaining = 15 - expInLevel;
+
+        // EXPバーの進捗率
+        int expProgressPercent = expInLevel * 100 / 15;
+
+        // レベルアップ判定
         boolean leveledUp = currentLevel > previousLevel;
 
+        // 満点判定
+        boolean isPerfect = qCount > 0 && caCount == qCount;
+        
         // 正解率に応じたキャラクターとメッセージ
         String scoreCharacter = null;
         String characterMessage = "";
@@ -363,11 +376,16 @@ public class TestController {
         view.put("ca",             caCount);
         view.put("ans",            results);
         view.put("currentLevel",   currentLevel);
+        // EXPバー表示用のデータ
+        view.put("totalExp", totalExp);
+        view.put("expInLevel", expInLevel);
+        view.put("expRemaining", expRemaining);
+        view.put("expProgressPercent", expProgressPercent);
+
         view.put("isPerfect",      isPerfect);
         view.put("newAchievements", newAchievements);
         view.put("previousLevel", previousLevel);
         view.put("displayCharacter", displayCharacter);
-        
         view.put("leveledUp", leveledUp);
         view.put("characterMessage", characterMessage);
         

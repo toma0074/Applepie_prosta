@@ -158,7 +158,7 @@
 
 .exp-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3b82d4 0%, #7c5cd8 100%);
+    background: linear-gradient(90deg, #ffd740 0%, #ff8f00 100%);
     border-radius: 6px;
     transition: width 0.8s ease;
 }
@@ -922,16 +922,59 @@ table.friends-ranking-table {
 }
 
 /* 実績解除履歴テーブルタイトル */
+/* 実績解除履歴：ゲーム風のパネル */
 .ach-history {
-    margin: 0 0 16px;
+    margin: 0 20px 24px;
+    padding: 14px 12px;
+    border: 1px solid #ffd740;
+    border-radius: 18px;
+    background: linear-gradient(
+        145deg,
+        rgba(255, 248, 220, 0.85),
+        rgba(255, 255, 255, 0.8)
+    );
+    box-shadow: 0 4px 12px rgba(11, 52, 110, 0.08);
 }
 
+/* 解除履歴のタイトル */
 .ach-history-title {
-    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
     font-weight: bold;
     color: #0B346E;
-    padding: 4px 20px 8px;
+    padding: 4px 8px 12px;
 }
+
+/* タイトルに星の飾りを追加 */
+.ach-history-title::before {
+    content: "✨";
+}
+
+/* 既存の解除履歴テーブルを装飾 */
+.ach-history table.my_table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+/* テーブルの見出し */
+.ach-history table.my_table th {
+    background: rgba(255, 215, 64, 0.25);
+    color: #0B346E;
+    padding: 9px 8px;
+}
+
+/* テーブルのデータ */
+.ach-history table.my_table td {
+    background: rgba(255, 255, 255, 0.75);
+    padding: 9px 8px;
+    vertical-align: middle;
+}
+
 
 .notify-badge {
     display: inline-block;
@@ -1174,20 +1217,6 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
         max-height: 85px;
     }
 }
-/* 問題選択画面の先生キャラクター */
-.selection-guide {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 8px auto 16px;
-}
-
-.selection-guide img {
-    display: block;
-    width: 100px;
-    max-height: 115px;
-    object-fit: contain;
-}
 
 /* テスト結果：レベル変化とキャラクター */
 .result-level-row {
@@ -1245,6 +1274,7 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
     );
 }
 
+/* スマホ―用 */
 @media (max-width: 600px) {
     .result-level-change {
         font-size: 15px;
@@ -1260,9 +1290,14 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
         width: 100px;
         height: 100px;
     }
+	.selection-guide {
+        top: 84px;
+        right: 8px;
+        width: 76px;
+    }
 
     .selection-guide img {
-        width: 85px;
+        max-height: 88px;
     }
 }
 /* 選択画面の先生キャラクター：右寄せ＋浮遊 */
@@ -1369,13 +1404,6 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
 }
 
 @media (max-width: 600px) {
-    .selection-guide {
-        margin-right: 12px;
-    }
-
-    .selection-guide img {
-        width: 85px;
-    }
 
     .exam-fixed-tools {
         top: 95px;

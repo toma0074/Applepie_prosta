@@ -21,6 +21,24 @@
 
 <!-- ===== レベル変化パネル ===== -->
 <div class="result-status-panel">
+	<div class="exp-bar-wrap">
+    <div class="exp-bar-label">
+        累計EXP：
+        <strong th:text="${totalExp}">0</strong> EXP
+    </div>
+
+    <div class="exp-bar-bg">
+        <div class="exp-bar-fill"
+             th:style="'width:' + ${expProgressPercent} + '%'">
+        </div>
+    </div>
+
+    <div class="exp-bar-sub">
+        <span th:text="${expInLevel}">0</span> / 15 EXP
+        ・次のレベルまであと
+        <span th:text="${expRemaining}">15</span> EXP
+    </div>
+</div>
 <!-- レベル変化とキャラクター -->
 <div class="result-level-row">
 
