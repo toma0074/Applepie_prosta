@@ -30,6 +30,15 @@ public class BackgroundController {
     @Autowired
     private CustomerRepository customerRepository;
 
+    /** 前回確認したレベルより後に解放された背景の数。 */
+    public static long countNewBackgrounds(Customer customer) {
+        int level = customer.getUserLevel() == null ? 1 : customer.getUserLevel();
+        int seen = customer.getBackgroundSeenLevel() == null ? 1 : customer.getBackgroundSeenLevel();
+        return BACKGROUND_LEVELS.values().stream()
+                .filter(required -> required > seen && required <= level)
+                .count();
+    }
+
     @GetMapping("/background")
     public String index(
             HttpSession session,
@@ -56,6 +65,12 @@ public class BackgroundController {
                 customer.getUserLevel());
         model.addAttribute("backgroundClass", customer.getBackgroundClass());
         model.addAttribute("backgroundColor", customer.getBackgroundColor());
+
+        int currentLevel = customer.getUserLevel() == null ? 1 : customer.getUserLevel();
+        if (customer.getBackgroundSeenLevel() == null || customer.getBackgroundSeenLevel() < currentLevel) {
+            customer.setBackgroundSeenLevel(currentLevel);
+            customerRepository.save(customer);
+        }
 
         return "mypage/background_select";
     }

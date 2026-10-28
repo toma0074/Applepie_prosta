@@ -85,7 +85,9 @@
        th:if="${unreadAchievementCount != null and unreadAchievementCount > 0}"
        class="notify-badge">NEW</span></a>
     <a class="admin-tile" th:href="@{/user/update/input(returnUrl='/mypage')}"><span class="admin-tile-icon">✏️</span>ユーザー更新</a>
-    <a class="admin-tile" th:href="@{/background}"><span class="admin-tile-icon">🎨</span>背景変更</a>
+    <a class="admin-tile" th:href="@{/background}"><span class="admin-tile-icon">🎨</span>背景変更<span
+       th:if="${newBackgroundCount != null and newBackgroundCount > 0}"
+       class="notify-badge">NEW</span></a>
   </div>
 
   <div th:replace="~{common/chatbot :: chatbot}"></div>
