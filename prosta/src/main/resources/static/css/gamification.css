@@ -163,11 +163,12 @@
     transition: width 0.8s ease;
 }
 
-.exp-bar-sub {
-    font-size: 11px;
-    color: #57606a;
-    text-align: right;
-}
+/*.exp-bar-sub {*/
+/*    font-size: 11px;*/
+/*    color: #57606a;*/
+/*    text-align: right;*/
+/*    margin-left: auto;*/
+/*}*/
 
 /* 統計チップ */
 .stats-row {
@@ -1220,23 +1221,40 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
 
 /* テスト結果：レベル変化とキャラクター */
 .result-level-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin: 12px auto 20px;
+    width: 100%;
+    gap: 8px 12px;
+    margin: 0;
 }
 
+/* Levelは常に中央 */
 .result-level-change {
+    grid-column: 2;
+    justify-self: center;
+
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
     gap: 8px;
+
     color: #0B346E;
     font-size: 18px;
     font-weight: bold;
+}
+
+/* EXPの詳細は同じ行の右側 */
+.result-level-row .exp-bar-sub {
+    grid-column: 3;
+    justify-self: end;
+    align-self: center;
+
+    margin-left: 0;
+    text-align: right;
+    font-size: 11px;
+    color: #57606a;
 }
 
 .level-value {
@@ -1256,11 +1274,51 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
 }
 
 /* 正解率に応じた結果キャラクター */
+/* テスト結果：Sutaと吹き出しを横並びにする */
 .result-character {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 18px;
+    max-width: 760px;
     margin: 16px auto;
+    text-align: left;
+}
+
+/* Sutaの右側に表示する吹き出し */
+.result-speech-bubble {
+    position: relative;
+    flex: 1 1 280px;
+    max-width: 520px;
+    box-sizing: border-box;
+    padding: 14px 18px;
+
+    background: #fff;
+    border: 2px solid #0B346E;
+    border-radius: 18px;
+
+    color: #0B346E;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.7;
+
+    box-shadow: 0 4px 10px rgba(11, 52, 110, 0.12);
+}
+
+/* 吹き出しの先端 */
+.result-speech-bubble::before {
+    content: "";
+    position: absolute;
+    top: 24px;
+    left: -9px;
+
+    width: 14px;
+    height: 14px;
+
+    background: #fff;
+    border-left: 2px solid #0B346E;
+    border-bottom: 2px solid #0B346E;
+    transform: rotate(45deg);
 }
 
 .result-character img {
@@ -1272,6 +1330,8 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
     filter: drop-shadow(
         0 3px 5px rgba(11, 52, 110, 0.16)
     );
+    /* Sutaが上下にふわふわ動く */
+    animation: charFloat 3s ease-in-out infinite;
 }
 
 /* スマホ―用 */
@@ -1287,9 +1347,15 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
     }
 
     .result-character img {
-        width: 100px;
-        height: 100px;
-    }
+    flex: 0 0 88px;
+    width: 88px;
+    height: 88px;
+}
+
+.result-speech-bubble {
+    padding: 10px 12px;
+    font-size: 14px;
+}
 	.selection-guide {
         top: 84px;
         right: 8px;

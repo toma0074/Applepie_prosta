@@ -9,10 +9,7 @@
 <body>
 <main class="suku">
 
-    <!-- 現在のキャラクター：タイトルより上 -->
-    <div class="ach-char-mini">
-        <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
-    </div>
+   
 
     <h3>実績一覧</h3>
 
@@ -39,7 +36,11 @@
             </div>
         </div>
     </div>
-
+ <!-- 現在のキャラクター：タイトルより上 -->
+    <div class="ach-char-mini">
+        <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
+    </div>
+    
     <!-- この下に、既存の実績カードグリッドを残す -->
 
   <!-- ===== 実績カードグリッド ===== -->

@@ -20,65 +20,72 @@
 </div>
 
 <!-- ===== レベル変化パネル ===== -->
-<div class="result-status-panel">
-	<div class="exp-bar-wrap">
-    <div class="exp-bar-label">
-        累計EXP：
-        <strong th:text="${totalExp}">0</strong> EXP
-    </div>
 
-    <div class="exp-bar-bg">
-        <div class="exp-bar-fill"
-             th:style="'width:' + ${expProgressPercent} + '%'">
+
+<!-- ===== EXP・Level・Sutaのパネル ===== -->
+<div class="result-status-panel">
+
+    <!-- EXPバーとLevel表示 -->
+    <div class="exp-bar-wrap">
+
+        <div class="exp-bar-label">
+            累計EXP：
+            <strong th:text="${totalExp}">0</strong> EXP
+        </div>
+
+        <div class="exp-bar-bg">
+            <div class="exp-bar-fill"
+                 th:style="'width:' + ${expProgressPercent} + '%'">
+            </div>
+        </div>
+
+        <!-- Levelは中央、EXP詳細は右側 -->
+        <div class="result-level-row">
+
+            <span class="result-level-change" th:if="${leveledUp}">
+                <span class="level-value"
+                      th:text="|Level ${previousLevel}|">Level 1</span>
+                <span class="level-arrow">→</span>
+                <span class="level-value"
+                      th:text="|Level ${currentLevel}|">Level 2</span>
+            </span>
+
+            <span class="result-level-change"
+                  th:unless="${leveledUp}"
+                  th:text="|Level ${currentLevel}|">
+                Level 1
+            </span>
+
+            <div class="exp-bar-sub">
+                <span th:text="${expInLevel}">0</span> / 15 EXP
+                ・次のレベルまであと
+                <span th:text="${expRemaining}">15</span> EXP
+            </div>
+
         </div>
     </div>
 
-    <div class="exp-bar-sub">
-        <span th:text="${expInLevel}">0</span> / 15 EXP
-        ・次のレベルまであと
-        <span th:text="${expRemaining}">15</span> EXP
-    </div>
-</div>
-<!-- レベル変化とキャラクター -->
-<div class="result-level-row">
-
-    <div class="result-level-change">
-        <span>
-            レベル<strong th:text="${previousLevel}">1</strong>
-        </span>
-
-        <span class="level-arrow" aria-label="から">→</span>
-
-        <span>
-            レベル<strong th:text="${currentLevel}">2</strong>
+    <!-- 満点バッジ -->
+    <div class="result-exp-gained">
+        <span th:if="${isPerfect}" class="perfect-badge">
+            🌟 満点！
         </span>
     </div>
 
-    <!-- 結果画面にはキャラクターを1体だけ表示 -->
-    <img th:if="${displayCharacter != null}"
-         class="result-level-character"
-         th:src="@{/images/{filename}(filename=${displayCharacter})}"
-         alt="テスト結果キャラクター">
+    <!-- Sutaと吹き出し -->
+    <div class="result-character"
+         th:if="${displayCharacter != null}">
 
-</div>
+        <img th:src="@{/images/{filename}(filename=${displayCharacter})}"
+             alt="Suta">
 
-<div class="result-exp-gained">
-    <span th:if="${isPerfect}" class="perfect-badge">
-        🌟 満点！
-    </span>
-</div>
-</div>
+        <div class="result-speech-bubble"
+             th:if="${characterMessage != null and !#strings.isEmpty(characterMessage)}"
+             th:text="${characterMessage}">
+            テストおつかれさま！
+        </div>
 
-<p th:if="${leveledUp}" class="level-up-message">
-    🎉 レベルアップしました！
-</p>
-
-<!-- ===== 正解率に応じたキャラクター ===== -->
-<div class="result-character"
-     th:if="${resultCharacter != null}">
-
-    <img th:src="@{/images/{filename}(filename=${resultCharacter})}"
-         alt="テスト結果キャラクター">
+    </div>
 
 </div>
 

@@ -361,14 +361,15 @@ public class TestController {
             }
         }
 
-        // レベルアップ時は、専用キャラクターとメッセージを優先
+     // レベルアップ時は専用キャラクターを表示
         String displayCharacter =
                 leveledUp ? "suta_star.png" : scoreCharacter;
 
+        // レベルアップ時だけ、一言を特別なメッセージに変更
         if (leveledUp) {
-            characterMessage = "レベルアップ！毎日の努力が実ったね！";
+            characterMessage = "レベルアップしました！毎日の努力が実ったね！";
         }
-                      
+        
         Map<String, Object> view = new LinkedHashMap<>();
         view.put("cateCorrect",    categCount);
         view.put("cateCount",      cateCount);
