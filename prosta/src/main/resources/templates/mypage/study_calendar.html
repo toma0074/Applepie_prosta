@@ -22,7 +22,20 @@
   <section class="study-calendar-card" aria-label="月間学習カレンダー">
     <div class="study-calendar-month-nav">
       <a class="btn" th:href="@{/study-calendar(month=${previousMonth})}" aria-label="前の月">‹ 前月</a>
-      <h4 th:text="${monthLabel}">2026-10</h4>
+      <div class="study-calendar-month-select">
+        <select id="calendar-year" aria-label="表示する年" data-page-navigation>
+          <option th:each="year : ${#numbers.sequence(month.year - 10, month.year + 10)}"
+                  th:value="${year}" th:selected="${year == month.year}"
+                  th:attr="data-page-url=@{/study-calendar(month=${month.withYear(year)})}"
+                  th:text="${year + '年'}">2026年</option>
+        </select>
+        <select id="calendar-month" aria-label="表示する月" data-page-navigation>
+          <option th:each="monthNumber : ${#numbers.sequence(1, 12)}"
+                  th:value="${monthNumber}" th:selected="${monthNumber == month.monthValue}"
+                  th:attr="data-page-url=@{/study-calendar(month=${month.withMonth(monthNumber)})}"
+                  th:text="${monthNumber + '月'}">10月</option>
+        </select>
+      </div>
       <a class="btn" th:href="@{/study-calendar(month=${nextMonth})}" aria-label="次の月">翌月 ›</a>
     </div>
 

@@ -46,7 +46,8 @@
 </th:block>
 
 <div id="pagination-container"
-     class="pagination-container">
+     class="pagination-container"
+     data-pagination-target="user-table" data-pagination-rows="tbody tr" data-pagination-size="8">
 </div>
 
 <table id="user-table" class="data-table" th:if="${#lists.size(customerForm) != 0}">
@@ -99,34 +100,5 @@
   </tbody>
 </table>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const rowsPerPage = 8;
-  const table = document.getElementById('user-table');
-  if (!table) return;
-  const rows = table.querySelectorAll('tbody tr');
-  const pageCount = Math.ceil(rows.length / rowsPerPage);
-  const container = document.getElementById('pagination-container');
-  if (pageCount <= 1) return;
-  let currentPage = 1;
-  function showPage(page) {
-    currentPage = page;
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    Array.from(rows).forEach((r, i) => r.style.display = (i >= start && i < end) ? '' : 'none');
-    document.getElementById('p-prev').disabled = (currentPage === 1);
-    document.getElementById('p-next').disabled = (currentPage === pageCount);
-  }
-  const prev = document.createElement('button');
-  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'btn-pagination';
-  prev.addEventListener('click', () => { if (currentPage > 1) showPage(currentPage - 1); });
-  const next = document.createElement('button');
-  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'btn-pagination';
-  next.addEventListener('click', () => { if (currentPage < pageCount) showPage(currentPage + 1); });
-  container.appendChild(prev);
-  container.appendChild(next);
-  showPage(1);
-});
-</script>
 </body>
 </html>

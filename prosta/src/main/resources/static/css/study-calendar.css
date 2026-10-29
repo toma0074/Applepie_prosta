@@ -45,6 +45,27 @@
 
 .study-calendar-month-nav {
     margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.study-calendar-month-select {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+}
+
+.study-calendar-month-select select {
+    min-width: 0;
+    max-width: 100%;
+    padding: 5px 8px;
+    border: 1px solid rgba(11, 52, 110, 0.35);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #0B346E;
+    font: inherit;
 }
 
 .study-calendar-month-nav h4 {
@@ -53,6 +74,7 @@
 
 .study-calendar-grid {
     display: grid;
+    /* 7列を等分し、長い予定名が列の最小幅を押し広げないようにする。 */
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 5px;
 }
@@ -238,6 +260,26 @@
 }
 
 @media (max-width: 700px) {
+    .study-calendar-month-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .study-calendar-month-nav > .btn {
+        grid-row: 1;
+        justify-self: start;
+    }
+
+    .study-calendar-month-nav > .btn:last-child {
+        grid-column: 2;
+        justify-self: end;
+    }
+
+    .study-calendar-month-select {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
     .study-calendar-card,
     .study-calendar-detail {
         padding: 10px;
@@ -265,5 +307,9 @@
     .study-calendar-header {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .study-calendar-header > .btn {
+        align-self: flex-end;
     }
 }

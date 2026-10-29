@@ -26,6 +26,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
@@ -98,6 +99,21 @@ class AdminQuestionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.containsString("sample question text")))
                 .andExpect(content().string(Matchers.containsString("/admin/questions/10/edit")));
+    }
+
+    @Test
+    void pageSelectorKeepsAllQuestionSearchFilters() throws Exception {
+        when(questionRepository.search(any(), any(), any(), anyBoolean(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(question()), PageRequest.of(1, 10), 30));
+
+        mockMvc.perform(get("/admin/questions").session(adminSession())
+                .param("categoryId", "1").param("difficulty", "2")
+                .param("keyword", "sample").param("noExplanation", "true").param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.containsString("data-page-navigation")))
+                .andExpect(content().string(Matchers.containsString("page=1\" selected=\"selected\">2</option>")))
+                .andExpect(content().string(Matchers.containsString(
+                        "data-page-url=\"/admin/questions?categoryId=1&amp;difficulty=2&amp;keyword=sample&amp;noExplanation=true&amp;page=2\"")));
     }
 
     @Test

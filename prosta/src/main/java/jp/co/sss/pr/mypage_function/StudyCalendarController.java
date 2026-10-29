@@ -213,6 +213,7 @@ public class StudyCalendarController {
     }
 
     private StudyPlan findOwnedPlan(Integer id, Customer customer) {
+        // URLの予定IDだけを信用せず、ログイン中の所有者とセットで取得する。
         return studyPlanRepository.findByStudyPlanIdAndCustomer(id, customer)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }

@@ -1,0 +1,136 @@
+@charset "UTF-8";
+
+/* Loaded after page styles. Fixed columns and wrapping keep long text inside the article.
+   The answer/confirmation table (.qcheck) retains its separate layout. */
+article table:not(.qcheck) {
+    width: 100%;
+    max-width: 100%;
+    margin: 16px 0;
+    box-sizing: border-box;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid rgba(11, 52, 110, 0.35);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(6px);
+    color: #0B346E;
+}
+
+article table:not(.qcheck) th,
+article table:not(.qcheck) td {
+    border: 0;
+    padding: 12px 14px;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+article table:not(.qcheck) th {
+    background: rgba(11, 52, 110, 0.05);
+}
+
+article table:not(.qcheck) tr > :not(:last-child) {
+    border-right: 1px solid rgba(11, 52, 110, 0.15);
+}
+
+article table:not(.qcheck) tr + tr > *,
+article table:not(.qcheck) thead + tbody tr:first-child > * {
+    border-top: 1px solid rgba(11, 52, 110, 0.15);
+}
+
+article table.question_list th.category {
+    width: 8rem;
+}
+
+article table.question_list th.difficulty {
+    width: 6rem;
+}
+
+article table.question_list th.questionText {
+    width: auto;
+}
+
+article table.mypage-table th.category {
+    width: 15%;
+}
+
+article table.mypage-table th.questionId {
+    width: 43%;
+}
+
+article table.mypage-table th.ansOption,
+article table.mypage-table th.correctOption,
+article table.mypage-table th.wrongCount {
+    width: 14%;
+}
+
+article table.weak-table th:first-child {
+    width: 15%;
+}
+
+article table.weak-table th:nth-child(n + 3) {
+    width: 12%;
+}
+
+article table.aq-table th:nth-child(1) { width: 6%; }
+article table.aq-table th:nth-child(2) { width: 13%; }
+article table.aq-table th:nth-child(3) { width: 10%; }
+article table.aq-table th:nth-child(4) { width: 43%; }
+article table.aq-table th:nth-child(5) { width: 7%; }
+article table.aq-table th:nth-child(6) { width: 21%; }
+
+article table.data-table th.userId { width: 12%; }
+article table.data-table th.userName { width: 20%; }
+article table.data-table th.permission { width: 12%; }
+article table.data-table th.deleteFlag { width: 14%; }
+article table.data-table th.button { width: 42%; }
+
+article .inputform table:not(.qcheck) {
+    width: 560px;
+    max-width: 100%;
+}
+
+article .inputform table th {
+    width: 35%;
+}
+
+article table:not(.qcheck) input,
+article table:not(.qcheck) select {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+article table:not(.qcheck) input[type="text"],
+article table:not(.qcheck) input[type="password"] {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+@media (max-width: 600px) {
+    article table:not(.qcheck) th,
+    article table:not(.qcheck) td {
+        padding: 8px 5px;
+        font-size: 12px;
+    }
+
+    article table.question_list th.category {
+        width: 22%;
+    }
+
+    article table.question_list th.difficulty {
+        width: 24%;
+    }
+
+    article table.aq-table td.num {
+        white-space: normal;
+    }
+
+    article table:not(.qcheck) input[type="submit"] {
+        padding: 5px 2px;
+        margin: 2px 0;
+        font-size: 12px;
+    }
+}

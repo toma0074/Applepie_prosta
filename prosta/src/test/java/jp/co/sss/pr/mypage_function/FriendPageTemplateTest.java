@@ -48,6 +48,17 @@ class FriendPageTemplateTest {
         mockMvc.perform(get("/friends").session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ランキング")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"friend-feed-modal\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"friend-feed-character\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"friend-character-1\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"friend-character-10\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"friend-character-25\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"friend-character-50\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"friend-character-75\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"friend-character-100\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("/images/suta5.png")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("フィードを見る")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("aria-labelledby=\"friend-feed-title\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("const apiBase")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("フレンド")));
     }

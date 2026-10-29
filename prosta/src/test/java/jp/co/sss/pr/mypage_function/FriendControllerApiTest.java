@@ -83,6 +83,7 @@ class FriendControllerApiTest {
         when(friendConnectionRepository.findAllForUserAndStatus(
                 currentUser, FriendConnection.ACCEPTED)).thenReturn(List.of(acceptedConnection));
         friend.setConsecutiveLoginDays(5);
+        friend.setUserLevel(25);
         friend.setLastSeenAt(LocalDateTime.now().minusMinutes(1));
         FriendStudySummary friendStudy = summary(2, 12, 9);
         when(answerRepository.        summarizeStudy(anyList(), isNull(), isNull(), isNull(), isNull()))
@@ -93,6 +94,7 @@ class FriendControllerApiTest {
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$[0].userId").value(2))
                 .andExpect(jsonPath("$[0].userName").value("みかん"))
+                .andExpect(jsonPath("$[0].level").value(25))
                 .andExpect(jsonPath("$[0].online").value(true))
                 .andExpect(jsonPath("$[0].consecutiveLoginDays").value(5))
                 .andExpect(jsonPath("$[0].answerCount").value(12))

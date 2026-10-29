@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,6 +91,7 @@ public class UserAddController {
 
     // ユーザー削除/復元完了
     @RequestMapping(path = "/user/delete/complete", method = RequestMethod.POST)
+    @Transactional
     public String userDeleteComp(Model model, Integer userId) {
         Customer user = userId == null ? null : userRepository.findByUserId(userId);
         if (user == null) {
@@ -115,4 +117,3 @@ public class UserAddController {
         return "user/user_delete_complete";
     }
 }
-

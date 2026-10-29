@@ -124,7 +124,8 @@
       </div>
     </div>
 
-    <div id="pagination-container"class="pagination-container"></div>
+    <div id="pagination-container" class="pagination-container"
+         data-pagination-target="question-table" data-pagination-rows=".form_group" data-pagination-size="3"></div>
 
     <div th:text="'正答数 ' + ${ca} + '/' + ${qc}"></div>
 
@@ -194,33 +195,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
   }
 
-  // ---- ページネーション ----
-  const rowsPerPage = 3;
-  const table = document.getElementById('question-table');
-  if (!table) return;
-  const rows = table.querySelectorAll('.form_group');
-  const pageCount = Math.ceil(rows.length / rowsPerPage);
-  const container = document.getElementById('pagination-container');
-  if (pageCount <= 1) return;
-  let currentPage = 1;
-  function showPage(page) {
-    currentPage = page;
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    Array.from(rows).forEach((r, i) => r.style.display = (i >= start && i < end) ? '' : 'none');
-    document.getElementById('p-prev').disabled = (currentPage === 1);
-    document.getElementById('p-next').disabled = (currentPage === pageCount);
-  }
-  const prev = document.createElement('button');
-  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'btn-pagination';
-  prev.addEventListener('click', () => { if (currentPage > 1) showPage(currentPage - 1); });
-  const next = document.createElement('button');
-  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'btn-pagination';
-  next.addEventListener('click', () => { if (currentPage < pageCount) showPage(currentPage + 1); });
-  container.appendChild(prev);
-  container.appendChild(next);
-  showPage(1);
-
   // ---- 実績トースト自動非表示 ----
   const toast = document.querySelector('.achievement-toast');
   if (toast) {
@@ -231,4 +205,3 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 </body>
 </html>
-

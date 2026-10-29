@@ -54,7 +54,14 @@
   <div class="aq-pager" th:if="${historyPage.totalPages > 1}">
     <a class="aq-page-btn" th:classappend="${!historyPage.hasPrevious()} ? 'disabled'"
        th:href="${historyPage.hasPrevious()} ? @{/mypage/history(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},correct=${correct},fromDate=${fromDate},toDate=${toDate},sort=${sort},page=${historyPage.number - 1})} : '#'">前へ</a>
-    <span th:text="${historyPage.number + 1} + ' / ' + ${historyPage.totalPages}"></span>
+    <label class="page-selector">ページ
+      <select aria-label="ページを選択" data-page-navigation>
+        <option th:each="p : ${#numbers.sequence(0, historyPage.totalPages - 1)}"
+                th:value="${p}" th:text="${p + 1}" th:selected="${p == historyPage.number}"
+                th:attr="data-page-url=@{/mypage/history(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},correct=${correct},fromDate=${fromDate},toDate=${toDate},sort=${sort},page=${p})}"></option>
+      </select>
+      / <span th:text="${historyPage.totalPages}"></span>
+    </label>
     <a class="aq-page-btn" th:classappend="${!historyPage.hasNext()} ? 'disabled'"
        th:href="${historyPage.hasNext()} ? @{/mypage/history(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},correct=${correct},fromDate=${fromDate},toDate=${toDate},sort=${sort},page=${historyPage.number + 1})} : '#'">次へ</a>
   </div>

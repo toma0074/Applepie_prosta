@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.repository.CustomerRepository;
 
 @Controller
+@Transactional
 public class BackgroundController {
 
     private static final Map<String, Integer> BACKGROUND_LEVELS = Map.of(
@@ -81,6 +83,7 @@ public class BackgroundController {
             HttpSession session) {
 
         Customer customer = currentCustomer(session);
+        // 画面のロック表示だけに頼らず、送信されたクラス名と必要レベルをサーバーでも確認する。
         Integer requiredLevel = BACKGROUND_LEVELS.get(background);
         if (requiredLevel == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "背景の指定が無効です");

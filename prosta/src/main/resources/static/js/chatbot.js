@@ -17,6 +17,7 @@
   function addMessage(text, who) {
     var div = document.createElement('div');
     div.className = 'chatbot-msg ' + who;
+    // 入力文・応答文をHTMLとして解釈せず、文字列のまま表示する。
     div.textContent = text;
     messages.appendChild(div);
     scrollBottom();

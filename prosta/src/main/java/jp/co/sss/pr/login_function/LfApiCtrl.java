@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,9 +24,11 @@ public class LfApiCtrl {
     private CustomerRepository customerRepository;
 
     /**
-     *  JavaScriptから5分おきに自動で呼ばれるフラグ判定API
+     * 共通レイアウトから約60秒ごと・再表示時に呼ばれ、オンライン判定用の最終確認時刻を更新する。
+     * 有効なログインかの判定はSingleLoginFilterで先に行う。非表示タブでは呼出しが遅れることがある。
      */
     @PostMapping("/api/login-status/heartbeat")
+    @Transactional
     public ResponseEntity<Void> handleHeartbeat(HttpSession session) {
         // セッションからログインユーザーを取得
         CustomerBean loginUser = (CustomerBean) session.getAttribute("user");

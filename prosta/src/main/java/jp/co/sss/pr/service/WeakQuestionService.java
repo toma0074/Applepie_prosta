@@ -52,6 +52,7 @@ public class WeakQuestionService {
         int max = Math.max(0, Math.min(limit, MAX_QUESTIONS));
         Set<Integer> seen = new HashSet<>();
         List<Question> result = new ArrayList<>();
+        // 新しい解答から各問題を一度だけ判定し、後から正解した問題を古い誤答で復習対象に戻さない。
         for (Answer a : answerRepository.findAllByCustomerOrderByAnsIdDesc(user)) {
             Question q = a.getQuestion();
             if (q == null || !seen.add(q.getQuestionId())) {

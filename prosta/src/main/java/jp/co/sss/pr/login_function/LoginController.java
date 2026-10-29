@@ -3,11 +3,13 @@ package jp.co.sss.pr.login_function;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -27,6 +29,7 @@ import jp.co.sss.pr.repository.DailyStudySummary;
 import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.service.LevelService;
 import jp.co.sss.pr.service.PasswordService;
+import jp.co.sss.pr.service.AfterCommit;
 
 @Controller
 public class LoginController {
@@ -63,6 +66,7 @@ public class LoginController {
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
+    @Transactional
     public String login(@Valid @ModelAttribute CustomerForm customerForm,
                         BindingResult result, HttpSession session, Model model) {
         if (result.hasErrors()) {
@@ -76,15 +80,21 @@ public class LoginController {
 
         if (activeCustomers.size() == 1) {
             Customer customer = activeCustomers.get(0);
-            upgradeLegacyPassword(customer, customerForm.getUserPass());
-            request.changeSessionId();
-            session.setAttribute("user", toBean(customer));
-            restoreBackground(customer, session);
-
             List<Achievement> newAchievements = levelService.processLogin(customer);
-            if (!newAchievements.isEmpty()) {
-                session.setAttribute("newAchievements", newAchievements);
-            }
+            upgradeLegacyPassword(customer, customerForm.getUserPass());
+            String loginToken = UUID.randomUUID().toString();
+            customer.setActiveLoginToken(loginToken);
+            customerRepository.save(customer);
+            // DB確定前にログイン済みにすると保存失敗でも認証が残るため、論理セッションの切替は確定後に行う。
+            AfterCommit.run(() -> {
+                request.changeSessionId();
+                session.setAttribute("user", toBean(customer));
+                session.setAttribute(SingleLoginFilter.LOGIN_TOKEN, loginToken);
+                restoreBackground(customer, session);
+                if (!newAchievements.isEmpty()) {
+                    session.setAttribute("newAchievements", newAchievements);
+                }
+            });
             return "redirect:/mypage";
         }
 
@@ -136,16 +146,19 @@ public class LoginController {
                 totalAnswers == 0 ? 0 : Math.round(totalCorrect * 100.0 / totalAnswers));
         model.addAttribute("weakCategory", weakest == null ? null : weakest.getCategoryName());
         model.addAttribute("weakAccuracy", weakest == null ? 0 : Math.round(weakestRate));
+        model.addAttribute("logoutSummary", true);
         return "logout/logout_analyze";
     }
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
+    @Transactional
     public String logout() {
         CustomerBean userBean = (CustomerBean) session.getAttribute("user");
         if (userBean != null) {
             customerRepository.findById(userBean.getUserId()).ifPresent(customer -> {
                 customer.setLoginFlag(false);
                 customer.setLastSeenAt(null);
+                customer.setActiveLoginToken(null);
                 customerRepository.save(customer);
             });
         }
@@ -159,6 +172,7 @@ public class LoginController {
     }
 
     @RequestMapping(path = "/regist/check", method = RequestMethod.POST)
+    @Transactional
     public String checkRegist(@Valid @ModelAttribute CustomerForm customerForm,
                               BindingResult result, Model model) {
         boolean nameTaken = customerRepository.existsByUserName(customerForm.getUserName());
@@ -182,11 +196,16 @@ public class LoginController {
         customer.setUserLevel(1);
         customer.setConsecutiveLoginDays(1);
         customer.setLastSeenAt(LocalDateTime.now());
+        customer.setActiveLoginToken(UUID.randomUUID().toString());
         customer = customerRepository.save(customer);
 
-        request.changeSessionId();
-        session.setAttribute("user", toBean(customer));
-        restoreBackground(customer, session);
+        Customer registered = customer;
+        AfterCommit.run(() -> {
+            request.changeSessionId();
+            session.setAttribute("user", toBean(registered));
+            session.setAttribute(SingleLoginFilter.LOGIN_TOKEN, registered.getActiveLoginToken());
+            restoreBackground(registered, session);
+        });
 
         return "redirect:/mypage";
     }

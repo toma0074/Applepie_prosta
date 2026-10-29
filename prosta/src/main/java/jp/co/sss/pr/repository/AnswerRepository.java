@@ -101,6 +101,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     Page<RecentStudyActivity> findRecentActivities(
             @Param("customer") Customer customer, Pageable pageable);
 
+    // 日別集計はカレンダー・クエスト・フィード・サマリーで共用し、1解答レコードを1問として数える。
     @Query("""
             SELECT a.ansDate AS studyDate,
                    COUNT(a.ansId) AS answerCount,

@@ -76,6 +76,29 @@
     margin-top: 8px;
 }
 
+.pagination-container,
+.aq-pager {
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.page-selector {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.page-selector select {
+    width: auto;
+    min-width: 4rem;
+    padding: 5px 8px;
+    border: 1px solid rgba(11, 52, 110, 0.35);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #0B346E;
+    font: inherit;
+}
+
 /* 完了・通知メッセージ */
 .message {
 	height: 150px;

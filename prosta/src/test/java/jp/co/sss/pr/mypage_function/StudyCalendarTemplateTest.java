@@ -9,7 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -47,8 +48,9 @@ class StudyCalendarTemplateTest {
     @MockBean
     private UserAchievementRepository userAchievementRepository;
 
-    @Test
-    void rendersMonthCalendarAndPlanForm() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"", "/prosta"})
+    void rendersMonthCalendarAndPlanForm(String contextPath) throws Exception {
         Customer customer = new Customer();
         customer.setUserId(1);
         when(customerRepository.getReferenceById(1)).thenReturn(customer);
@@ -74,17 +76,34 @@ class StudyCalendarTemplateTest {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", user);
 
-        mockMvc.perform(get("/study-calendar")
+        mockMvc.perform(get(contextPath + "/study-calendar")
+                        .contextPath(contextPath)
                         .param("month", "2026-03")
                         .param("date", "2026-03-12")
                         .session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.containsString("学習カレンダー・予定表")))
                 .andExpect(content().string(Matchers.containsString("2026-03")))
+                .andExpect(content().string(Matchers.containsString(
+                        "<select id=\"calendar-year\" aria-label=\"表示する年\" data-page-navigation>")))
+                .andExpect(content().string(Matchers.containsString(
+                        "<select id=\"calendar-month\" aria-label=\"表示する月\" data-page-navigation>")))
+                .andExpect(content().string(Matchers.matchesPattern(
+                        "(?s).*<option value=\"2026\"[^>]*selected=\"selected\"[^>]*>2026年</option>.*")))
+                .andExpect(content().string(Matchers.matchesPattern(
+                        "(?s).*<option value=\"3\"[^>]*selected=\"selected\"[^>]*>3月</option>.*")))
+                .andExpect(content().string(Matchers.containsString(
+                        "data-page-url=\"" + contextPath + "/study-calendar?month=2030-03\"")))
+                .andExpect(content().string(Matchers.containsString(
+                        "data-page-url=\"" + contextPath + "/study-calendar?month=2026-07\"")))
+                .andExpect(content().string(Matchers.not(Matchers.containsString("type=\"month\""))))
+                .andExpect(content().string(Matchers.not(Matchers.containsString(">移動</button>"))))
+                .andExpect(content().string(Matchers.not(Matchers.containsString(
+                        "<label for=\"calendar-month\">"))))
                 .andExpect(content().string(Matchers.containsString("Javaの問題を10問解く")))
                 .andExpect(content().string(Matchers.containsString("Java復習")))
                 .andExpect(content().string(Matchers.containsString("配列を復習する")))
-                .andExpect(content().string(Matchers.containsString("/study-calendar/plans/3/delete")))
+                .andExpect(content().string(Matchers.containsString(contextPath + "/study-calendar/plans/3/delete")))
                 .andExpect(content().string(Matchers.containsString("予定を登録")));
     }
 }

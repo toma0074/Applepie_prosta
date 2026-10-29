@@ -336,6 +336,7 @@ public class FriendController {
     }
 
     private FriendConnection findConnection(Customer user, Customer other) {
+        // A→B/B→Aの二重レコードを避けるため、保存時と同じID順で検索する。
         Customer userLow = user.getUserId() < other.getUserId() ? user : other;
         Customer userHigh = user.getUserId() < other.getUserId() ? other : user;
         return friendConnectionRepository.findByUserLowAndUserHigh(userLow, userHigh)
@@ -363,6 +364,7 @@ public class FriendController {
         return new FriendSummary(
                 friend.getUserId(),
                 friend.getUserName(),
+                friend.getUserLevel(),
                 lastSeenAt != null && lastSeenAt.isAfter(onlineCutoff),
                 friend.getConsecutiveLoginDays(),
                 answerCount(study),
@@ -380,6 +382,7 @@ public class FriendController {
     public record FriendSummary(
             Integer userId,
             String userName,
+            int level,
             boolean online,
             int consecutiveLoginDays,
             long answerCount,

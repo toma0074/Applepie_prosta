@@ -19,6 +19,8 @@
     var remainingAtLoad = Number(box.dataset.remaining);
     var done = false;
 
+    // tick回数で減算すると非表示タブで時間がずれるため、読込時の残時間から実経過時間を引く。
+    // このJSは表示・自動送信用であり、厳密な不正対策としてのサーバー期限検証とは別。
     function remaining() { return Math.max(0, remainingAtLoad - (Date.now() - loadedAt)); }
 
     function expire() {

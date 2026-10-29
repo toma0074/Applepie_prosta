@@ -3,6 +3,7 @@ package jp.co.sss.pr.user_function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
@@ -21,6 +22,7 @@ import jp.co.sss.pr.service.PasswordService;
 import jp.co.sss.pr.service.ReturnUrls;
 
 @Controller
+@Transactional
 public class UserController {
 
     private static final Integer ADMIN = 1;
@@ -99,6 +101,7 @@ public class UserController {
         if (result.hasErrors()) {
             return "user/user_update_input";
         }
+        // 確認画面の後に他ユーザーが名前を使う場合があるため、確定時も重複を再検査する。
         if (isNameTaken(userForm, existing)) {
             model.addAttribute("err", "既に使用されているユーザー名です。");
             return "user/user_update_input";

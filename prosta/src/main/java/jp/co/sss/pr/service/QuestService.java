@@ -42,6 +42,7 @@ public class QuestService {
 
     List<Quest> buildQuests(long answers, long correct) {
         long accuracy = answers == 0 ? 0 : Math.round(correct * 100.0 / answers);
+        // 少数の正解だけで達成にならないよう、表示と同じ丸め正答率に最低解答数の条件を併用する。
         boolean accuracyDone = answers >= ACCURACY_MIN_ANSWERS && accuracy >= ACCURACY_TARGET;
         return List.of(
                 new Quest("今日の5問チャレンジ", "今日5問に解答する",

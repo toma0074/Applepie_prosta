@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceContext;
 import jp.co.sss.pr.entity.Achievement;
 import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.entity.UserAchievement;
@@ -22,19 +25,23 @@ import jp.co.sss.pr.repository.UserAchievementRepository;
  *
  * <p>使用テーブル（既存テーブルのみ）：
  * <ul>
- *   <li>customer : login_date, login_count, login_flag, user_level</li>
+ *   <li>customer : ログイン情報、total_exp、user_level、perfect_test_count</li>
  *   <li>answer   : correct_flag, ans_date</li>
  *   <li>achievement / user_achievement : 実績マスター・解除記録</li>
  * </ul>
  *
  * <p>レベル計算式：
  * <pre>
- *   レベル = ログイン日数×1 + 連続ログインボーナス + 正解数×2 + 満点ボーナス×5
- *   ※ 計算後の値を customer.user_level に直接保存する
+ *   獲得EXP = 今回の正解数×2 + 満点時のみ5
+ *   レベル = floor(累計EXP / 15) + 1
+ *   ※ ログインではEXPを加算しない。ログイン日数は実績判定に使用する。
  * </pre>
  */
 @Service
 public class LevelService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -70,6 +77,7 @@ public class LevelService {
      */
     @Transactional
     public List<Achievement> processLogin(Customer customer) {
+        customer = lockCurrentCustomer(customer);
         LocalDate today = LocalDate.now();
         LocalDate lastLoginDate = customer.getLoginDate();
         customer.setLastSeenAt(LocalDateTime.now());
@@ -101,7 +109,8 @@ public class LevelService {
     /**
      * テスト解答結果を受けてレベルを再計算し、実績を確認する。
      *
-     * <p>レベル計算は answer テーブルの集計値（正解数・満点回数）を参照する。
+     * <p>今回の正解数から累計EXPへ加算し、満点回数をテスト単位で更新する。
+     * answerの累計正解数は実績判定に使用し、過去の履歴からEXPを再生成しない。
      *
      * @param customer     解答したユーザーEntity
      * @param correctCount 今回の正解数
@@ -111,6 +120,7 @@ public class LevelService {
     @Transactional
     public List<Achievement> processTestResult(
             Customer customer, int correctCount, int totalCount) {
+        customer = lockCurrentCustomer(customer);
 
         // 1回のテストで満点なら、満点回数を1増やす
         if (totalCount > 0 && correctCount == totalCount) {
@@ -133,10 +143,6 @@ public class LevelService {
         recalcLevel(customer);
         customerRepository.save(customer);
         
-        // レベル再計算
-        recalcLevel(customer);
-        customerRepository.save(customer);
-
         // 通常の実績をチェック
         List<Achievement> newlyUnlocked = checkAchievements(customer);
 
@@ -146,6 +152,19 @@ public class LevelService {
         }
 
         return newlyUnlocked;
+    }
+
+    private Customer lockCurrentCustomer(Customer customer) {
+        if (entityManager.contains(customer)) {
+            // 別要求の確定前に読んだEntityでも、加算前にロック下の最新値へ更新する。
+            entityManager.refresh(customer, LockModeType.PESSIMISTIC_WRITE);
+            return customer;
+        }
+        Customer current = entityManager.find(Customer.class, customer.getUserId(), LockModeType.PESSIMISTIC_WRITE);
+        if (current == null) {
+            throw new jakarta.persistence.EntityNotFoundException("Customer no longer exists");
+        }
+        return current;
     }
 
     // ----------------------------------------------------------------
@@ -169,13 +188,11 @@ public class LevelService {
     }
 
     /**
-     * 次のレベルまでの残りポイント（表示用）。
-     * 「あと何点で次のレベルか」を計算する。
-     * ログイン日数 1 = 1レベル換算で計算。
+     * 旧画面向けの互換メソッド。現在のEXP進捗の計算には使用しない。
+     * 次レベルまでのEXPは、累計EXPを使って 15 - (totalExp % 15) で求める。
      */
     public static int pointsToNextLevel(int currentLevel) {
-        // 次のレベルに必要な追加ポイント（ログイン換算）
-        return 1; // レベルは1ログインまたは1正解ごとに上がる設計のため常に1
+        return 1;
     }
 
     // ----------------------------------------------------------------

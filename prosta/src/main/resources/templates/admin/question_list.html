@@ -36,7 +36,14 @@
   <div class="aq-pager" th:if="${page.totalPages > 1}">
     <a class="aq-page-btn" th:classappend="${!page.hasPrevious()} ? 'disabled'"
        th:href="${page.hasPrevious()} ? @{/admin/questions(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},noExplanation=${noExplanation},page=${page.number - 1})} : '#'">前へ</a>
-    <span th:text="${page.number + 1} + ' / ' + ${page.totalPages}"></span>
+    <label class="page-selector">ページ
+      <select aria-label="ページを選択" data-page-navigation>
+        <option th:each="p : ${#numbers.sequence(0, page.totalPages - 1)}"
+                th:value="${p}" th:text="${p + 1}" th:selected="${p == page.number}"
+                th:attr="data-page-url=@{/admin/questions(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},noExplanation=${noExplanation},page=${p})}"></option>
+      </select>
+      / <span th:text="${page.totalPages}"></span>
+    </label>
     <a class="aq-page-btn" th:classappend="${!page.hasNext()} ? 'disabled'"
        th:href="${page.hasNext()} ? @{/admin/questions(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},noExplanation=${noExplanation},page=${page.number + 1})} : '#'">次へ</a>
   </div>

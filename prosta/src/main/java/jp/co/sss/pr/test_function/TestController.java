@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +34,7 @@ import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.repository.QuestionRepository;
 import jp.co.sss.pr.service.LevelService;
 import jp.co.sss.pr.service.WeakQuestionService;
+import jp.co.sss.pr.service.AfterCommit;
 
 @Controller
 public class TestController {
@@ -225,6 +227,7 @@ public class TestController {
 
     // 制限時間切れ：未回答は「わからない」として、そのまま採点する
     @RequestMapping(path = "/test/timeup", method = RequestMethod.POST)
+    @Transactional
     public String timeUp(@ModelAttribute AnswerListForm answerForm, Model model) {
         List<?> questions = (List<?>) session.getAttribute("question");
         List<AnswerForm> results = answerForm.getResults();
@@ -243,6 +246,7 @@ public class TestController {
 
     // 解答結果確認画面
     @RequestMapping(path = "/test/result", method = RequestMethod.POST)
+    @Transactional
     public String resulttTest(Model model, AnswerListForm ans) {
 
         CustomerBean userBean =
@@ -302,10 +306,6 @@ public class TestController {
 
         // ---- レベル再計算・実績チェック ----
         List<Achievement> newAchievements = levelService.processTestResult(user, caCount, qCount);
-
-        if (!newAchievements.isEmpty()) {
-            session.setAttribute("newAchievements", newAchievements);
-        }
 
         // 最新レベルを取得（processTestResult 内で save 済み）
         Customer updatedUser =
@@ -393,11 +393,17 @@ public class TestController {
         view.put("leveledUp", leveledUp);
         view.put("characterMessage", characterMessage);
         
-        session.setAttribute(RESULT_VIEW, view);
-
-        session.removeAttribute("question");
-        session.removeAttribute("ans");
-        clearTimer();
+        // 解答保存・EXP・実績は同じトランザクション。確定前に解答セッションを消すと再送できなくなる。
+        Runnable finish = () -> {
+            if (!newAchievements.isEmpty()) {
+                session.setAttribute("newAchievements", newAchievements);
+            }
+            session.setAttribute(RESULT_VIEW, view);
+            session.removeAttribute("question");
+            session.removeAttribute("ans");
+            clearTimer();
+        };
+        AfterCommit.run(finish);
 
         // 再読み込みやブラウザバックでの二重登録を防ぐため、リダイレクトで結果を表示する
         return "redirect:/test/result";

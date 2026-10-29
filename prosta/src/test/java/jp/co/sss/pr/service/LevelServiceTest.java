@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -18,9 +19,20 @@ import jp.co.sss.pr.repository.AchievementRepository;
 import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.repository.UserAchievementRepository;
+import jakarta.persistence.EntityManager;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class LevelServiceTest {
+
+    @Mock
+    private EntityManager entityManager;
+
+    @BeforeEach
+    void managedCustomer() {
+        lenient().when(entityManager.contains(any())).thenReturn(true);
+    }
 
     @Mock
     private CustomerRepository customerRepository;

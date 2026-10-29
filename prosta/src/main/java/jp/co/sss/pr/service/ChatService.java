@@ -51,6 +51,7 @@ public class ChatService {
     public Reply reply(Customer user, String message, String contextPath) {
         String m = message == null ? "" : message.trim().toLowerCase();
 
+        // 上から最初に一致した意図を採用する。「弱点から出題」を単なる弱点集計より先に判定する。
         if (containsAny(m, "解説", "なぜ", "理由", "どうして", "答えの意味")) {
             return explain(user, message, contextPath);
         }

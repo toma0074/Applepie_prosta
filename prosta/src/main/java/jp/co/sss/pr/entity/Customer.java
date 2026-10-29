@@ -3,6 +3,8 @@ package jp.co.sss.pr.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +14,9 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
  
 @Entity
+// heartbeatやプロフィール保存で、変更していないEXP・認証トークン等を古い値で上書きしない。
+// 更新列の限定だけでは同時加算を守れないため、加算・認証には別途顧客行ロックも使用する。
+@DynamicUpdate
 @Table(name = "customer")
 public class Customer {
  
@@ -66,6 +71,12 @@ public class Customer {
 
     @Column(name = "background_seen_level", nullable = false)
     private Integer backgroundSeenLevel = 1;
+
+    @Column(name = "active_login_token", length = 36)
+    private String activeLoginToken;
+
+    public String getActiveLoginToken() { return activeLoginToken; }
+    public void setActiveLoginToken(String activeLoginToken) { this.activeLoginToken = activeLoginToken; }
 
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }

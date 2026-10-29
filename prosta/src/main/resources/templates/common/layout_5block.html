@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	th:fragment="layout(body)">
 <head>
+<script th:src="@{/js/tab-session.js}"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/layout.css}" />
@@ -9,8 +10,10 @@
 <link rel="stylesheet" type="text/css" th:href="@{/css/stylesheet.css}" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/gamification.css}" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/test.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/tables.css}" />
 <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
 <title>PROSTA</title>
+<script th:src="@{/js/pagination.js}" defer></script>
 </head>
 <body
 	th:class="${session.backgroundClass != null ? session.backgroundClass : 'bg-default'}"
