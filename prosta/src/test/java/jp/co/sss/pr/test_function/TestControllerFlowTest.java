@@ -127,7 +127,7 @@ class TestControllerFlowTest {
 
     @Test
     void diagnosticStartRequiresThreeOrMoreCategories() {
-        for (List<Integer> ids : new List[] { null, List.of(), List.of(1), List.of(1, 2) }) {
+        for (List<Integer> ids : java.util.Arrays.<List<Integer>>asList(null, List.of(), List.of(1), List.of(1, 2))) {
             ExtendedModelMap model = new ExtendedModelMap();
 
             String view = controller.startDiagnostic(ids, 1, model, false);

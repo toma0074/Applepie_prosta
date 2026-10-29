@@ -74,8 +74,8 @@ public class WeakQuestionService {
                 .filter(s -> s.getCorrectCount() < s.getAttemptCount())
                 .sorted(Comparator
                         .comparingDouble((QuestionAttemptStat s) -> (double) s.getCorrectCount() / s.getAttemptCount())
-                        .thenComparing(Comparator.comparingLong(QuestionAttemptStat::getAttemptCount).reversed())
-                        .thenComparing(QuestionAttemptStat::getQuestionId))
+                        .thenComparing(Comparator.comparingLong((QuestionAttemptStat s) -> s.getAttemptCount()).reversed())
+                        .thenComparing(s -> s.getQuestionId()))
                 .limit(max)
                 .toList();
         if (weakStats.isEmpty()) {
@@ -83,9 +83,9 @@ public class WeakQuestionService {
         }
 
         Map<Integer, Question> questions = questionRepository
-                .findAllById(weakStats.stream().map(QuestionAttemptStat::getQuestionId).toList())
+                .findAllById(weakStats.stream().map(s -> s.getQuestionId()).toList())
                 .stream()
-                .collect(Collectors.toMap(Question::getQuestionId, Function.identity()));
+                .collect(Collectors.toMap(q -> q.getQuestionId(), Function.identity()));
 
         List<WeakQuestion> result = new ArrayList<>();
         for (QuestionAttemptStat s : weakStats) {

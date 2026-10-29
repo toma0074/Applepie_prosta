@@ -18,7 +18,7 @@ class QuestServiceTest {
     void noAnswersCompletesNothing() {
         List<Quest> quests = service.buildQuests(0, 0);
 
-        assertTrue(quests.stream().noneMatch(Quest::completed));
+        assertTrue(quests.stream().noneMatch(quest -> quest.completed()));
     }
 
     @Test
@@ -34,7 +34,7 @@ class QuestServiceTest {
     void allQuestsCompleteWithFiveCorrectAnswers() {
         List<Quest> quests = service.buildQuests(5, 5);
 
-        assertTrue(quests.stream().allMatch(Quest::completed));
+        assertTrue(quests.stream().allMatch(quest -> quest.completed()));
     }
 
     @Test

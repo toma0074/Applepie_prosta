@@ -60,8 +60,6 @@ public class SingleLoginFilter extends OncePerRequestFilter {
             return;
         }
         try {
-            // MVCで解決された4xxでも、内側の@Transactionalがrollback-onlyにした場合はここで失敗する。
-            // 例外を一律に握りつぶさず、読取専用API側で想定内エラーの扱いを限定して定義する。
             transaction.executeWithoutResult(status -> {
                 Customer current = entityManager.find(Customer.class, user.getUserId(),
                         LockModeType.PESSIMISTIC_WRITE);
@@ -82,6 +80,11 @@ public class SingleLoginFilter extends OncePerRequestFilter {
                         return;
                     }
                     chain.doFilter(request, response);
+                    // MVCが処理済みの4xxは明示的にロールバックし、確定時に500へ変化させない。
+                    // 更新APIでも途中の変更を残さず、成功応答や通常のDB例外の扱いは変えない。
+                    if (response.getStatus() >= 400 && response.getStatus() < 500) {
+                        status.setRollbackOnly();
+                    }
                 } catch (IOException | ServletException e) {
                     throw new RequestFailure(e);
                 }

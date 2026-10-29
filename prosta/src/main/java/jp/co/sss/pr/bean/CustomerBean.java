@@ -1,7 +1,5 @@
 package jp.co.sss.pr.bean;
 
-import java.time.LocalDateTime;
-
 public class CustomerBean {
 
     private Integer userId;

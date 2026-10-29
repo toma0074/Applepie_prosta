@@ -161,7 +161,7 @@ public class TestController {
         if (weakList.isEmpty()) {
             return "redirect:/test/weak";
         }
-        List<Question> quesList = weakList.stream().map(WeakQuestionService.WeakQuestion::question).toList();
+        List<Question> quesList = weakList.stream().map(weak -> weak.question()).toList();
 
         model.addAttribute("answerListForm", new AnswerListForm());
         session.setAttribute("ans", buildAnswerFormList(quesList.size()));
@@ -272,7 +272,7 @@ public class TestController {
 
         Map<Integer, String> explanations = new LinkedHashMap<>();
         for (Question q : quesRpstry.findAllById(
-                results.stream().map(AnswerForm::getQuestionId).toList())) {
+                results.stream().map(answer -> answer.getQuestionId()).toList())) {
             explanations.put(q.getQuestionId(), q.getExplanation());
         }
 

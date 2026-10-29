@@ -178,7 +178,7 @@ class UserControllerFlowTest {
 
     @Test
     void checkAllowsKeepingYourOwnName() {
-        Customer me = customer(1, "taro", 0);
+        customer(1, "taro", 0);
         loginAs(1, "taro", 0);
         when(repo.existsByUserNameAndUserIdNot("taro", 1)).thenReturn(false);
         CustomerForm f = form(1, "taro", "pass1234", 0);
@@ -255,7 +255,7 @@ class UserControllerFlowTest {
         Customer me = customer(1, "taro", 0);
         loginAs(1, "taro", 0);
         pend(1, "newpass1");
-        Customer other = customer(2, "hanako", 0);
+        customer(2, "hanako", 0);
         when(repo.existsByUserNameAndUserIdNot("hanako", 1)).thenReturn(true);
         CustomerForm f = form(1, "hanako", null, 0);
         ExtendedModelMap model = new ExtendedModelMap();

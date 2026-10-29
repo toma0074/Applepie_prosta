@@ -68,7 +68,7 @@ public class AdminQuestionController {
                 "%" + kw + "%", noExplanation, PageRequest.of(Math.max(page, 0), PAGE_SIZE));
 
         Map<Integer, QuestionAttemptStat> stats = new HashMap<>();
-        List<Integer> ids = result.getContent().stream().map(Question::getQuestionId).toList();
+        List<Integer> ids = result.getContent().stream().map(q -> q.getQuestionId()).toList();
         if (!ids.isEmpty()) {
             for (QuestionAttemptStat s : answerRepository.summarizeByQuestionIds(ids)) {
                 stats.put(s.getQuestionId(), s);

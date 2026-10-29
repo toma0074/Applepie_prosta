@@ -130,7 +130,7 @@ class WeakQuestionServiceTest {
         answers(me, newlyWrong, true, false);
 
         List<String> result = service.pickRecentMistakes(me, 15).stream()
-                .map(Question::getQuestionText).toList();
+                .map(question -> question.getQuestionText()).toList();
 
         assertEquals(List.of("newlyWrong", "stillWrong"), result);
         assertEquals(1, service.pickRecentMistakes(me, 1).size());

@@ -92,12 +92,12 @@ public class FriendController {
                 .toList();
 
         Map<Integer, FriendStudySummary> studyByUser = studySummaries(
-                friends.stream().map(Customer::getUserId).toList(), null, null, null, null);
+                friends.stream().map(friend -> friend.getUserId()).toList(), null, null, null, null);
         LocalDateTime onlineCutoff = LocalDateTime.now().minusMinutes(ONLINE_WINDOW_MINUTES);
 
         return friends.stream()
                 .map(friend -> toFriendSummary(friend, studyByUser.get(friend.getUserId()), onlineCutoff))
-                .sorted(Comparator.comparing(FriendSummary::userName, String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparing((FriendSummary summary) -> summary.userName(), String.CASE_INSENSITIVE_ORDER))
                 .toList();
     }
 
@@ -278,13 +278,13 @@ public class FriendController {
                 .forEach(participants::add);
 
         List<Integer> participantIds = participants.stream()
-                .map(Customer::getUserId)
+                .map(user -> user.getUserId())
                 .distinct()
                 .toList();
         Map<Integer, FriendStudySummary> studyByUser = studySummaries(
                 participantIds, categoryId, difficulty, fromDate, toDate);
         Map<Integer, Customer> usersById = participants.stream()
-                .collect(Collectors.toMap(Customer::getUserId, user -> user, (first, ignored) -> first));
+                .collect(Collectors.toMap(user -> user.getUserId(), user -> user, (first, ignored) -> first));
 
         List<LeaderboardEntry> entries = participantIds.stream()
                 .map(userId -> {
@@ -296,10 +296,10 @@ public class FriendController {
                     return new LeaderboardEntry(
                             userId, user.getUserName(), answers, correct, accuracy);
                 })
-                .sorted(Comparator.comparingDouble(LeaderboardEntry::accuracy).reversed()
-                        .thenComparing(Comparator.comparingLong(LeaderboardEntry::correctCount).reversed())
-                        .thenComparing(Comparator.comparingLong(LeaderboardEntry::answerCount).reversed())
-                        .thenComparing(LeaderboardEntry::userName, String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparingDouble((LeaderboardEntry entry) -> entry.accuracy()).reversed()
+                        .thenComparing(Comparator.comparingLong((LeaderboardEntry entry) -> entry.correctCount()).reversed())
+                        .thenComparing(Comparator.comparingLong((LeaderboardEntry entry) -> entry.answerCount()).reversed())
+                        .thenComparing(entry -> entry.userName(), String.CASE_INSENSITIVE_ORDER))
                 .toList();
 
         return new Leaderboard(
@@ -355,7 +355,7 @@ public class FriendController {
             return Map.of();
         }
         return answerRepository.summarizeStudy(userIds, categoryId, difficulty, from, to).stream()
-                .collect(Collectors.toMap(FriendStudySummary::getUserId, summary -> summary));
+                .collect(Collectors.toMap(summary -> summary.getUserId(), summary -> summary));
     }
 
     private FriendSummary toFriendSummary(
