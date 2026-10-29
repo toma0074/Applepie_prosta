@@ -92,7 +92,7 @@ public class FriendController {
                 .toList();
 
         Map<Integer, FriendStudySummary> studyByUser = studySummaries(
-                friends.stream().map(Customer::getUserId).toList(), null, null, null);
+                friends.stream().map(Customer::getUserId).toList(), null, null, null, null);
         LocalDateTime onlineCutoff = LocalDateTime.now().minusMinutes(ONLINE_WINDOW_MINUTES);
 
         return friends.stream()
@@ -106,7 +106,7 @@ public class FriendController {
     public FriendSummary currentUserSummary(HttpSession session) {
         Customer user = currentUser(session);
         FriendStudySummary study = studySummaries(
-                List.of(user.getUserId()), null, null, null).get(user.getUserId());
+                List.of(user.getUserId()), null, null, null, null).get(user.getUserId());
         return toFriendSummary(
                 user, study, LocalDateTime.now().minusMinutes(ONLINE_WINDOW_MINUTES));
     }
@@ -246,13 +246,20 @@ public class FriendController {
     @GetMapping("/leaderboard")
     @Transactional(readOnly = true)
     public Leaderboard leaderboard(
-            @RequestParam Integer categoryId,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) Integer difficulty,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             HttpSession session) {
         Customer currentUser = currentUser(session);
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "カテゴリが無効です"));
+        Category category = null;
+        if (categoryId != null) {
+            category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "カテゴリが無効です"));
+        }
+        if (difficulty != null && (difficulty < 1 || difficulty > 3)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "難易度が無効です");
+        }
         LocalDate today = LocalDate.now();
         LocalDate fromDate = from == null ? today.withDayOfMonth(1) : from;
         LocalDate toDate = to == null ? today : to;
@@ -275,7 +282,7 @@ public class FriendController {
                 .distinct()
                 .toList();
         Map<Integer, FriendStudySummary> studyByUser = studySummaries(
-                participantIds, categoryId, fromDate, toDate);
+                participantIds, categoryId, difficulty, fromDate, toDate);
         Map<Integer, Customer> usersById = participants.stream()
                 .collect(Collectors.toMap(Customer::getUserId, user -> user, (first, ignored) -> first));
 
@@ -295,7 +302,10 @@ public class FriendController {
                         .thenComparing(LeaderboardEntry::userName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
 
-        return new Leaderboard(category.getCategoryId(), category.getCategoryName(),
+        return new Leaderboard(
+                category == null ? null : category.getCategoryId(),
+                category == null ? "すべてのカテゴリ" : category.getCategoryName(),
+                difficulty,
                 fromDate, toDate, entries);
     }
 
@@ -339,11 +349,11 @@ public class FriendController {
     }
 
     private Map<Integer, FriendStudySummary> studySummaries(
-            List<Integer> userIds, Integer categoryId, LocalDate from, LocalDate to) {
+            List<Integer> userIds, Integer categoryId, Integer difficulty, LocalDate from, LocalDate to) {
         if (userIds.isEmpty()) {
             return Map.of();
         }
-        return answerRepository.summarizeStudy(userIds, categoryId, from, to).stream()
+        return answerRepository.summarizeStudy(userIds, categoryId, difficulty, from, to).stream()
                 .collect(Collectors.toMap(FriendStudySummary::getUserId, summary -> summary));
     }
 
@@ -409,6 +419,7 @@ public class FriendController {
     public record Leaderboard(
             Integer categoryId,
             String categoryName,
+            Integer difficulty,
             LocalDate from,
             LocalDate to,
             List<LeaderboardEntry> entries) {

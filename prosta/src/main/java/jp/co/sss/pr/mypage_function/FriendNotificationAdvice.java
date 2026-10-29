@@ -40,6 +40,17 @@ public class FriendNotificationAdvice {
                 .orElse(0L);
     }
 
+    @ModelAttribute("newBackgroundCount")
+    public long newBackgroundCount(HttpSession session, HttpServletRequest request) {
+        if (request.getRequestURI().contains("/api/")
+                || !(session.getAttribute("user") instanceof CustomerBean bean)) {
+            return 0;
+        }
+        return customerRepository.findById(bean.getUserId())
+                .map(BackgroundController::countNewBackgrounds)
+                .orElse(0L);
+    }
+
     @ModelAttribute("pendingFriendRequestCount")
     public long pendingFriendRequestCount(HttpSession session, HttpServletRequest request) {
         if (request.getRequestURI().contains("/api/")) {

@@ -64,6 +64,9 @@ public class Customer {
     @Column(name = "background_color", length = 7)
     private String backgroundColor;
 
+    @Column(name = "background_seen_level", nullable = false)
+    private Integer backgroundSeenLevel = 1;
+
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
     public String getUserName() { return userName; }
@@ -102,5 +105,7 @@ public class Customer {
     public void setBackgroundClass(String backgroundClass) { this.backgroundClass = backgroundClass; }
     public String getBackgroundColor() { return backgroundColor; }
     public void setBackgroundColor(String backgroundColor) { this.backgroundColor = backgroundColor; }
+    public Integer getBackgroundSeenLevel() { return backgroundSeenLevel; }
+    public void setBackgroundSeenLevel(Integer backgroundSeenLevel) { this.backgroundSeenLevel = backgroundSeenLevel; }
 
 }

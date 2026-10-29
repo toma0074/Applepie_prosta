@@ -64,24 +64,35 @@
   </section>
 
   <section class="friends-card" aria-labelledby="friends-ranking-title">
-    <h4 id="friends-ranking-title">カテゴリ別ランキング</h4>
-    <p>今月のカテゴリ別回答数・正解数・正答率を、あなたと友達で比較します。</p>
+    <h4 id="friends-ranking-title">ランキング</h4>
+    <p>カテゴリ・難易度・期間を指定して、回答数・正解数・正答率をあなたと友達で比較します(未選択は「すべて」)。</p>
     <form id="friends-ranking-form" class="friends-inline-form">
       <label for="friends-category">カテゴリ</label>
-      <select id="friends-category" name="categoryId" required>
-        <option value="">カテゴリを選択</option>
+      <select id="friends-category" name="categoryId">
+        <option value="">すべて</option>
         <option th:each="category : ${categoryList}"
                 th:value="${category.categoryId}"
                 th:text="${category.categoryName}">Java</option>
       </select>
-      <label for="friends-from">開始日</label>
-      <input id="friends-from" name="from" type="date" required>
-      <label for="friends-to">終了日</label>
-      <input id="friends-to" name="to" type="date" required>
+      <label for="friends-difficulty">難易度</label>
+      <select id="friends-difficulty" name="difficulty">
+        <option value="">すべて</option>
+        <option value="1">★☆☆</option>
+        <option value="2">★★☆</option>
+        <option value="3">★★★</option>
+      </select>
+      <span class="friends-field">
+        <label for="friends-from">開始日</label>
+        <input id="friends-from" name="from" type="date" required>
+      </span>
+      <span class="friends-field">
+        <label for="friends-to">終了日</label>
+        <input id="friends-to" name="to" type="date" required>
+      </span>
       <button type="submit">比較</button>
     </form>
     <div id="friends-leaderboard" class="friends-list">
-      <p class="friends-empty">カテゴリと期間を選択してください。</p>
+      <p class="friends-empty">条件と期間を選択して「比較」を押してください。</p>
     </div>
   </section>
 </main>
@@ -319,8 +330,12 @@
   rankingForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     showMessage('', false);
-    const form = new FormData(rankingForm);
-    const params = new URLSearchParams(form);
+    const params = new URLSearchParams();
+    new FormData(rankingForm).forEach((value, key) => {
+      if (value !== '') {
+        params.append(key, value);
+      }
+    });
     try {
       renderLeaderboard(await request(`/leaderboard?${params.toString()}`));
     } catch (error) {

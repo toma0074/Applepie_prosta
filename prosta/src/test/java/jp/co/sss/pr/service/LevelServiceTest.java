@@ -41,7 +41,6 @@ class LevelServiceTest {
     void incrementsStreakAfterLoginOnPreviousDay() {
         Customer customer = customerWithLogin(LocalDate.now().minusDays(1), 0, 4);
         when(answerRepository.countByCustomerAndCorrectFlagTrue(customer)).thenReturn(0);
-        when(answerRepository.countPerfectDaysByCustomer(customer)).thenReturn(0);
         when(customerRepository.save(customer)).thenReturn(customer);
 
         levelService.processLogin(customer);
@@ -56,7 +55,6 @@ class LevelServiceTest {
     void resetsStreakAfterMissedDay() {
         Customer customer = customerWithLogin(LocalDate.now().minusDays(2), 3, 9);
         when(answerRepository.countByCustomerAndCorrectFlagTrue(customer)).thenReturn(0);
-        when(answerRepository.countPerfectDaysByCustomer(customer)).thenReturn(0);
         when(customerRepository.save(customer)).thenReturn(customer);
 
         levelService.processLogin(customer);
@@ -66,17 +64,16 @@ class LevelServiceTest {
     }
 
     @Test
-    void totalLoginDaysDoNotCountAsAConsecutiveStreak() {
+    void loginDoesNotRaiseLevelWithoutExp() {
         Customer customer = customerWithLogin(LocalDate.now().minusDays(1), 6, 0);
         when(answerRepository.countByCustomerAndCorrectFlagTrue(customer)).thenReturn(0);
-        when(answerRepository.countPerfectDaysByCustomer(customer)).thenReturn(0);
         when(customerRepository.save(customer)).thenReturn(customer);
 
         levelService.processLogin(customer);
 
         assertEquals(7, customer.getLoginCount());
         assertEquals(1, customer.getConsecutiveLoginDays());
-        assertEquals(7, customer.getUserLevel());
+        assertEquals(1, customer.getUserLevel());
     }
 
     @Test

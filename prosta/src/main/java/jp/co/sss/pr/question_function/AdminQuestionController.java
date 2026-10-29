@@ -29,6 +29,7 @@ import jp.co.sss.pr.repository.CategoryRepository;
 import jp.co.sss.pr.repository.FavoriteRepository;
 import jp.co.sss.pr.repository.QuestionAttemptStat;
 import jp.co.sss.pr.repository.QuestionRepository;
+import jp.co.sss.pr.service.ReturnUrls;
 
 /** 管理者用の問題管理（アクセス制御は LoginCheck / AccessPolicy の /admin/ 配下） */
 @Controller
@@ -89,17 +90,20 @@ public class AdminQuestionController {
     }
 
     @GetMapping("/admin/questions/new")
-    public String newForm(Model model) {
+    public String newForm(@RequestParam(required = false) String returnUrl, Model model) {
         QuestionForm form = new QuestionForm();
+        form.setReturnUrl(returnUrl);
         form.setDifficulty(1);
         form.setCorrectOption(1);
         return form(model, form, true);
     }
 
     @GetMapping("/admin/questions/{id}/edit")
-    public String editForm(@PathVariable Integer id, Model model) {
+    public String editForm(@PathVariable Integer id,
+                           @RequestParam(required = false) String returnUrl, Model model) {
         Question q = find(id);
         QuestionForm form = new QuestionForm();
+        form.setReturnUrl(returnUrl);
         form.setQuestionId(q.getQuestionId());
         form.setCategory(q.getCategory() == null ? null : q.getCategory().getCategoryId());
         form.setDifficulty(q.getDifficulty());
@@ -149,7 +153,7 @@ public class AdminQuestionController {
         }
 
         redirect.addFlashAttribute("message", creating ? "問題を登録しました。" : "問題を更新しました。");
-        return "redirect:/admin/questions";
+        return "redirect:" + ReturnUrls.resolve(form.getReturnUrl(), "/admin/questions");
     }
 
     @PostMapping("/admin/questions/{id}/delete")
@@ -171,6 +175,7 @@ public class AdminQuestionController {
     }
 
     private String form(Model model, QuestionForm form, boolean creating) {
+        model.addAttribute("returnUrl", ReturnUrls.resolve(form.getReturnUrl(), "/admin/questions"));
         model.addAttribute("questionForm", form);
         model.addAttribute("creating", creating);
         model.addAttribute("categories", categoryRepository.findAll());

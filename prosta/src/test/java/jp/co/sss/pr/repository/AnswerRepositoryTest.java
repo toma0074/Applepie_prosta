@@ -65,6 +65,7 @@ class AnswerRepositoryTest {
         List<FriendStudySummary> summaries = answerRepository.summarizeStudy(
                 List.of(first.getUserId(), second.getUserId()),
                 category.getCategoryId(),
+                null,
                 LocalDate.now().minusDays(2),
                 LocalDate.now());
         Map<Integer, FriendStudySummary> byUser = summaries.stream()

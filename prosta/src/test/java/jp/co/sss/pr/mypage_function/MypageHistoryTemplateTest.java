@@ -50,6 +50,8 @@ class MypageHistoryTemplateTest {
     private CategoryRepository categoryRepository;
     @MockBean
     private FriendConnectionRepository friendConnectionRepository;
+    @MockBean
+    private jp.co.sss.pr.service.QuestService questService;
 
     @Test
     void questionTextCarriesAllOptionsAndTheCorrectAnswerForTheModal() throws Exception {
@@ -81,7 +83,7 @@ class MypageHistoryTemplateTest {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", bean);
 
-        mockMvc.perform(get("/mypage").session(session))
+        mockMvc.perform(get("/mypage/history").session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.containsString("class=\"question-link\"")))
                 .andExpect(content().string(Matchers.containsString("data-option-a=\"double\"")))

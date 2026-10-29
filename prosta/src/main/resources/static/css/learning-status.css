@@ -184,7 +184,8 @@
     opacity: 0.8;
 }
 
-.learning-activity-content p {
+.learning-activity-content p,
+.learning-activity-content .question-link {
     margin: 4px 0 0;
     padding: 0;
     overflow-wrap: anywhere;

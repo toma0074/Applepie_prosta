@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
 <head>
@@ -7,7 +7,27 @@
 </head>
 <body>
 <h3>ユーザー一覧</h3>
+<p><a class="btn" th:href="@{/admin/menu}">管理メニュー</a></p>
 
+<form class="friends-inline-form mypage-filter" th:action="@{/user/list}" method="get"
+      style="display:flex;flex-wrap:nowrap;align-items:center;gap:8px;">
+  <input type="text" name="userName" th:value="${userName}" placeholder="ユーザー名キーワード"
+         style="flex:0 1 240px;width:240px;max-width:240px;" />
+  <select class="mypage-sort" name="permission" style="width:150px;min-width:150px;flex:0 0 150px;">
+    <option value="">権限(全て)</option>
+    <option value="0" th:selected="${permission != null and permission == 0}">一般</option>
+    <option value="1" th:selected="${permission != null and permission == 1}">管理者</option>
+  </select>
+  <select class="mypage-sort" name="deleteFlag" style="width:150px;min-width:150px;flex:0 0 150px;">
+    <option value="">状態(全て)</option>
+    <option value="false" th:selected="${deleteFlag != null and !deleteFlag}">アクティブ</option>
+    <option value="true" th:selected="${deleteFlag != null and deleteFlag}">削除済み</option>
+  </select>
+  <div class="mypage-filter-row" style="display:flex;align-items:center;gap:8px;margin:0;">
+    <button type="submit">検索</button>
+    <a class="friends-secondary-button mypage-reset" th:href="@{/user/list}">リセット</a>
+  </div>
+</form>
 <th:block th:if="${errorMessage}">
   <span class="error-message"
       th:text="${errorMessage}">
@@ -49,6 +69,7 @@
       <td th:if="${user.deleteFlag}">削除済み</td>
       <td class="button">
         <form class="text-center" th:action="@{/user/update/input}" method="get">
+          <input type="hidden" name="returnUrl" value="/user/list" />
           <input type="hidden" name="userId"     th:value="${user.userId}" />
           <input type="hidden" name="userName"   th:value="${user.userName}" />
           <input type="hidden" name="permission" th:value="${user.permission}" />

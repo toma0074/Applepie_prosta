@@ -79,7 +79,7 @@
         <h4 id="activity-title">最近の学習活動</h4>
         <p>最新の解答を最大<span th:text="${activityLimit}">20</span>件表示します。</p>
       </div>
-      <a class="learning-action-link" th:href="@{/mypage}">解答履歴を見る</a>
+      <a class="learning-action-link" th:href="@{/mypage/history}">解答履歴を見る</a>
     </div>
 
     <div class="learning-activity-list" th:if="${!#lists.isEmpty(recentActivities)}">
@@ -93,7 +93,15 @@
                   th:text="${#temporals.format(activity.studyDate, 'yyyy/MM/dd')}">2026/10/27</time>
             <span th:text="${activity.categoryName}">Java</span>
           </div>
-          <p th:text="${activity.questionText}">問題文</p>
+          <button type="button" class="question-link"
+                  th:data-question="${activity.questionText}"
+                  th:data-option-a="${activity.optionA}"
+                  th:data-option-b="${activity.optionB}"
+                  th:data-option-c="${activity.optionC}"
+                  th:data-correct="${activity.correctOption}"
+                  th:data-chosen="${activity.ansOption}"
+                  th:data-explanation="${activity.explanation}"
+                  th:text="${activity.questionText}">問題文</button>
         </div>
       </article>
     </div>
@@ -101,6 +109,66 @@
       表示できる学習活動はありません。
     </p>
   </section>
+
+  <div id="question-modal" class="question-modal" hidden>
+    <div class="question-modal-backdrop" data-close="true"></div>
+    <div class="question-modal-body" role="dialog" aria-modal="true" aria-labelledby="question-modal-text">
+      <button type="button" class="question-modal-close" data-close="true" aria-label="閉じる">×</button>
+      <p id="question-modal-text" class="question-modal-text"></p>
+      <ul id="question-modal-options" class="question-modal-options"></ul>
+      <p id="question-modal-result" class="question-modal-result"></p>
+      <p id="question-modal-explanation" class="question-modal-explanation"></p>
+    </div>
+  </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const modal = document.getElementById('question-modal');
+  if (!modal) return;
+  const labels = ['A', 'B', 'C'];
+  const textEl = document.getElementById('question-modal-text');
+  const optionsEl = document.getElementById('question-modal-options');
+  const resultEl = document.getElementById('question-modal-result');
+  const explanationEl = document.getElementById('question-modal-explanation');
+  const closeModal = () => { modal.hidden = true; };
+
+  function openModal(btn) {
+    const correct = Number(btn.dataset.correct);
+    const chosen = Number(btn.dataset.chosen);
+    const options = [btn.dataset.optionA, btn.dataset.optionB, btn.dataset.optionC];
+
+    textEl.textContent = btn.dataset.question;
+    optionsEl.replaceChildren();
+    options.forEach((text, i) => {
+      const no = i + 1;
+      const li = document.createElement('li');
+      const tags = [];
+      if (no === correct) {
+        li.classList.add('is-correct');
+        tags.push('正解');
+      }
+      if (no === chosen) {
+        li.classList.add('is-chosen');
+        tags.push('あなたの解答');
+      }
+      li.textContent = labels[i] + '. ' + text + (tags.length ? '  [' + tags.join(' / ') + ']' : '');
+      optionsEl.appendChild(li);
+    });
+
+    resultEl.textContent = chosen === 4 ? '解答：わからない'
+        : (chosen === correct ? '正解でした' : '不正解でした');
+    resultEl.className = 'question-modal-result ' + (chosen === correct ? 'ok' : 'ng');
+    explanationEl.textContent = '解説：' + (btn.dataset.explanation || '解説はまだ登録されていません。');
+    modal.hidden = false;
+  }
+
+  document.querySelectorAll('.question-link').forEach((btn) => {
+    btn.addEventListener('click', () => openModal(btn));
+  });
+  modal.addEventListener('click', (e) => { if (e.target.dataset.close) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+});
+</script>
 </body>
 </html>

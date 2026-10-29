@@ -277,7 +277,11 @@ public class LevelService {
      * 指定実績がまだ解除されていなければ解除して newlyUnlocked に追加する。
      */
     private void tryUnlock(Customer customer, int achievementId, List<Achievement> newlyUnlocked) {
-        Achievement ach = achievementRepository.getReferenceById(achievementId);
+        // 遅延プロキシだと画面描画時に LazyInitializationException になるため実体を取得する
+        Achievement ach = achievementRepository.findById(achievementId).orElse(null);
+        if (ach == null) {
+            return;
+        }
         if (!userAchievementRepository.existsByCustomerAndAchievement(customer, ach)) {
             UserAchievement ua = new UserAchievement();
             ua.setCustomer(customer);

@@ -46,6 +46,10 @@ public class QuestionForm {
 
     @Size(max = 1000, message = "解説は1000文字以内で入力してください")
     private String explanation;
+    private String returnUrl;
+
+    public String getReturnUrl() { return returnUrl; }
+    public void setReturnUrl(String returnUrl) { this.returnUrl = returnUrl; }
 
     public String getExplanation() { return explanation; }
     public void setExplanation(String explanation) { this.explanation = explanation; }

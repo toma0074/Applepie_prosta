@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
 <head>
@@ -11,7 +11,8 @@
   <p th:if="${message}" class="aq-msg ok" th:text="${message}"></p>
   <p th:if="${error}" class="aq-msg ng" th:text="${error}"></p>
 
-  <p><a th:href="@{/admin/questions/new}">＋ 新規問題登録</a></p>
+  <p><a class="btn" th:href="@{/admin/menu}">管理メニュー</a>
+     <a class="btn" th:href="@{/admin/questions/new(returnUrl='/admin/questions')}">新規問題登録</a></p>
 
   <form class="aq-filter" th:action="@{/admin/questions}" method="get">
     <select class="category" name="categoryId">
@@ -57,6 +58,7 @@
           <td>
             <div class="aq-actions">
               <form th:action="@{/admin/questions/{id}/edit(id=${r.question.questionId})}" method="get">
+                <input type="hidden" name="returnUrl" value="/admin/questions" />
                 <input type="submit" value="編集" />
               </form>
               <form th:action="@{/admin/questions/{id}/delete(id=${r.question.questionId})}" method="post"
