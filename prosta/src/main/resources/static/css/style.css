@@ -24,9 +24,9 @@ header .row{
 	display:flex;
 	justify-content:space-between;
 	align-items:center;
-	width:90%;
+	width:95%;
 	margin:0 auto;
-	max-width:1280px;
+	max-width:1600px;
 	padding:20px 0;
 	border-bottom:1px solid rgba(225,225,225,3);
 }
@@ -34,7 +34,7 @@ header .row{
 .header_logo_img {
     height: 35px; 
     width: auto; 
-    vertical-align: middle; /* ロゴが上下の真ん中に来るようにする */
+   vertical-align: middle;  /* ロゴが上下の真ん中に来るようにする */
 }
 header .logo{
 	font-size:24px;

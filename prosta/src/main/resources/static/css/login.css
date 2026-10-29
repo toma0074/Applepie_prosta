@@ -44,7 +44,7 @@ body {
 .header_logo_img {
     height: 30px;     
     width: auto;
-    vertical-align: middle; /* ロゴが上下の真ん中に来るようにする */
+   vertical-align: middle; /* ロゴが上下の真ん中に来るようにする */
 }
 /* ---- メインコンテンツ（中央配置） ---- */
 .main-content {
