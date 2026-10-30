@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 public class Favorite {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_favorite_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_favorite_gen")
     @SequenceGenerator(name = "seq_favorite_gen", sequenceName = "seq_favorite", allocationSize = 1)
     @Column(name = "favorite_id")
     private Integer favoriteId;

@@ -101,7 +101,6 @@ public class BackgroundController {
 
         return "redirect:/background";
     }
-<<<<<<< HEAD
     @PostMapping("/background/default")
     public String defaultBackground(
             HttpSession session) {
@@ -110,7 +109,6 @@ public class BackgroundController {
         session.removeAttribute("backgroundColor");
 
         return "redirect:/background";
-=======
 
     private Customer currentCustomer(HttpSession session) {
         CustomerBean user = (CustomerBean) session.getAttribute("user");
@@ -123,6 +121,5 @@ public class BackgroundController {
 
     private boolean isHexColor(String value) {
         return value != null && value.matches("#[0-9A-Fa-f]{6}");
->>>>>>> 1cf35766ed15fe66278b0e0e1ad935be161f9706
     }
 }

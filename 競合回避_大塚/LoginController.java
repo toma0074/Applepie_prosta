@@ -1,18 +1,12 @@
 package jp.co.sss.pr.login_function;
 
-<<<<<<< HEAD
 import java.util.List;
-=======
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-<<<<<<< HEAD
-=======
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
->>>>>>> dbbeeff4a6dc45b31000f5bdad3215498d51e015
 
->>>>>>> 92f95d2d7f7129929be5e578ced430ec6fcb6e93
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,10 +31,8 @@ public class LoginController {
     @Autowired
     CustomerRepository customerRepository;
 
-<<<<<<< HEAD
     @Autowired
     HttpSession session;
-=======
 		if (customer != null && customer.getDeleteFlag()==0) {
 			
 			// 今回の最終ログイン日時を「現在時刻」に更新
@@ -61,9 +53,7 @@ public class LoginController {
 			customerRepository.save(customer);
 			// 一覧へリダイレクト
 			return "redirect:/mypage";
->>>>>>> dbbeeff4a6dc45b31000f5bdad3215498d51e015
 
-<<<<<<< HEAD
 		} else {
 			model.addAttribute("errMessage", "ユーザー名、またはパスワードが間違っています。");
 			return "login/login";
@@ -95,10 +85,8 @@ public class LoginController {
 		session.invalidate();
 		return "redirect:/";
 	}
-=======
     @Autowired
     LevelService levelService;
->>>>>>> 92f95d2d7f7129929be5e578ced430ec6fcb6e93
 
     // 最初画面
     @RequestMapping(path = "/", method = RequestMethod.GET)
