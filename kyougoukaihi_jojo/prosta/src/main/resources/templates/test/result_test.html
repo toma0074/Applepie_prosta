@@ -26,7 +26,7 @@
 <div class="result-status-panel">
 
     <!-- EXPバーとLevel表示 -->
-    <div class="exp-bar-wrap">
+    <div class="exp-progress-component">
 
         <div class="exp-bar-label">
             累計EXP：
@@ -39,31 +39,33 @@
             </div>
         </div>
 
-        <!-- Levelは中央、EXP詳細は右側 -->
-        <div class="result-level-row">
+       <div class="result-level-row">
 
-            <span class="result-level-change" th:if="${leveledUp}">
-                <span class="level-value"
-                      th:text="|Level ${previousLevel}|">Level 1</span>
-                <span class="level-arrow">→</span>
-                <span class="level-value"
-                      th:text="|Level ${currentLevel}|">Level 2</span>
-            </span>
+    <!-- Level表示：中央 -->
+    <div class="result-level-center">
+        <span class="result-level-change" th:if="${leveledUp}">
+            <span class="level-value"
+                  th:text="|Level ${previousLevel}|">Level 1</span>
+            <span class="level-arrow">→</span>
+            <span class="level-value"
+                  th:text="|Level ${currentLevel}|">Level 2</span>
+        </span>
 
-            <span class="result-level-change"
-                  th:unless="${leveledUp}"
-                  th:text="|Level ${currentLevel}|">
-                Level 1
-            </span>
-
-            <div class="exp-bar-sub">
-                <span th:text="${expInLevel}">0</span> / 15 EXP
-                ・次のレベルまであと
-                <span th:text="${expRemaining}">15</span> EXP
-            </div>
-
-        </div>
+        <span class="result-level-change"
+              th:unless="${leveledUp}"
+              th:text="|Level ${currentLevel}|">
+            Level 1
+        </span>
     </div>
+
+    <!-- EXP詳細：右側 -->
+    <div class="exp-bar-sub">
+        <span th:text="${expInLevel}">0</span> / 15 EXP
+        ・次のレベルまであと
+        <span th:text="${expRemaining}">15</span> EXP
+    </div>
+  </div>
+</div>
 
     <!-- 満点バッジ -->
     <div class="result-exp-gained">
@@ -90,7 +92,7 @@
 </div>
 
 <!-- ===== 解答結果 ===== -->
-<div>
+<div class="test-result-answers">
   <form th:action="@{/mypage}" method="get" id="question-table">
 
     <div class="form_group" th:each="ans,count : ${ans}">
@@ -124,7 +126,8 @@
       </div>
     </div>
 
-    <div id="pagination-container"class="pagination-container"></div>
+    <div id="pagination-container" class="pagination-container"
+         data-pagination-target="question-table" data-pagination-rows=".form_group" data-pagination-size="3"></div>
 
     <div th:text="'正答数 ' + ${ca} + '/' + ${qc}"></div>
 
@@ -142,6 +145,7 @@
     </div>
   </form>
 </div>
+
 
 <div id="question-modal" class="question-modal" hidden>
   <div class="question-modal-backdrop" data-close="true"></div>
@@ -194,33 +198,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
   }
 
-  // ---- ページネーション ----
-  const rowsPerPage = 3;
-  const table = document.getElementById('question-table');
-  if (!table) return;
-  const rows = table.querySelectorAll('.form_group');
-  const pageCount = Math.ceil(rows.length / rowsPerPage);
-  const container = document.getElementById('pagination-container');
-  if (pageCount <= 1) return;
-  let currentPage = 1;
-  function showPage(page) {
-    currentPage = page;
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    Array.from(rows).forEach((r, i) => r.style.display = (i >= start && i < end) ? '' : 'none');
-    document.getElementById('p-prev').disabled = (currentPage === 1);
-    document.getElementById('p-next').disabled = (currentPage === pageCount);
-  }
-  const prev = document.createElement('button');
-  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'btn-pagination';
-  prev.addEventListener('click', () => { if (currentPage > 1) showPage(currentPage - 1); });
-  const next = document.createElement('button');
-  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'btn-pagination';
-  next.addEventListener('click', () => { if (currentPage < pageCount) showPage(currentPage + 1); });
-  container.appendChild(prev);
-  container.appendChild(next);
-  showPage(1);
-
   // ---- 実績トースト自動非表示 ----
   const toast = document.querySelector('.achievement-toast');
   if (toast) {
@@ -231,4 +208,3 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 </body>
 </html>
-
