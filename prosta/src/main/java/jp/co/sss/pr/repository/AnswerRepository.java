@@ -85,7 +85,13 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
             SELECT a.ansDate AS studyDate,
                    c.categoryName AS categoryName,
                    q.questionText AS questionText,
-                   a.correctFlag AS correctFlag
+                   a.correctFlag AS correctFlag,
+                   q.optionA AS optionA,
+                   q.optionB AS optionB,
+                   q.optionC AS optionC,
+                   q.explanation AS explanation,
+                   a.ansOption AS ansOption,
+                   a.correctOption AS correctOption
             FROM Answer a
             JOIN a.question q
             JOIN q.category c
@@ -95,6 +101,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     Page<RecentStudyActivity> findRecentActivities(
             @Param("customer") Customer customer, Pageable pageable);
 
+    // 日別集計はカレンダー・クエスト・フィード・サマリーで共用し、1解答レコードを1問として数える。
     @Query("""
             SELECT a.ansDate AS studyDate,
                    COUNT(a.ansId) AS answerCount,
@@ -116,6 +123,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
             FROM Customer c
             LEFT JOIN Answer a ON a.customer = c
               AND (:categoryId IS NULL OR a.question.category.categoryId = :categoryId)
+              AND (:difficulty IS NULL OR a.question.difficulty = :difficulty)
               AND (:fromDate IS NULL OR a.ansDate >= :fromDate)
               AND (:toDate IS NULL OR a.ansDate <= :toDate)
             WHERE c.userId IN :userIds
@@ -124,6 +132,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     List<FriendStudySummary> summarizeStudy(
             @Param("userIds") List<Integer> userIds,
             @Param("categoryId") Integer categoryId,
+            @Param("difficulty") Integer difficulty,
             @Param("fromDate") LocalDate fromDate,
             @Param("toDate") LocalDate toDate);
 

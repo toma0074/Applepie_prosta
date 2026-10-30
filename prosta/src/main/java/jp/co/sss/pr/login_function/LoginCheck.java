@@ -3,6 +3,8 @@ package jp.co.sss.pr.login_function;
 import java.io.IOException;
 
 import org.springframework.stereotype.Component;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,6 +19,7 @@ import jp.co.sss.pr.bean.CustomerBean;
  * 更新系リクエストの同一オリジン確認、ログイン確認、管理者専用URLの確認、セキュリティヘッダーの付与を行う。
  */
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 15)
 public class LoginCheck extends HttpFilter {
 
     private static final Integer ADMIN = 1;

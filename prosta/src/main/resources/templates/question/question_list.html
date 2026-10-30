@@ -12,7 +12,8 @@
 <div th:if="${session.user != null and session.user.permission == 1}">
   <p class="btn"><a th:href="@{/admin/questions/new}">新規問題登録</a></p>
 </div>
-<div id="pagination-container" class="pagination-container"></div>
+<div id="pagination-container" class="pagination-container"
+     data-pagination-target="question-table" data-pagination-rows="tbody tr" data-pagination-size="6"></div>
 
 <th:block th:if="${#lists.isEmpty(Questions)}">
   <div class="message">
@@ -44,34 +45,5 @@
 </table>
 <p class="btn"><a th:href="@{/question}">一覧表示に戻る</a></p>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const rowsPerPage = 6;
-  const table = document.getElementById('question-table');
-  if (!table) return;
-  const rows = table.querySelectorAll('tbody tr');
-  const pageCount = Math.ceil(rows.length / rowsPerPage);
-  const container = document.getElementById('pagination-container');
-  if (pageCount <= 1) return;
-  let currentPage = 1;
-  function showPage(page) {
-    currentPage = page;
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    Array.from(rows).forEach((r, i) => r.style.display = (i >= start && i < end) ? '' : 'none');
-    document.getElementById('p-prev').disabled = (currentPage === 1);
-    document.getElementById('p-next').disabled = (currentPage === pageCount);
-  }
-  const prev = document.createElement('button');
-  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'btn-pagination';
-  prev.addEventListener('click', () => { if (currentPage > 1) showPage(currentPage - 1); });
-  const next = document.createElement('button');
-  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'btn-pagination';
-  next.addEventListener('click', () => { if (currentPage < pageCount) showPage(currentPage + 1); });
-  container.appendChild(prev);
-  container.appendChild(next);
-  showPage(1);
-});
-</script>
 </body>
 </html>

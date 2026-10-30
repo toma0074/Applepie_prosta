@@ -15,6 +15,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
     Customer findByUserName(String userName);
 
+    boolean existsByUserName(String userName);
+
+    boolean existsByUserNameAndUserIdNot(String userName, Integer userId);
+
     List<Customer> findByDeleteFlag(Boolean deleteFlag);
 
     List<Customer> findByPermission(Integer permission);

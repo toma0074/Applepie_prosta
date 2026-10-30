@@ -18,8 +18,6 @@ import jp.co.sss.pr.entity.Answer;
 import jp.co.sss.pr.entity.Category;
 import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.entity.Question;
-import jp.co.sss.pr.repository.CategoryStudySummary;
-import jp.co.sss.pr.repository.RecentStudyActivity;
 
 @DataJpaTest(properties = {
         "spring.jpa.hibernate.ddl-auto=create-drop",
@@ -65,10 +63,11 @@ class AnswerRepositoryTest {
         List<FriendStudySummary> summaries = answerRepository.summarizeStudy(
                 List.of(first.getUserId(), second.getUserId()),
                 category.getCategoryId(),
+                null,
                 LocalDate.now().minusDays(2),
                 LocalDate.now());
         Map<Integer, FriendStudySummary> byUser = summaries.stream()
-                .collect(Collectors.toMap(FriendStudySummary::getUserId, summary -> summary));
+                .collect(Collectors.toMap(summary -> summary.getUserId(), summary -> summary));
 
         assertEquals(2, byUser.get(first.getUserId()).getAnswerCount());
         assertEquals(1, byUser.get(first.getUserId()).getCorrectCount());

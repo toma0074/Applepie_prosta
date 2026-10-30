@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
 <head>
@@ -10,18 +10,6 @@
 <main class="suku">
   <div class="mypage-header">
     <h3>My Page</h3>
-    <div class="mypage-links">
-      <a class="btn" th:href="@{/friends}"
-         th:if="${session.user != null and session.user.permission == 0}">フレンド<span
-         th:if="${pendingFriendRequestCount != null and pendingFriendRequestCount > 0}"
-         class="notify-badge" th:text="${pendingFriendRequestCount}">1</span></a>
-      <a class="btn" th:href="@{/user/update/input}">ユーザー更新</a>
-      <a class="btn" th:href="@{/achievement}">実績一覧</a>
-      <a class="btn" th:href="@{/background}">背景変更</a>
-<!--</a>-->
-<!--         th:if="${unreadAchievementCount != null and unreadAchievementCount > 0}"-->
-<!--         class="notify-badge">NEW</span></a>-->
-    </div>
   </div>
 
   <div class="status-panel">
@@ -74,102 +62,32 @@
     </div>
   </div>
 
-  <div class="center">解答履歴</div>
-
-  <form class="friends-inline-form mypage-filter" th:action="@{/mypage}" method="get">
-    <select class="category" name="categoryId">
-      <option value="">カテゴリー(全て)</option>
-      <option th:each="c : ${categories}" th:value="${c.categoryId}" th:text="${c.categoryName}"
-              th:selected="${categoryId != null and categoryId == c.categoryId}"></option>
-    </select>
-    <select class="difficulty" name="difficulty">
-      <option value="">難易度(全て)</option>
-      <option value="1" th:selected="${difficulty != null and difficulty == 1}">★☆☆</option>
-      <option value="2" th:selected="${difficulty != null and difficulty == 2}">★★☆</option>
-      <option value="3" th:selected="${difficulty != null and difficulty == 3}">★★★</option>
-    </select>
-    <select class="mypage-sort" name="correct">
-      <option value="">正誤(全て)</option>
-      <option value="1" th:selected="${correct != null and correct == 1}">正解のみ</option>
-      <option value="0" th:selected="${correct != null and correct == 0}">不正解のみ</option>
-    </select>
-    <select class="mypage-sort" name="sort">
-      <option value="1" th:selected="${sort == 1}">新しい順</option>
-      <option value="2" th:selected="${sort == 2}">古い順</option>
-    </select>
-    <input type="text" name="keyword" th:value="${keyword}" placeholder="問題文キーワード" />
-    <div class="mypage-filter-row">
-    <label for="h-from">開始日</label>
-    <input id="h-from" type="date" name="fromDate" th:value="${fromDate}" />
-    <label for="h-to">終了日</label>
-    <input id="h-to" type="date" name="toDate" th:value="${toDate}" />
-    <button type="submit">検索</button>
-    <a class="friends-secondary-button mypage-reset" th:href="@{/mypage}">リセット</a>
+  <section class="ach-preview quest-panel" th:if="${!#lists.isEmpty(quests)}" aria-label="今日のクエスト">
+    <div class="ach-preview-title">🎯 今日のクエスト</div>
+    <div class="ach-chips">
+      <span th:each="q : ${quests}" class="ach-chip" th:title="${q.description}">
+        <span th:text="${q.completed ? '✅' : '⬜'}">⬜</span>
+        <span th:text="${q.title}">クエスト</span>
+        <span th:text="${q.progress + '/' + q.target}">0/5</span>
+      </span>
     </div>
-  </form>
+  </section>
 
-  <div class="aq-pager" th:if="${historyPage.totalPages > 1}">
-    <a class="aq-page-btn" th:classappend="${!historyPage.hasPrevious()} ? 'disabled'"
-       th:href="${historyPage.hasPrevious()} ? @{/mypage(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},correct=${correct},fromDate=${fromDate},toDate=${toDate},sort=${sort},page=${historyPage.number - 1})} : '#'">前へ</a>
-    <span th:text="${historyPage.number + 1} + ' / ' + ${historyPage.totalPages}"></span>
-    <a class="aq-page-btn" th:classappend="${!historyPage.hasNext()} ? 'disabled'"
-       th:href="${historyPage.hasNext()} ? @{/mypage(categoryId=${categoryId},difficulty=${difficulty},keyword=${keyword},correct=${correct},fromDate=${fromDate},toDate=${toDate},sort=${sort},page=${historyPage.number + 1})} : '#'">次へ</a>
-  </div>
-
-  <table id="ans-table" class="mypage-table" th:if="${!#lists.isEmpty(answerlist)}">
-    <thead>
-      <tr>
-        <th class="category">カテゴリー</th>
-        <th class="questionId">問題</th>
-        <th class="ansOption">選択履歴</th>
-        <th class="correctOption">正解選択肢</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr th:each="ans : ${answerlist}">
-        <td class="center"
-            th:switch="${ans.question.category.categoryId}">
-          <span th:case="1">Java</span>
-          <span th:case="2">Spring</span>
-          <span th:case="3">HTML</span>
-          <span th:case="4">SQL</span>
-        </td>
-        <td class="question-cell">
-          <button type="button" class="question-link"
-                  th:data-question="${ans.question.questionText}"
-                  th:data-option-a="${ans.question.optionA}"
-                  th:data-option-b="${ans.question.optionB}"
-                  th:data-option-c="${ans.question.optionC}"
-                  th:data-correct="${ans.correctOption}"
-                  th:data-chosen="${ans.ansOption}"
-                  th:data-explanation="${ans.question.explanation}"
-                  th:text="${ans.question.questionText}"></button>
-        </td>
-        <td class="center" th:switch="${ans.ansOption}">
-          <span th:case="1">A</span>
-          <span th:case="2">B</span>
-          <span th:case="3">C</span>
-          <span th:case="4">わからない</span>
-        </td>
-        <td class="center" th:switch="${ans.correctOption}">
-          <span th:case="1">A</span>
-          <span th:case="2">B</span>
-          <span th:case="3">C</span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <p class="center" th:if="${#lists.isEmpty(answerlist)}">履歴がありません。</p>
-
-  <div id="question-modal" class="question-modal" hidden>
-    <div class="question-modal-backdrop" data-close="true"></div>
-    <div class="question-modal-body" role="dialog" aria-modal="true" aria-labelledby="question-modal-text">
-      <button type="button" class="question-modal-close" data-close="true" aria-label="閉じる">×</button>
-      <p id="question-modal-text" class="question-modal-text"></p>
-      <ul id="question-modal-options" class="question-modal-options"></ul>
-      <p id="question-modal-result" class="question-modal-result"></p>
-      <p id="question-modal-explanation" class="question-modal-explanation"></p>
-    </div>
+  <div class="admin-tiles">
+    <a class="admin-tile" th:href="@{/friends}"
+       th:if="${session.user != null and session.user.permission == 0}"><span class="admin-tile-icon">🤝</span>フレンド<span
+       th:if="${pendingFriendRequestCount != null and pendingFriendRequestCount > 0}"
+       class="notify-badge" th:text="${pendingFriendRequestCount}">1</span></a>
+    <a class="admin-tile" th:href="@{/mypage/history}"><span class="admin-tile-icon">📖</span>解答履歴</a>
+    <a class="admin-tile" th:href="@{/learning-status}"><span class="admin-tile-icon">📊</span>学習状況</a>
+    <a class="admin-tile" th:href="@{/study-calendar}"><span class="admin-tile-icon">📅</span>学習カレンダー</a>
+    <a class="admin-tile" th:href="@{/achievement}"><span class="admin-tile-icon">🏆</span>実績一覧<span
+       th:if="${unreadAchievementCount != null and unreadAchievementCount > 0}"
+       class="notify-badge">NEW</span></a>
+    <a class="admin-tile" th:href="@{/user/update/input(returnUrl='/mypage')}"><span class="admin-tile-icon">✏️</span>ユーザー更新</a>
+    <a class="admin-tile" th:href="@{/background}"><span class="admin-tile-icon">🎨</span>背景変更<span
+       th:if="${newBackgroundCount != null and newBackgroundCount > 0}"
+       class="notify-badge">NEW</span></a>
   </div>
 
   <div th:replace="~{common/chatbot :: chatbot}"></div>
@@ -177,62 +95,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const modal = document.getElementById('question-modal');
-  if (modal) {
-    const labels = ['A', 'B', 'C'];
-    const textEl = document.getElementById('question-modal-text');
-    const optionsEl = document.getElementById('question-modal-options');
-    const resultEl = document.getElementById('question-modal-result');
-    const explanationEl = document.getElementById('question-modal-explanation');
-
-    function closeModal() {
-      modal.hidden = true;
-    }
-
-    function openModal(btn) {
-      const correct = Number(btn.dataset.correct);
-      const chosen = Number(btn.dataset.chosen);
-      const options = [btn.dataset.optionA, btn.dataset.optionB, btn.dataset.optionC];
-
-      textEl.textContent = btn.dataset.question;
-      optionsEl.replaceChildren();
-      options.forEach((text, i) => {
-        const no = i + 1;
-        const li = document.createElement('li');
-        const tags = [];
-        if (no === correct) {
-          li.classList.add('is-correct');
-          tags.push('正解');
-        }
-        if (no === chosen) {
-          li.classList.add('is-chosen');
-          tags.push('あなたの解答');
-        }
-        li.textContent = labels[i] + '. ' + text + (tags.length ? '  [' + tags.join(' / ') + ']' : '');
-        optionsEl.appendChild(li);
-      });
-
-      if (chosen === 4) {
-        resultEl.textContent = '解答：わからない';
-      } else {
-        resultEl.textContent = chosen === correct ? '正解でした' : '不正解でした';
-      }
-      resultEl.className = 'question-modal-result ' + (chosen === correct ? 'ok' : 'ng');
-      explanationEl.textContent = '解説：' + (btn.dataset.explanation || '解説はまだ登録されていません。');
-      modal.hidden = false;
-    }
-
-    document.querySelectorAll('.question-link').forEach((btn) => {
-      btn.addEventListener('click', () => openModal(btn));
-    });
-    modal.addEventListener('click', (e) => {
-      if (e.target.dataset.close) closeModal();
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.hidden) closeModal();
-    });
-  }
-
   const toast = document.querySelector('.achievement-toast');
   if (toast) {
     setTimeout(() => {

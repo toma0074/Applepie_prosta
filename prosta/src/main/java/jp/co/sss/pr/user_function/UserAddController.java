@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.pr.bean.CustomerBean;
@@ -24,36 +26,24 @@ public class UserAddController {
     @Autowired
     CustomerRepository userRepository;
 
-    // ユーザー一覧表示
+    // ユーザー一覧表示(名前・権限・状態の複合検索)
     @RequestMapping(path = "/user/list", method = RequestMethod.GET)
-    public String userListshow(Model model) {
-        List<Customer> userList = userRepository.findAll();
+    public String userListshow(Model model,
+            @RequestParam(required = false) String userName,
+            @RequestParam(required = false) Integer permission,
+            @RequestParam(required = false) Boolean deleteFlag) {
+        String keyword = userName == null ? "" : userName.trim();
+        List<Customer> userList = userRepository.findAll().stream()
+                .filter(u -> keyword.isEmpty()
+                        || (u.getUserName() != null && u.getUserName().contains(keyword)))
+                .filter(u -> permission == null || permission.equals(u.getPermission()))
+                .filter(u -> deleteFlag == null
+                        || deleteFlag.equals(Boolean.TRUE.equals(u.getDeleteFlag())))
+                .toList();
         model.addAttribute("customerForm", userList);
-        return "user/user_list";
-    }
-
-    // ユーザー名あいまい検索
-    @RequestMapping(path = "/user/list/text", method = RequestMethod.POST)
-    public String userTextSearch(Model model, String userName) {
-        List<Customer> userList = userRepository.findByUserNameContaining(userName);
-        model.addAttribute("customerForm", userList);
-        return "user/user_list";
-    }
-
-    // 権限検索
-    @RequestMapping(path = "/user/list/permission", method = RequestMethod.POST)
-    public String userPermissionSearch(Model model, Integer permission) {
-        List<Customer> userList = userRepository.findByPermission(permission);
-        model.addAttribute("customerForm", userList);
-        return "user/user_list";
-    }
-
-    // 削除済みユーザー検索
-    // deleteFlag は Boolean なので "0"/"1" の代わりに true/false で受け取る
-    @RequestMapping(path = "/user/list/delete", method = RequestMethod.POST)
-    public String userDeleteSearch(Model model, Boolean deleteFlag) {
-        List<Customer> userList = userRepository.findByDeleteFlag(deleteFlag);
-        model.addAttribute("customerForm", userList);
+        model.addAttribute("userName", keyword);
+        model.addAttribute("permission", permission);
+        model.addAttribute("deleteFlag", deleteFlag);
         return "user/user_list";
     }
 
@@ -101,8 +91,13 @@ public class UserAddController {
 
     // ユーザー削除/復元完了
     @RequestMapping(path = "/user/delete/complete", method = RequestMethod.POST)
+    @Transactional
     public String userDeleteComp(Model model, Integer userId) {
-        Customer user = userRepository.findByUserId(userId);
+        Customer user = userId == null ? null : userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND);
+        }
         String m = "";
 
         if (!Boolean.TRUE.equals(user.getDeleteFlag())) {
@@ -122,4 +117,3 @@ public class UserAddController {
         return "user/user_delete_complete";
     }
 }
-

@@ -23,7 +23,7 @@ import jp.co.sss.pr.repository.CustomerRepository;
 @Controller
 public class LearningStatusController {
 
-    private static final int RECENT_ACTIVITY_LIMIT = 20;
+    private static final int RECENT_ACTIVITY_LIMIT = 15;
     private static final int WEAK_CATEGORY_THRESHOLD = 60;
 
     private final AnswerRepository answerRepository;
@@ -66,12 +66,12 @@ public class LearningStatusController {
                     answers > 0 && accuracy < WEAK_CATEGORY_THRESHOLD));
         }
         categoryProgress.sort(Comparator
-                .comparing(CategoryProgress::hasAnswers).reversed()
-                .thenComparingInt(CategoryProgress::accuracy)
-                .thenComparing(CategoryProgress::categoryId));
+                .comparing((CategoryProgress progress) -> progress.hasAnswers()).reversed()
+                .thenComparingInt(progress -> progress.accuracy())
+                .thenComparing(progress -> progress.categoryId()));
 
-        long totalAnswers = categoryProgress.stream().mapToLong(CategoryProgress::answerCount).sum();
-        long totalCorrect = categoryProgress.stream().mapToLong(CategoryProgress::correctCount).sum();
+        long totalAnswers = categoryProgress.stream().mapToLong(progress -> progress.answerCount()).sum();
+        long totalCorrect = categoryProgress.stream().mapToLong(progress -> progress.correctCount()).sum();
         int overallAccuracy = totalAnswers == 0
                 ? 0
                 : (int) Math.round(totalCorrect * 100.0 / totalAnswers);

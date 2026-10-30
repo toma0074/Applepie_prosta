@@ -83,9 +83,10 @@ class FriendControllerApiTest {
         when(friendConnectionRepository.findAllForUserAndStatus(
                 currentUser, FriendConnection.ACCEPTED)).thenReturn(List.of(acceptedConnection));
         friend.setConsecutiveLoginDays(5);
+        friend.setUserLevel(25);
         friend.setLastSeenAt(LocalDateTime.now().minusMinutes(1));
         FriendStudySummary friendStudy = summary(2, 12, 9);
-        when(answerRepository.summarizeStudy(anyList(), isNull(), isNull(), isNull()))
+        when(answerRepository.        summarizeStudy(anyList(), isNull(), isNull(), isNull(), isNull()))
                 .thenReturn(List.of(friendStudy));
 
         mockMvc.perform(get("/api/friends").session(session))
@@ -93,6 +94,7 @@ class FriendControllerApiTest {
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$[0].userId").value(2))
                 .andExpect(jsonPath("$[0].userName").value("みかん"))
+                .andExpect(jsonPath("$[0].level").value(25))
                 .andExpect(jsonPath("$[0].online").value(true))
                 .andExpect(jsonPath("$[0].consecutiveLoginDays").value(5))
                 .andExpect(jsonPath("$[0].answerCount").value(12))
@@ -106,7 +108,7 @@ class FriendControllerApiTest {
                 currentUser, FriendConnection.ACCEPTED)).thenReturn(List.of(acceptedConnection));
         friend.setLastSeenAt(LocalDateTime.now().minusMinutes(6));
         FriendStudySummary friendStudy = summary(2, 0, 0);
-        when(answerRepository.summarizeStudy(anyList(), isNull(), isNull(), isNull()))
+        when(answerRepository.        summarizeStudy(anyList(), isNull(), isNull(), isNull(), isNull()))
                 .thenReturn(List.of(friendStudy));
 
         mockMvc.perform(get("/api/friends").session(session))
@@ -181,7 +183,7 @@ class FriendControllerApiTest {
         FriendStudySummary currentStudy = summary(1, 10, 5);
         FriendStudySummary friendStudy = summary(2, 8, 6);
         when(answerRepository.summarizeStudy(
-                anyList(), eq(1), any(LocalDate.class), any(LocalDate.class)))
+                anyList(), eq(1), isNull(), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(currentStudy, friendStudy));
 
         mockMvc.perform(get("/api/friends/leaderboard")

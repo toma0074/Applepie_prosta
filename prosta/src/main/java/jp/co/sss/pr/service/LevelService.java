@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceContext;
 import jp.co.sss.pr.entity.Achievement;
 import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.entity.UserAchievement;
@@ -22,19 +25,23 @@ import jp.co.sss.pr.repository.UserAchievementRepository;
  *
  * <p>使用テーブル（既存テーブルのみ）：
  * <ul>
- *   <li>customer : login_date, login_count, login_flag, user_level</li>
+ *   <li>customer : ログイン情報、total_exp、user_level、perfect_test_count</li>
  *   <li>answer   : correct_flag, ans_date</li>
  *   <li>achievement / user_achievement : 実績マスター・解除記録</li>
  * </ul>
  *
  * <p>レベル計算式：
  * <pre>
- *   レベル = ログイン日数×1 + 連続ログインボーナス + 正解数×2 + 満点ボーナス×5
- *   ※ 計算後の値を customer.user_level に直接保存する
+ *   獲得EXP = 今回の正解数×2 + 満点時のみ5
+ *   レベル = floor(累計EXP / 15) + 1
+ *   ※ ログインではEXPを加算しない。ログイン日数は実績判定に使用する。
  * </pre>
  */
 @Service
 public class LevelService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -70,6 +77,7 @@ public class LevelService {
      */
     @Transactional
     public List<Achievement> processLogin(Customer customer) {
+        customer = lockCurrentCustomer(customer);
         LocalDate today = LocalDate.now();
         LocalDate lastLoginDate = customer.getLoginDate();
         customer.setLastSeenAt(LocalDateTime.now());
@@ -101,7 +109,8 @@ public class LevelService {
     /**
      * テスト解答結果を受けてレベルを再計算し、実績を確認する。
      *
-     * <p>レベル計算は answer テーブルの集計値（正解数・満点回数）を参照する。
+     * <p>今回の正解数から累計EXPへ加算し、満点回数をテスト単位で更新する。
+     * answerの累計正解数は実績判定に使用し、過去の履歴からEXPを再生成しない。
      *
      * @param customer     解答したユーザーEntity
      * @param correctCount 今回の正解数
@@ -111,6 +120,7 @@ public class LevelService {
     @Transactional
     public List<Achievement> processTestResult(
             Customer customer, int correctCount, int totalCount) {
+        customer = lockCurrentCustomer(customer);
 
         // 1回のテストで満点なら、満点回数を1増やす
         if (totalCount > 0 && correctCount == totalCount) {
@@ -118,10 +128,21 @@ public class LevelService {
                     customer.getPerfectTestCount() + 1);
         }
 
-        // レベル再計算
+     // 正解1問につき2 EXP
+        long earnedExp = correctCount * 2L;
+
+        // 満点の場合は追加で5 EXP
+        if (totalCount > 0 && correctCount == totalCount) {
+            earnedExp += 5L;
+        }
+
+        // 累計EXPに加算
+        customer.setTotalExp(customer.getTotalExp() + earnedExp);
+
+        // 新しいEXPからレベルを計算
         recalcLevel(customer);
         customerRepository.save(customer);
-
+        
         // 通常の実績をチェック
         List<Achievement> newlyUnlocked = checkAchievements(customer);
 
@@ -133,42 +154,29 @@ public class LevelService {
         return newlyUnlocked;
     }
 
+    private Customer lockCurrentCustomer(Customer customer) {
+        if (entityManager.contains(customer)) {
+            // 別要求の確定前に読んだEntityでも、加算前にロック下の最新値へ更新する。
+            entityManager.refresh(customer, LockModeType.PESSIMISTIC_WRITE);
+            return customer;
+        }
+        Customer current = entityManager.find(Customer.class, customer.getUserId(), LockModeType.PESSIMISTIC_WRITE);
+        if (current == null) {
+            throw new jakarta.persistence.EntityNotFoundException("Customer no longer exists");
+        }
+        return current;
+    }
+
     // ----------------------------------------------------------------
     // レベル計算
     // ----------------------------------------------------------------
 
-    /**
-     * customer.user_level を再計算して customer オブジェクトに反映する（DBへの保存は呼び出し元が行う）。
-     *
-     * <p>レベル = ログイン日数 + 連続ログインボーナス + (総正解数 × 2) + (満点回数 × 5)
-     * <ul>
-     *   <li>ログイン日数 : 2日につき1ポイント</li>
-     * <li>連続ログインボーナス :7日ごとに5ポイント</li>
-     *   <li>総正解数   : answer テーブルの correct_flag=true の件数</li>
-     *   <li>満点回数   : 同一 ans_date に全問正解した日の回数</li>
-     * </ul>
-     * 最小値は 1。
-     */
     private void recalcLevel(Customer customer) {
+        long totalExp = customer.getTotalExp();
 
-        int loginCount = customer.getLoginCount();
+        // 15 EXPごとに1レベルアップ
+        int level = (int) (totalExp / 15L) + 1;
 
-        // ログイン日数：2日につき1ポイント
-        int loginBonus = loginCount / 2;
-
-        // 連続ログイン：7日ごとに5ポイント
-        int streakBonus =
-                (customer.getConsecutiveLoginDays() / 7) * 5;
-
-        // 総正解数
-        int totalCorrect =
-                answerRepository.countByCustomerAndCorrectFlagTrue(customer);
-
-        // 満点だった日数（従来のレベル計算用）
-        int perfectDays =
-                answerRepository.countPerfectDaysByCustomer(customer);
-
-        int level = (int) (customer.getTotalExp() / 15) + 1;
         customer.setUserLevel(level);
     }
 
@@ -180,13 +188,11 @@ public class LevelService {
     }
 
     /**
-     * 次のレベルまでの残りポイント（表示用）。
-     * 「あと何点で次のレベルか」を計算する。
-     * ログイン日数 1 = 1レベル換算で計算。
+     * 旧画面向けの互換メソッド。現在のEXP進捗の計算には使用しない。
+     * 次レベルまでのEXPは、累計EXPを使って 15 - (totalExp % 15) で求める。
      */
     public static int pointsToNextLevel(int currentLevel) {
-        // 次のレベルに必要な追加ポイント（ログイン換算）
-        return 1; // レベルは1ログインまたは1正解ごとに上がる設計のため常に1
+        return 1;
     }
 
     // ----------------------------------------------------------------
@@ -288,7 +294,11 @@ public class LevelService {
      * 指定実績がまだ解除されていなければ解除して newlyUnlocked に追加する。
      */
     private void tryUnlock(Customer customer, int achievementId, List<Achievement> newlyUnlocked) {
-        Achievement ach = achievementRepository.getReferenceById(achievementId);
+        // 遅延プロキシだと画面描画時に LazyInitializationException になるため実体を取得する
+        Achievement ach = achievementRepository.findById(achievementId).orElse(null);
+        if (ach == null) {
+            return;
+        }
         if (!userAchievementRepository.existsByCustomerAndAchievement(customer, ach)) {
             UserAchievement ua = new UserAchievement();
             ua.setCustomer(customer);

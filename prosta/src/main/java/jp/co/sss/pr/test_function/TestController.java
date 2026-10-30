@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +34,7 @@ import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.repository.QuestionRepository;
 import jp.co.sss.pr.service.LevelService;
 import jp.co.sss.pr.service.WeakQuestionService;
+import jp.co.sss.pr.service.AfterCommit;
 
 @Controller
 public class TestController {
@@ -75,6 +77,9 @@ public class TestController {
     @RequestMapping(path = "/test/category/start", method = RequestMethod.GET)
     public String startCategory(Model model, QuestionForm questionForm,
             @RequestParam(defaultValue = "false") boolean timer) {
+        if (questionForm.getCategory() == null || questionForm.getDifficulty() == null) {
+            return "redirect:/test/category";
+        }
         Category category = categoryRepository.getReferenceById(questionForm.getCategory());
         List<Question> quesList = pickRandom(quesRpstry
                 .findAllByCategoryAndDifficulty(
@@ -156,7 +161,7 @@ public class TestController {
         if (weakList.isEmpty()) {
             return "redirect:/test/weak";
         }
-        List<Question> quesList = weakList.stream().map(WeakQuestionService.WeakQuestion::question).toList();
+        List<Question> quesList = weakList.stream().map(weak -> weak.question()).toList();
 
         model.addAttribute("answerListForm", new AnswerListForm());
         session.setAttribute("ans", buildAnswerFormList(quesList.size()));
@@ -222,6 +227,7 @@ public class TestController {
 
     // 制限時間切れ：未回答は「わからない」として、そのまま採点する
     @RequestMapping(path = "/test/timeup", method = RequestMethod.POST)
+    @Transactional
     public String timeUp(@ModelAttribute AnswerListForm answerForm, Model model) {
         List<?> questions = (List<?>) session.getAttribute("question");
         List<AnswerForm> results = answerForm.getResults();
@@ -240,6 +246,7 @@ public class TestController {
 
     // 解答結果確認画面
     @RequestMapping(path = "/test/result", method = RequestMethod.POST)
+    @Transactional
     public String resulttTest(Model model, AnswerListForm ans) {
 
         CustomerBean userBean =
@@ -265,7 +272,7 @@ public class TestController {
 
         Map<Integer, String> explanations = new LinkedHashMap<>();
         for (Question q : quesRpstry.findAllById(
-                results.stream().map(AnswerForm::getQuestionId).toList())) {
+                results.stream().map(answer -> answer.getQuestionId()).toList())) {
             explanations.put(q.getQuestionId(), q.getExplanation());
         }
 
@@ -300,22 +307,31 @@ public class TestController {
         // ---- レベル再計算・実績チェック ----
         List<Achievement> newAchievements = levelService.processTestResult(user, caCount, qCount);
 
-        if (!newAchievements.isEmpty()) {
-            session.setAttribute("newAchievements", newAchievements);
-        }
-
         // 最新レベルを取得（processTestResult 内で save 済み）
         Customer updatedUser =
                 customerRepository.getReferenceById(user.getUserId());
 
+        // 現在のレベルと累計EXP
         int currentLevel = updatedUser.getUserLevel();
-        boolean isPerfect = qCount > 0 && caCount == qCount;
+        long totalExp = updatedUser.getTotalExp() == null
+                ? 0L
+                : updatedUser.getTotalExp();
 
-       
-        // 現在のレベルと、レベルアップしたかどうかを判定
+        // 現在のレベル内での進捗（0〜14 EXP）
+        int expInLevel = (int) (totalExp % 15L);
 
+        // 次のレベルまでに必要なEXP
+        int expRemaining = 15 - expInLevel;
+
+        // EXPバーの進捗率
+        int expProgressPercent = expInLevel * 100 / 15;
+
+        // レベルアップ判定
         boolean leveledUp = currentLevel > previousLevel;
 
+        // 満点判定
+        boolean isPerfect = qCount > 0 && caCount == qCount;
+        
         // 正解率に応じたキャラクターとメッセージ
         String scoreCharacter = null;
         String characterMessage = "";
@@ -348,14 +364,15 @@ public class TestController {
             }
         }
 
-        // レベルアップ時は、専用キャラクターとメッセージを優先
+     // レベルアップ時は専用キャラクターを表示
         String displayCharacter =
                 leveledUp ? "suta_star.png" : scoreCharacter;
 
+        // レベルアップ時だけ、一言を特別なメッセージに変更
         if (leveledUp) {
-            characterMessage = "レベルアップ！毎日の努力が実ったね！";
+            characterMessage = "レベルアップしました！毎日の努力が実ったね！";
         }
-                      
+        
         Map<String, Object> view = new LinkedHashMap<>();
         view.put("cateCorrect",    categCount);
         view.put("cateCount",      cateCount);
@@ -363,19 +380,30 @@ public class TestController {
         view.put("ca",             caCount);
         view.put("ans",            results);
         view.put("currentLevel",   currentLevel);
+        // EXPバー表示用のデータ
+        view.put("totalExp", totalExp);
+        view.put("expInLevel", expInLevel);
+        view.put("expRemaining", expRemaining);
+        view.put("expProgressPercent", expProgressPercent);
+
         view.put("isPerfect",      isPerfect);
         view.put("newAchievements", newAchievements);
         view.put("previousLevel", previousLevel);
         view.put("displayCharacter", displayCharacter);
-        
         view.put("leveledUp", leveledUp);
         view.put("characterMessage", characterMessage);
         
-        session.setAttribute(RESULT_VIEW, view);
-
-        session.removeAttribute("question");
-        session.removeAttribute("ans");
-        clearTimer();
+        // 解答保存・EXP・実績は同じトランザクション。確定前に解答セッションを消すと再送できなくなる。
+        Runnable finish = () -> {
+            if (!newAchievements.isEmpty()) {
+                session.setAttribute("newAchievements", newAchievements);
+            }
+            session.setAttribute(RESULT_VIEW, view);
+            session.removeAttribute("question");
+            session.removeAttribute("ans");
+            clearTimer();
+        };
+        AfterCommit.run(finish);
 
         // 再読み込みやブラウザバックでの二重登録を防ぐため、リダイレクトで結果を表示する
         return "redirect:/test/result";

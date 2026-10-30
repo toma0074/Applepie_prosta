@@ -42,34 +42,15 @@ public class QuestionController {
     @RequestMapping(path = "/question/list/category")
     public String questionList(Model model, Integer category) {
 
-        String resultText = "";
-        if (category == null) {
-            resultText = "全件検索";
-        } else if (category == 1) {
-            resultText = "Java";
-        } else if (category == 2) {
-            resultText = "Spring";
-        } else if (category == 3) {
-            resultText = "HTML";
+        Category categoryEntity = category == null ? null : categoryRepository.findById(category).orElse(null);
+
+        if (categoryEntity == null) {
+            model.addAttribute("QuestionResult", "全件検索");
+            model.addAttribute("Questions", qRepository.findAllByOrderByDifficultyAscCategoryAsc());
         } else {
-            resultText = "SQL";
-        }
-
-        model.addAttribute("QuestionResult", resultText);
-
-        if (category == null) {
-            List<Question> questionList =
-                    qRepository.findAllByOrderByDifficultyAscCategoryAsc();
-            model.addAttribute("Questions", questionList);
-        } else {
-            Category categoryEntity =
-                    categoryRepository.getReferenceById(category);
-
-            List<Question> categoryList =
-                    qRepository.findByCategoryOrderByDifficultyAscCategoryAsc(
-                            categoryEntity);
-
-            model.addAttribute("Questions", categoryList);
+            model.addAttribute("QuestionResult", categoryEntity.getCategoryName());
+            model.addAttribute("Questions",
+                    qRepository.findByCategoryOrderByDifficultyAscCategoryAsc(categoryEntity));
         }
 
         return "question/question_list";

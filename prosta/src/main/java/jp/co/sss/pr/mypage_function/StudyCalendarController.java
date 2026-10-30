@@ -81,7 +81,7 @@ public class StudyCalendarController {
         Map<LocalDate, DailyStudySummary> summariesByDate = new HashMap<>();
         summaries.forEach(summary -> summariesByDate.put(summary.getStudyDate(), summary));
         Map<LocalDate, Long> planCountsByDate = new HashMap<>();
-        monthPlans.forEach(plan -> planCountsByDate.merge(plan.getPlanDate(), 1L, Long::sum));
+        monthPlans.forEach(plan -> planCountsByDate.merge(plan.getPlanDate(), 1L, (count, added) -> count + added));
 
         List<List<CalendarDay>> weeks = buildCalendar(selectedMonth, selectedDate, summariesByDate, planCountsByDate);
         List<StudyPlan> selectedPlans =
@@ -213,6 +213,7 @@ public class StudyCalendarController {
     }
 
     private StudyPlan findOwnedPlan(Integer id, Customer customer) {
+        // URLの予定IDだけを信用せず、ログイン中の所有者とセットで取得する。
         return studyPlanRepository.findByStudyPlanIdAndCustomer(id, customer)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }

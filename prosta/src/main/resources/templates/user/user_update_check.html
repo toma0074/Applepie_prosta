@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
 <head>
@@ -29,9 +29,9 @@
   <div class="inputform">
     <input type="hidden" name="userId"     th:value="${user.userId}" />
     <input type="hidden" name="userName"   th:value="${user.userName}" />
-    <input type="hidden" name="userPass"   th:value="${user.userPass}" />
     <input type="hidden" name="permission" th:value="${user.permission}" />
     <input type="hidden" name="deleteFlag" th:value="${user.deleteFlag}" />
+    <input type="hidden" name="returnUrl" th:value="${returnUrl}" />
     <div class="inputselect">
       <input type="submit" value="確定" />
     </div>
@@ -40,9 +40,9 @@
 <form th:action="@{/user/update/input}" method="get">
   <input type="hidden" name="userId"     th:value="${user.userId}" />
   <input type="hidden" name="userName"   th:value="${user.userName}" />
-  <input type="hidden" name="userPass"   th:value="${user.userPass}" />
   <input type="hidden" name="permission" th:value="${user.permission}" />
   <input type="hidden" name="deleteFlag" th:value="${user.deleteFlag}" />
+  <input type="hidden" name="returnUrl" th:value="${returnUrl}" />
   <div class="inputform">
     <div class="inputselect">
       <input type="submit" value="戻る" />

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -18,9 +19,20 @@ import jp.co.sss.pr.repository.AchievementRepository;
 import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.repository.UserAchievementRepository;
+import jakarta.persistence.EntityManager;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class LevelServiceTest {
+
+    @Mock
+    private EntityManager entityManager;
+
+    @BeforeEach
+    void managedCustomer() {
+        lenient().when(entityManager.contains(any())).thenReturn(true);
+    }
 
     @Mock
     private CustomerRepository customerRepository;
@@ -41,7 +53,6 @@ class LevelServiceTest {
     void incrementsStreakAfterLoginOnPreviousDay() {
         Customer customer = customerWithLogin(LocalDate.now().minusDays(1), 0, 4);
         when(answerRepository.countByCustomerAndCorrectFlagTrue(customer)).thenReturn(0);
-        when(answerRepository.countPerfectDaysByCustomer(customer)).thenReturn(0);
         when(customerRepository.save(customer)).thenReturn(customer);
 
         levelService.processLogin(customer);
@@ -56,7 +67,6 @@ class LevelServiceTest {
     void resetsStreakAfterMissedDay() {
         Customer customer = customerWithLogin(LocalDate.now().minusDays(2), 3, 9);
         when(answerRepository.countByCustomerAndCorrectFlagTrue(customer)).thenReturn(0);
-        when(answerRepository.countPerfectDaysByCustomer(customer)).thenReturn(0);
         when(customerRepository.save(customer)).thenReturn(customer);
 
         levelService.processLogin(customer);
@@ -66,17 +76,16 @@ class LevelServiceTest {
     }
 
     @Test
-    void totalLoginDaysDoNotCountAsAConsecutiveStreak() {
+    void loginDoesNotRaiseLevelWithoutExp() {
         Customer customer = customerWithLogin(LocalDate.now().minusDays(1), 6, 0);
         when(answerRepository.countByCustomerAndCorrectFlagTrue(customer)).thenReturn(0);
-        when(answerRepository.countPerfectDaysByCustomer(customer)).thenReturn(0);
         when(customerRepository.save(customer)).thenReturn(customer);
 
         levelService.processLogin(customer);
 
         assertEquals(7, customer.getLoginCount());
         assertEquals(1, customer.getConsecutiveLoginDays());
-        assertEquals(7, customer.getUserLevel());
+        assertEquals(1, customer.getUserLevel());
     }
 
     @Test

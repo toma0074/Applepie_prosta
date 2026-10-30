@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROSTA | 本日の学習サマリー</title>
+</head>
+<body>
+<main class="suku learning-status-page">
+  <div class="learning-status-header">
+    <div>
+      <h3>本日の学習サマリー</h3>
+      <p>おつかれさまでした。ログアウト前に今日の学習を振り返りましょう。</p>
+    </div>
+  </div>
+
+  <section class="learning-overview" aria-label="本日の学習">
+    <div class="learning-overview-item">
+      <span>本日の解答数</span>
+      <strong th:text="${todayAnswers}">0</strong>
+    </div>
+    <div class="learning-overview-item">
+      <span>本日の正解数</span>
+      <strong th:text="${todayCorrect}">0</strong>
+    </div>
+    <div class="learning-overview-item">
+      <span>本日の正答率</span>
+      <strong th:text="${todayAccuracy + '%'}">0%</strong>
+    </div>
+    <div class="learning-overview-item">
+      <span>累計正答率</span>
+      <strong th:text="${totalAccuracy + '%'}">0%</strong>
+    </div>
+  </section>
+
+  <section class="learning-status-card">
+    <p class="learning-no-answers" th:if="${todayAnswers == 0}">
+      今日はまだ解答していません。
+    </p>
+    <p th:if="${weakCategory != null}">
+      いちばん正答率が低いカテゴリ：
+      <strong th:text="${weakCategory}">Java</strong>
+      （<span th:text="${weakAccuracy + '%'}">0%</span>）
+    </p>
+    <a class="learning-action-link" th:if="${weakCategory != null}" th:href="@{/test/weak}">弱点問題を解く</a>
+  </section>
+
+  <div class="learning-status-header">
+    <a class="btn" th:href="@{/mypage}">マイページに戻る</a>
+    <a class="btn" th:href="@{/logout}">ログアウトする</a>
+  </div>
+</main>
+</body>
+</html>

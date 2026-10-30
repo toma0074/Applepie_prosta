@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
 <head>
@@ -7,7 +7,27 @@
 </head>
 <body>
 <h3>ユーザー一覧</h3>
+<p><a class="btn" th:href="@{/admin/menu}">管理メニュー</a></p>
 
+<form class="friends-inline-form mypage-filter" th:action="@{/user/list}" method="get"
+      style="display:flex;flex-wrap:nowrap;align-items:center;gap:8px;">
+  <input type="text" name="userName" th:value="${userName}" placeholder="ユーザー名キーワード"
+         style="flex:0 1 240px;width:240px;max-width:240px;" />
+  <select class="mypage-sort" name="permission" style="width:150px;min-width:150px;flex:0 0 150px;">
+    <option value="">権限(全て)</option>
+    <option value="0" th:selected="${permission != null and permission == 0}">一般</option>
+    <option value="1" th:selected="${permission != null and permission == 1}">管理者</option>
+  </select>
+  <select class="mypage-sort" name="deleteFlag" style="width:150px;min-width:150px;flex:0 0 150px;">
+    <option value="">状態(全て)</option>
+    <option value="false" th:selected="${deleteFlag != null and !deleteFlag}">アクティブ</option>
+    <option value="true" th:selected="${deleteFlag != null and deleteFlag}">削除済み</option>
+  </select>
+  <div class="mypage-filter-row" style="display:flex;align-items:center;gap:8px;margin:0;">
+    <button type="submit">検索</button>
+    <a class="friends-secondary-button mypage-reset" th:href="@{/user/list}">リセット</a>
+  </div>
+</form>
 <th:block th:if="${errorMessage}">
   <span class="error-message"
       th:text="${errorMessage}">
@@ -26,7 +46,8 @@
 </th:block>
 
 <div id="pagination-container"
-     class="pagination-container">
+     class="pagination-container"
+     data-pagination-target="user-table" data-pagination-rows="tbody tr" data-pagination-size="8">
 </div>
 
 <table id="user-table" class="data-table" th:if="${#lists.size(customerForm) != 0}">
@@ -49,6 +70,7 @@
       <td th:if="${user.deleteFlag}">削除済み</td>
       <td class="button">
         <form class="text-center" th:action="@{/user/update/input}" method="get">
+          <input type="hidden" name="returnUrl" value="/user/list" />
           <input type="hidden" name="userId"     th:value="${user.userId}" />
           <input type="hidden" name="userName"   th:value="${user.userName}" />
           <input type="hidden" name="permission" th:value="${user.permission}" />
@@ -78,34 +100,5 @@
   </tbody>
 </table>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const rowsPerPage = 8;
-  const table = document.getElementById('user-table');
-  if (!table) return;
-  const rows = table.querySelectorAll('tbody tr');
-  const pageCount = Math.ceil(rows.length / rowsPerPage);
-  const container = document.getElementById('pagination-container');
-  if (pageCount <= 1) return;
-  let currentPage = 1;
-  function showPage(page) {
-    currentPage = page;
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    Array.from(rows).forEach((r, i) => r.style.display = (i >= start && i < end) ? '' : 'none');
-    document.getElementById('p-prev').disabled = (currentPage === 1);
-    document.getElementById('p-next').disabled = (currentPage === pageCount);
-  }
-  const prev = document.createElement('button');
-  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'btn-pagination';
-  prev.addEventListener('click', () => { if (currentPage > 1) showPage(currentPage - 1); });
-  const next = document.createElement('button');
-  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'btn-pagination';
-  next.addEventListener('click', () => { if (currentPage < pageCount) showPage(currentPage + 1); });
-  container.appendChild(prev);
-  container.appendChild(next);
-  showPage(1);
-});
-</script>
 </body>
 </html>

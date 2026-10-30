@@ -52,6 +52,7 @@ public class WeakQuestionService {
         int max = Math.max(0, Math.min(limit, MAX_QUESTIONS));
         Set<Integer> seen = new HashSet<>();
         List<Question> result = new ArrayList<>();
+        // 新しい解答から各問題を一度だけ判定し、後から正解した問題を古い誤答で復習対象に戻さない。
         for (Answer a : answerRepository.findAllByCustomerOrderByAnsIdDesc(user)) {
             Question q = a.getQuestion();
             if (q == null || !seen.add(q.getQuestionId())) {
@@ -73,8 +74,8 @@ public class WeakQuestionService {
                 .filter(s -> s.getCorrectCount() < s.getAttemptCount())
                 .sorted(Comparator
                         .comparingDouble((QuestionAttemptStat s) -> (double) s.getCorrectCount() / s.getAttemptCount())
-                        .thenComparing(Comparator.comparingLong(QuestionAttemptStat::getAttemptCount).reversed())
-                        .thenComparing(QuestionAttemptStat::getQuestionId))
+                        .thenComparing(Comparator.comparingLong((QuestionAttemptStat s) -> s.getAttemptCount()).reversed())
+                        .thenComparing(s -> s.getQuestionId()))
                 .limit(max)
                 .toList();
         if (weakStats.isEmpty()) {
@@ -82,9 +83,9 @@ public class WeakQuestionService {
         }
 
         Map<Integer, Question> questions = questionRepository
-                .findAllById(weakStats.stream().map(QuestionAttemptStat::getQuestionId).toList())
+                .findAllById(weakStats.stream().map(s -> s.getQuestionId()).toList())
                 .stream()
-                .collect(Collectors.toMap(Question::getQuestionId, Function.identity()));
+                .collect(Collectors.toMap(q -> q.getQuestionId(), Function.identity()));
 
         List<WeakQuestion> result = new ArrayList<>();
         for (QuestionAttemptStat s : weakStats) {

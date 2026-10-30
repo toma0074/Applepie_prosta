@@ -64,27 +64,54 @@
   </section>
 
   <section class="friends-card" aria-labelledby="friends-ranking-title">
-    <h4 id="friends-ranking-title">カテゴリ別ランキング</h4>
-    <p>今月のカテゴリ別回答数・正解数・正答率を、あなたと友達で比較します。</p>
+    <h4 id="friends-ranking-title">ランキング</h4>
+    <p>カテゴリ・難易度・期間を指定して、回答数・正解数・正答率をあなたと友達で比較します(未選択は「すべて」)。</p>
     <form id="friends-ranking-form" class="friends-inline-form">
       <label for="friends-category">カテゴリ</label>
-      <select id="friends-category" name="categoryId" required>
-        <option value="">カテゴリを選択</option>
+      <select id="friends-category" name="categoryId">
+        <option value="">すべて</option>
         <option th:each="category : ${categoryList}"
                 th:value="${category.categoryId}"
                 th:text="${category.categoryName}">Java</option>
       </select>
-      <label for="friends-from">開始日</label>
-      <input id="friends-from" name="from" type="date" required>
-      <label for="friends-to">終了日</label>
-      <input id="friends-to" name="to" type="date" required>
+      <label for="friends-difficulty">難易度</label>
+      <select id="friends-difficulty" name="difficulty">
+        <option value="">すべて</option>
+        <option value="1">★☆☆</option>
+        <option value="2">★★☆</option>
+        <option value="3">★★★</option>
+      </select>
+      <span class="friends-field">
+        <label for="friends-from">開始日</label>
+        <input id="friends-from" name="from" type="date" required>
+      </span>
+      <span class="friends-field">
+        <label for="friends-to">終了日</label>
+        <input id="friends-to" name="to" type="date" required>
+      </span>
       <button type="submit">比較</button>
     </form>
     <div id="friends-leaderboard" class="friends-list">
-      <p class="friends-empty">カテゴリと期間を選択してください。</p>
+      <p class="friends-empty">条件と期間を選択して「比較」を押してください。</p>
     </div>
   </section>
 </main>
+
+<div id="friend-feed-modal" class="question-modal" hidden>
+  <div class="question-modal-backdrop" data-feed-close="true"></div>
+  <div class="question-modal-body" role="dialog" aria-modal="true" aria-labelledby="friend-feed-title">
+    <button type="button" class="question-modal-close" data-feed-close="true" aria-label="閉じる">×</button>
+    <h4 id="friend-feed-title">フレンドフィード</h4>
+    <div id="friend-feed-character" aria-label="フレンドのレベルとキャラクター"></div>
+    <p>直近30日間の学習・実績</p>
+    <div id="friend-feed-content" aria-live="polite"></div>
+  </div>
+</div>
+
+<template th:each="stageLevel : ${ {1, 10, 25, 50, 75, 100} }"
+          th:id="'friend-character-' + ${stageLevel}">
+  <div th:replace="~{common/character :: character(level=${stageLevel})}"></div>
+</template>
 
 <script th:inline="javascript">
 (() => {
@@ -98,6 +125,67 @@
   const friendsList = document.getElementById('friends-list');
   const selfSummary = document.getElementById('friends-self');
   const leaderboard = document.getElementById('friends-leaderboard');
+  const feedModal = document.getElementById('friend-feed-modal');
+  const feedContent = document.getElementById('friend-feed-content');
+  const feedClose = feedModal.querySelector('button[data-feed-close]');
+  let feedTrigger;
+  let feedRequest = 0;
+  function closeFeed() {
+    feedModal.hidden = true;
+    feedRequest++;
+    // The presence refresh may have replaced the button while the dialog was open.
+    const target = feedTrigger?.isConnected ? feedTrigger
+      : friendsList.querySelector('[data-friend-feed]');
+    target?.focus();
+  }
+  async function openFeed(friend, trigger) {
+    // 別の友達を開き直した後に古い通信が完了しても、現在のモーダルを上書きさせない。
+    const requestId = ++feedRequest;
+    feedTrigger = trigger;
+    document.getElementById('friend-feed-title').textContent = `${friend.userName}さんのフレンドフィード`;
+    const level = friend.level;
+    // 一覧取得時のレベルを使い、共通キャラクターの閾値別テンプレートから表示だけを複製する。
+    const stage = [100, 75, 50, 25, 10, 1].find((threshold) => level >= threshold);
+    const character = document.getElementById(`friend-character-${stage}`).content.cloneNode(true);
+    character.querySelector('.char-label span').textContent = level;
+    document.getElementById('friend-feed-character').replaceChildren(character);
+    replaceWithEmpty(feedContent, '読み込み中...');
+    feedModal.hidden = false;
+    feedClose.focus();
+    try {
+      const entries = await request(`/${encodeURIComponent(friend.userId)}/feed`);
+      if (requestId !== feedRequest) return;
+      feedContent.replaceChildren();
+      if (entries.length === 0) {
+        replaceWithEmpty(feedContent, '直近30日間の活動はありません。');
+        return;
+      }
+      const list = makeElement('ul', 'question-modal-options');
+      entries.forEach((entry) => {
+        const item = makeElement('li');
+        item.append(makeElement('strong', '', `${entry.date} · ${entry.type}`),
+          makeElement('p', '', entry.message));
+        list.append(item);
+      });
+      feedContent.append(list);
+    } catch (error) {
+      if (requestId === feedRequest) {
+        replaceWithEmpty(feedContent, `フィードを読み込めませんでした。${error.message}`);
+      }
+    }
+  }
+  feedModal.addEventListener('click', (event) => {
+    if (event.target.dataset.feedClose) closeFeed();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (feedModal.hidden) return;
+    if (event.key === 'Escape') closeFeed();
+    if (event.key === 'Tab') {
+      // 現状の操作要素は閉じるボタンだけ。操作要素を増やす場合はフォーカス循環も更新する。
+      event.preventDefault();
+      feedClose.focus();
+    }
+  });
   const today = new Date();
   const dateValue = (date) => {
     const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -138,6 +226,7 @@
   function makeElement(tag, className, text) {
     const element = document.createElement(tag);
     if (className) element.className = className;
+    // ユーザー名や活動メッセージをHTMLとして組み立てない。
     if (text !== undefined) element.textContent = text;
     return element;
   }
@@ -252,6 +341,9 @@
       const row = makeElement('div', 'friends-list-row friends-profile');
       const details = makeElement('div', 'friends-profile-details');
       renderSummary(details, friend, true);
+      const feed = makeButton('フィードを見る', 'friends-action-button',
+        () => openFeed(friend, feed));
+      feed.dataset.friendFeed = String(friend.userId);
       const remove = makeButton('友達解除', 'friends-secondary-button', async () => {
         if (!window.confirm(`${friend.userName}さんを友達から解除しますか？`)) return;
         try {
@@ -262,7 +354,7 @@
           showMessage(error.message, true);
         }
       });
-      row.append(details, remove);
+      row.append(details, feed, remove);
       friendsList.append(row);
     });
   }
@@ -319,8 +411,12 @@
   rankingForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     showMessage('', false);
-    const form = new FormData(rankingForm);
-    const params = new URLSearchParams(form);
+    const params = new URLSearchParams();
+    new FormData(rankingForm).forEach((value, key) => {
+      if (value !== '') {
+        params.append(key, value);
+      }
+    });
     try {
       renderLeaderboard(await request(`/leaderboard?${params.toString()}`));
     } catch (error) {

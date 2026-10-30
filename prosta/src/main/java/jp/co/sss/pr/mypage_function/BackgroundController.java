@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.repository.CustomerRepository;
 
 @Controller
+@Transactional
 public class BackgroundController {
 
     private static final Map<String, Integer> BACKGROUND_LEVELS = Map.of(
@@ -29,6 +31,15 @@ public class BackgroundController {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    /** 前回確認したレベルより後に解放された背景の数。 */
+    public static long countNewBackgrounds(Customer customer) {
+        int level = customer.getUserLevel() == null ? 1 : customer.getUserLevel();
+        int seen = customer.getBackgroundSeenLevel() == null ? 1 : customer.getBackgroundSeenLevel();
+        return BACKGROUND_LEVELS.values().stream()
+                .filter(required -> required > seen && required <= level)
+                .count();
+    }
 
     @GetMapping("/background")
     public String index(
@@ -57,6 +68,12 @@ public class BackgroundController {
         model.addAttribute("backgroundClass", customer.getBackgroundClass());
         model.addAttribute("backgroundColor", customer.getBackgroundColor());
 
+        int currentLevel = customer.getUserLevel() == null ? 1 : customer.getUserLevel();
+        if (customer.getBackgroundSeenLevel() == null || customer.getBackgroundSeenLevel() < currentLevel) {
+            customer.setBackgroundSeenLevel(currentLevel);
+            customerRepository.save(customer);
+        }
+
         return "mypage/background_select";
     }
 
@@ -66,6 +83,7 @@ public class BackgroundController {
             HttpSession session) {
 
         Customer customer = currentCustomer(session);
+        // 画面のロック表示だけに頼らず、送信されたクラス名と必要レベルをサーバーでも確認する。
         Integer requiredLevel = BACKGROUND_LEVELS.get(background);
         if (requiredLevel == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "背景の指定が無効です");

@@ -58,6 +58,7 @@ public final class AccessPolicy {
     }
 
     private static String normalizeHost(String hostHeader) {
+        // 既定ポート表記を吸収するHost比較であり、schemeまで厳密に比較するCSRFトークン方式ではない。
         return hostHeader.replaceFirst(":(80|443)$", "");
     }
 }

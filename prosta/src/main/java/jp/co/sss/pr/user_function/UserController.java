@@ -3,8 +3,10 @@ package jp.co.sss.pr.user_function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,11 +19,18 @@ import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.form.CustomerForm;
 import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.service.PasswordService;
+import jp.co.sss.pr.service.ReturnUrls;
 
 @Controller
+@Transactional
 public class UserController {
 
     private static final Integer ADMIN = 1;
+    private static final String PENDING_PASS = "pendingUserPass";
+    private static final String PENDING_USER_ID = "pendingUserId";
+
+    @Autowired
+    Validator validator;
 
     @Autowired
     CustomerRepository userRepository;
@@ -41,12 +50,12 @@ public class UserController {
         CustomerBean user = new CustomerBean();
         user.setUserId(target.getUserId());
         user.setUserName(userForm.getUserName() != null ? userForm.getUserName() : target.getUserName());
-        user.setUserPass(userForm.getUserPass());
         user.setPermission(isAdmin(login) && userForm.getPermission() != null
                 ? userForm.getPermission() : target.getPermission());
         user.setDeleteFlag(target.getDeleteFlag());
 
         model.addAttribute("user", user);
+        addReturnUrl(model, userForm, login);
         return "user/user_update_input";
     }
 
@@ -56,6 +65,7 @@ public class UserController {
         Customer target = authorizedTarget(loginUser(), user.getUserId());
         // 画面側の隠しフィールドが空でも、更新対象は確定した本人のIDにそろえる
         user.setUserId(target.getUserId());
+        addReturnUrl(model, user, loginUser());
 
         if (result.hasErrors()) {
             return "user/user_update_input";
@@ -64,18 +74,34 @@ public class UserController {
             model.addAttribute("err", "既に使用されているユーザー名です。");
             return "user/user_update_input";
         }
+        // パスワードはHTMLに出さず、確認画面から確定までセッションで保持する
+        session.setAttribute(PENDING_PASS, user.getUserPass());
+        session.setAttribute(PENDING_USER_ID, user.getUserId());
         return "user/user_update_check";
     }
 
     @RequestMapping(path = "/user/update/complete", method = RequestMethod.POST)
-    public String userUpdateComplete(@Valid @ModelAttribute("user") CustomerForm userForm,
+    public String userUpdateComplete(@ModelAttribute("user") CustomerForm userForm,
                                      BindingResult result, Model model) {
         CustomerBean login = loginUser();
         Customer existing = authorizedTarget(login, userForm.getUserId());
+        addReturnUrl(model, userForm, login);
+
+        Object pendingPass = session.getAttribute(PENDING_PASS);
+        Object pendingId = session.getAttribute(PENDING_USER_ID);
+        session.removeAttribute(PENDING_PASS);
+        session.removeAttribute(PENDING_USER_ID);
+        if (!(pendingPass instanceof String) || !existing.getUserId().equals(pendingId)) {
+            return "redirect:/user/update/input?userId=" + existing.getUserId()
+                    + "&returnUrl=" + model.getAttribute("returnUrl");
+        }
+        userForm.setUserPass((String) pendingPass);
+        validator.validate(userForm, result);
 
         if (result.hasErrors()) {
             return "user/user_update_input";
         }
+        // 確認画面の後に他ユーザーが名前を使う場合があるため、確定時も重複を再検査する。
         if (isNameTaken(userForm, existing)) {
             model.addAttribute("err", "既に使用されているユーザー名です。");
             return "user/user_update_input";
@@ -100,6 +126,14 @@ public class UserController {
         return "user/user_update_complete";
     }
 
+    // 入口ごとの戻り先。未指定・不正な値は権限ごとの既定値にする
+    private void addReturnUrl(Model model, CustomerForm form, CustomerBean login) {
+        String fallback = isAdmin(login) ? "/user/list" : "/mypage";
+        String url = ReturnUrls.resolve(form.getReturnUrl(), fallback);
+        model.addAttribute("returnUrl", url);
+        model.addAttribute("returnLabel", ReturnUrls.label(url));
+    }
+
     private CustomerBean loginUser() {
         return (CustomerBean) session.getAttribute("user");
     }
@@ -122,7 +156,6 @@ public class UserController {
     }
 
     private boolean isNameTaken(CustomerForm form, Customer target) {
-        Customer same = userRepository.findByUserName(form.getUserName());
-        return same != null && !same.getUserId().equals(target.getUserId());
+        return userRepository.existsByUserNameAndUserIdNot(form.getUserName(), target.getUserId());
     }
 }

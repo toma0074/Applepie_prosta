@@ -1,6 +1,8 @@
 package jp.co.sss.pr.login_function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
@@ -64,11 +66,11 @@ class LoginControllerTest {
 
         assertEquals(true, passwordService.matches("pass1234", customer.getUserPass()));
         assertEquals(false, "pass1234".equals(customer.getUserPass()));
-        verify(customerRepository).save(customer);
+        verify(customerRepository, times(2)).save(customer);
     }
 
     @Test
-    void keepsLegacyPasswordAndStillLogsInWhenHashDoesNotFitTheColumn() {
+    void doesNotAuthenticateWhenTheNewLoginCannotBePersisted() {
         CustomerForm form = new CustomerForm();
         form.setUserName("testuser");
         form.setUserPass("pass1234");
@@ -79,7 +81,8 @@ class LoginControllerTest {
         when(customerRepository.save(customer)).thenThrow(new RuntimeException("ORA-12899"));
         when(levelService.processLogin(customer)).thenReturn(List.of());
 
-        assertEquals("redirect:/mypage", loginController.login(form, bindingResult, session, model));
+        assertThrows(RuntimeException.class, () -> loginController.login(form, bindingResult, session, model));
+        verify(session, never()).setAttribute(eq("user"), any());
         assertEquals("pass1234", customer.getUserPass());
     }
 
@@ -150,7 +153,7 @@ class LoginControllerTest {
         form.setUserPass("pass1234");
         BindingResult bindingResult = mock(BindingResult.class);
         Model model = mock(Model.class);
-        when(customerRepository.findByUserName("newuser")).thenReturn(null);
+        when(customerRepository.existsByUserName("newuser")).thenReturn(false);
         when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> {
             Customer customer = invocation.getArgument(0);
             customer.setUserId(4);

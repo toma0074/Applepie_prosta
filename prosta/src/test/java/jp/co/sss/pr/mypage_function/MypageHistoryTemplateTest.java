@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -50,6 +51,8 @@ class MypageHistoryTemplateTest {
     private CategoryRepository categoryRepository;
     @MockBean
     private FriendConnectionRepository friendConnectionRepository;
+    @MockBean
+    private jp.co.sss.pr.service.QuestService questService;
 
     @Test
     void questionTextCarriesAllOptionsAndTheCorrectAnswerForTheModal() throws Exception {
@@ -81,8 +84,9 @@ class MypageHistoryTemplateTest {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", bean);
 
-        mockMvc.perform(get("/mypage").session(session))
+        mockMvc.perform(get("/mypage/history").session(session))
                 .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.containsString("href=\"/css/tables.css\"")))
                 .andExpect(content().string(Matchers.containsString("class=\"question-link\"")))
                 .andExpect(content().string(Matchers.containsString("data-option-a=\"double\"")))
                 .andExpect(content().string(Matchers.containsString("data-option-b=\"int\"")))
@@ -91,5 +95,29 @@ class MypageHistoryTemplateTest {
                 .andExpect(content().string(Matchers.containsString("data-chosen=\"3\"")))
                 .andExpect(content().string(Matchers.containsString("name=\"fromDate\"")))
                 .andExpect(content().string(Matchers.containsString("id=\"question-modal\"")));
+    }
+
+    @Test
+    void pageSelectorKeepsAllHistoryFilters() throws Exception {
+        Customer customer = new Customer();
+        customer.setUserId(1);
+        when(customerRepository.getReferenceById(1)).thenReturn(customer);
+        when(answerRepository.searchHistory(eq(customer), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(new PageImpl<Answer>(List.of(), PageRequest.of(1, 6), 18));
+        CustomerBean bean = new CustomerBean();
+        bean.setUserId(1);
+        bean.setPermission(0);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", bean);
+
+        mockMvc.perform(get("/mypage/history").session(session)
+                .param("categoryId", "1").param("difficulty", "2").param("keyword", "sample")
+                .param("correct", "0").param("fromDate", "2026-10-01")
+                .param("toDate", "2026-10-29").param("sort", "2").param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.containsString("data-page-navigation")))
+                .andExpect(content().string(Matchers.containsString("page=1\" selected=\"selected\">2</option>")))
+                .andExpect(content().string(Matchers.containsString(
+                        "data-page-url=\"/mypage/history?categoryId=1&amp;difficulty=2&amp;keyword=sample&amp;correct=0&amp;fromDate=2026-10-01&amp;toDate=2026-10-29&amp;sort=2&amp;page=2\"")));
     }
 }

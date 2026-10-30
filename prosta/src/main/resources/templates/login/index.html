@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
+<script th:src="@{/js/tab-session.js}"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/destyle.css@3.0.2/destyle.css">
 <link rel="stylesheet" th:href="@{/css/style.css}"/>
-<link rel="stylesheet" th:href="@{/css/mobile.css}">
 <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
 <title>PROSTA</title>
 </head>
@@ -55,7 +55,7 @@
   <section class="section2">
     <div class="container js-fade">
       <p class="sub_title">カテゴリ</p>
-      <h2>4つの問題集から学べる</h2>
+      <h2>5つの問題集から学べる</h2>
       <div class="category_wrapper">
         <div class="category_grid">
           <div class="col">
@@ -95,6 +95,10 @@
           <div class="desc_item">
             <h4>SQL</h4>
             <p>データベースに保存された情報を操作するための言語</p>
+          </div>
+          <div class="desc_item">
+            <h4>基本情報</h4>
+            <p>基本情報技術者試験の出題範囲から、ITの基礎知識を幅広く学べる問題集</p>
           </div>
         </div>
       </div>

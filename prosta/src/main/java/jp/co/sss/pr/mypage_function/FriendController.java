@@ -92,12 +92,12 @@ public class FriendController {
                 .toList();
 
         Map<Integer, FriendStudySummary> studyByUser = studySummaries(
-                friends.stream().map(Customer::getUserId).toList(), null, null, null);
+                friends.stream().map(friend -> friend.getUserId()).toList(), null, null, null, null);
         LocalDateTime onlineCutoff = LocalDateTime.now().minusMinutes(ONLINE_WINDOW_MINUTES);
 
         return friends.stream()
                 .map(friend -> toFriendSummary(friend, studyByUser.get(friend.getUserId()), onlineCutoff))
-                .sorted(Comparator.comparing(FriendSummary::userName, String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparing((FriendSummary summary) -> summary.userName(), String.CASE_INSENSITIVE_ORDER))
                 .toList();
     }
 
@@ -106,7 +106,7 @@ public class FriendController {
     public FriendSummary currentUserSummary(HttpSession session) {
         Customer user = currentUser(session);
         FriendStudySummary study = studySummaries(
-                List.of(user.getUserId()), null, null, null).get(user.getUserId());
+                List.of(user.getUserId()), null, null, null, null).get(user.getUserId());
         return toFriendSummary(
                 user, study, LocalDateTime.now().minusMinutes(ONLINE_WINDOW_MINUTES));
     }
@@ -246,13 +246,20 @@ public class FriendController {
     @GetMapping("/leaderboard")
     @Transactional(readOnly = true)
     public Leaderboard leaderboard(
-            @RequestParam Integer categoryId,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) Integer difficulty,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             HttpSession session) {
         Customer currentUser = currentUser(session);
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "カテゴリが無効です"));
+        Category category = null;
+        if (categoryId != null) {
+            category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "カテゴリが無効です"));
+        }
+        if (difficulty != null && (difficulty < 1 || difficulty > 3)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "難易度が無効です");
+        }
         LocalDate today = LocalDate.now();
         LocalDate fromDate = from == null ? today.withDayOfMonth(1) : from;
         LocalDate toDate = to == null ? today : to;
@@ -271,13 +278,13 @@ public class FriendController {
                 .forEach(participants::add);
 
         List<Integer> participantIds = participants.stream()
-                .map(Customer::getUserId)
+                .map(user -> user.getUserId())
                 .distinct()
                 .toList();
         Map<Integer, FriendStudySummary> studyByUser = studySummaries(
-                participantIds, categoryId, fromDate, toDate);
+                participantIds, categoryId, difficulty, fromDate, toDate);
         Map<Integer, Customer> usersById = participants.stream()
-                .collect(Collectors.toMap(Customer::getUserId, user -> user, (first, ignored) -> first));
+                .collect(Collectors.toMap(user -> user.getUserId(), user -> user, (first, ignored) -> first));
 
         List<LeaderboardEntry> entries = participantIds.stream()
                 .map(userId -> {
@@ -289,13 +296,16 @@ public class FriendController {
                     return new LeaderboardEntry(
                             userId, user.getUserName(), answers, correct, accuracy);
                 })
-                .sorted(Comparator.comparingDouble(LeaderboardEntry::accuracy).reversed()
-                        .thenComparing(Comparator.comparingLong(LeaderboardEntry::correctCount).reversed())
-                        .thenComparing(Comparator.comparingLong(LeaderboardEntry::answerCount).reversed())
-                        .thenComparing(LeaderboardEntry::userName, String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparingDouble((LeaderboardEntry entry) -> entry.accuracy()).reversed()
+                        .thenComparing(Comparator.comparingLong((LeaderboardEntry entry) -> entry.correctCount()).reversed())
+                        .thenComparing(Comparator.comparingLong((LeaderboardEntry entry) -> entry.answerCount()).reversed())
+                        .thenComparing(entry -> entry.userName(), String.CASE_INSENSITIVE_ORDER))
                 .toList();
 
-        return new Leaderboard(category.getCategoryId(), category.getCategoryName(),
+        return new Leaderboard(
+                category == null ? null : category.getCategoryId(),
+                category == null ? "すべてのカテゴリ" : category.getCategoryName(),
+                difficulty,
                 fromDate, toDate, entries);
     }
 
@@ -326,6 +336,7 @@ public class FriendController {
     }
 
     private FriendConnection findConnection(Customer user, Customer other) {
+        // A→B/B→Aの二重レコードを避けるため、保存時と同じID順で検索する。
         Customer userLow = user.getUserId() < other.getUserId() ? user : other;
         Customer userHigh = user.getUserId() < other.getUserId() ? other : user;
         return friendConnectionRepository.findByUserLowAndUserHigh(userLow, userHigh)
@@ -339,12 +350,12 @@ public class FriendController {
     }
 
     private Map<Integer, FriendStudySummary> studySummaries(
-            List<Integer> userIds, Integer categoryId, LocalDate from, LocalDate to) {
+            List<Integer> userIds, Integer categoryId, Integer difficulty, LocalDate from, LocalDate to) {
         if (userIds.isEmpty()) {
             return Map.of();
         }
-        return answerRepository.summarizeStudy(userIds, categoryId, from, to).stream()
-                .collect(Collectors.toMap(FriendStudySummary::getUserId, summary -> summary));
+        return answerRepository.summarizeStudy(userIds, categoryId, difficulty, from, to).stream()
+                .collect(Collectors.toMap(summary -> summary.getUserId(), summary -> summary));
     }
 
     private FriendSummary toFriendSummary(
@@ -353,6 +364,7 @@ public class FriendController {
         return new FriendSummary(
                 friend.getUserId(),
                 friend.getUserName(),
+                friend.getUserLevel(),
                 lastSeenAt != null && lastSeenAt.isAfter(onlineCutoff),
                 friend.getConsecutiveLoginDays(),
                 answerCount(study),
@@ -370,6 +382,7 @@ public class FriendController {
     public record FriendSummary(
             Integer userId,
             String userName,
+            int level,
             boolean online,
             int consecutiveLoginDays,
             long answerCount,
@@ -409,6 +422,7 @@ public class FriendController {
     public record Leaderboard(
             Integer categoryId,
             String categoryName,
+            Integer difficulty,
             LocalDate from,
             LocalDate to,
             List<LeaderboardEntry> entries) {

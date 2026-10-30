@@ -17,4 +17,8 @@ INSERT INTO category (category_id, category_name)
 SELECT seq_category.NEXTVAL, 'SQL' FROM dual
 WHERE NOT EXISTS (SELECT 1 FROM category WHERE category_name = 'SQL');
 
+INSERT INTO category (category_id, category_name)
+SELECT seq_category.NEXTVAL, '基本情報' FROM dual
+WHERE NOT EXISTS (SELECT 1 FROM category WHERE category_name = '基本情報');
+
 COMMIT;

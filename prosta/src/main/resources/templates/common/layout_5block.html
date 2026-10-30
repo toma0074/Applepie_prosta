@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	th:fragment="layout(body)">
 <head>
+<script th:src="@{/js/tab-session.js}"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/layout.css}" />
@@ -9,8 +10,10 @@
 <link rel="stylesheet" type="text/css" th:href="@{/css/stylesheet.css}" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/gamification.css}" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/test.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/tables.css}" />
 <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
 <title>PROSTA</title>
+<script th:src="@{/js/pagination.js}" defer></script>
 </head>
 <body
 	th:class="${session.backgroundClass != null ? session.backgroundClass : 'bg-default'}"
@@ -21,6 +24,7 @@
 <div th:replace="~{common/header :: layout-header}">
 </div>
 </header>
+<button type="button" class="sidebar-toggle" aria-label="メニューを開閉" aria-expanded="false">☰ MENU</button>
 <div class="contents">
 <!--/* サイドバー */-->
 <aside th:replace="~{common/sidebar2 :: layout-sidebar}">
@@ -36,6 +40,18 @@
 <div th:replace="~{common/footer :: layout-footer}">
 </div>
 </footer>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var btn = document.querySelector('.sidebar-toggle');
+  var side = document.querySelector('.contents aside');
+  if (!btn || !side) return;
+  btn.addEventListener('click', function () {
+    var open = side.classList.toggle('is-open');
+    side.style.top = btn.getBoundingClientRect().bottom + 'px';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+});
+</script>
 </body>
 </html>
 
