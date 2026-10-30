@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PROSTA | MyPage</title>
+</head>
+<body>
+<main class="suku">
+  <div class="mypage-header">
+    <h3>My Page</h3>
+  </div>
+
+  <div class="status-panel">
+    <div class="char-area">
+      <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
+    </div>
+
+<div class="status-info">
+
+    <!-- EXP進捗表示 -->
+    <div class="exp-progress-component">
+
+        <!-- 累計EXP -->
+        <div class="exp-bar-label">
+            累計EXP：
+            <strong th:text="${totalExp}">0</strong> EXP
+        </div>
+
+        <!-- 進捗バーと王冠 -->
+        <div class="exp-bar-track">
+            <div class="exp-bar-bg">
+                <div class="exp-bar-fill"
+                     th:style="'width:' + ${expProgressPercent} + '%'">
+                </div>
+            </div>
+
+            <!-- 王冠は残す -->
+            <span class="exp-bar-crown" aria-hidden="true">👑</span>
+        </div>
+
+        <!-- バーの右下：現在のEXPと残りEXP -->
+        <div class="exp-bar-sub">
+            <span th:text="${expInLevel}">0</span> / 15 EXP
+            ・次のレベルまであと
+            <span th:text="${expRemaining}">15</span> EXP
+        </div>
+
+    </div>
+
+    <!-- 統計情報 -->
+
+      <div class="stats-row" style="margin-top:8px;">
+        <div class="stat-chip">
+          <span class="stat-icon">📅</span>
+          ログイン日数 <strong th:text="${loginCount}">0</strong>日
+        </div>
+        <div class="stat-chip">
+          <span class="stat-icon">✅</span>
+          累計正解数 <strong th:text="${totalCorrect}">0</strong>問
+        </div>
+        <div class="stat-chip">
+          <span class="stat-icon">⭐</span>
+          満点回数 <strong th:text="${perfectCount}">0</strong>回
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div th:if="${newAchievements != null and !#lists.isEmpty(newAchievements)}"
+       class="achievement-toast">
+    <div class="achievement-toast-inner">
+      <span class="toast-icon">🎉</span>
+      <span class="toast-title">実績解除！</span>
+      <span th:each="ach : ${newAchievements}"
+            th:text="${ach.icon + ' ' + ach.achievementName}"
+            class="toast-item"></span>
+    </div>
+  </div>
+
+  <div th:if="${achievements != null and !#lists.isEmpty(achievements)}" class="ach-preview">
+    <div class="ach-preview-title">🏆 最近の実績</div>
+    <div class="ach-chips">
+      <span th:each="ua, stat : ${achievements}"
+            th:if="${stat.index < 5}"
+            class="ach-chip">
+        <span th:text="${ua.achievement.icon}">🏆</span>
+        <span th:text="${ua.achievement.achievementName}">名称</span>
+      </span>
+    </div>
+  </div>
+
+  <section class="ach-preview quest-panel" th:if="${!#lists.isEmpty(quests)}" aria-label="今日のクエスト">
+    <div class="ach-preview-title">🎯 今日のクエスト</div>
+    <div class="ach-chips">
+      <span th:each="q : ${quests}" class="ach-chip" th:title="${q.description}">
+        <span th:text="${q.completed ? '✅' : '⬜'}">⬜</span>
+        <span th:text="${q.title}">クエスト</span>
+        <span th:text="${q.progress + '/' + q.target}">0/5</span>
+      </span>
+    </div>
+  </section>
+
+  <div class="admin-tiles">
+    <a class="admin-tile" th:href="@{/friends}"
+       th:if="${session.user != null and session.user.permission == 0}"><span class="admin-tile-icon">🤝</span>フレンド<span
+       th:if="${pendingFriendRequestCount != null and pendingFriendRequestCount > 0}"
+       class="notify-badge" th:text="${pendingFriendRequestCount}">1</span></a>
+    <a class="admin-tile" th:href="@{/mypage/history}"><span class="admin-tile-icon">📖</span>解答履歴</a>
+    <a class="admin-tile" th:href="@{/learning-status}"><span class="admin-tile-icon">📊</span>学習状況</a>
+    <a class="admin-tile" th:href="@{/study-calendar}"><span class="admin-tile-icon">📅</span>学習カレンダー</a>
+    <a class="admin-tile" th:href="@{/achievement}"><span class="admin-tile-icon">🏆</span>実績一覧<span
+       th:if="${unreadAchievementCount != null and unreadAchievementCount > 0}"
+       class="notify-badge">NEW</span></a>
+    <a class="admin-tile" th:href="@{/user/update/input(returnUrl='/mypage')}"><span class="admin-tile-icon">✏️</span>ユーザー更新</a>
+    <a class="admin-tile" th:href="@{/background}"><span class="admin-tile-icon">🎨</span>背景変更<span
+       th:if="${newBackgroundCount != null and newBackgroundCount > 0}"
+       class="notify-badge">NEW</span></a>
+  </div>
+
+  <div th:replace="~{common/chatbot :: chatbot}"></div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const toast = document.querySelector('.achievement-toast');
+  if (toast) {
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-30px)';
+    }, 4000);
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 4600);
+  }
+});
+</script>
+</body>
+</html>

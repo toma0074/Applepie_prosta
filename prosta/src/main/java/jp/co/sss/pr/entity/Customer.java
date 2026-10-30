@@ -15,13 +15,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-<<<<<<< HEAD
 
-=======
 // heartbeatやプロフィール保存で、変更していないEXP・認証トークン等を古い値で上書きしない。
 // 更新列の限定だけでは同時加算を守れないため、加算・認証には別途顧客行ロックも使用する。
 @DynamicUpdate
->>>>>>> 222e4ae9ad9b20990eb88dca204d7d9a33f80352
 @Table(name = "customer")
 
 public class Customer {
@@ -75,34 +72,26 @@ public class Customer {
     @Column(name = "last_seen_at")
 
     private LocalDateTime lastSeenAt;
-<<<<<<< HEAD
  
     @Transient
-=======
 
     @Column(name = "perfect_test_count", nullable = false)
->>>>>>> 222e4ae9ad9b20990eb88dca204d7d9a33f80352
     private Integer perfectTestCount = 0;
 
     @Transient
     private Long totalExp = 0L;
-<<<<<<< HEAD
 
  
-=======
     
 
->>>>>>> 222e4ae9ad9b20990eb88dca204d7d9a33f80352
     @Column(name = "background_class", length = 32)
 
     private String backgroundClass;
  
     @Column(name = "background_color", length = 7)
 
-<<<<<<< HEAD
     private String backgroundColor;
  
-=======
     @Column(name = "background_seen_level", nullable = false)
     private Integer backgroundSeenLevel = 1;
 
@@ -112,7 +101,6 @@ public class Customer {
     public String getActiveLoginToken() { return activeLoginToken; }
     public void setActiveLoginToken(String activeLoginToken) { this.activeLoginToken = activeLoginToken; }
 
->>>>>>> 222e4ae9ad9b20990eb88dca204d7d9a33f80352
     public Integer getUserId() { return userId; }
 
     public void setUserId(Integer userId) { this.userId = userId; }
@@ -156,11 +144,8 @@ public class Customer {
     public LocalDateTime getLastSeenAt() { return lastSeenAt; }
 
     public void setLastSeenAt(LocalDateTime lastSeenAt) { this.lastSeenAt = lastSeenAt; }
-<<<<<<< HEAD
  
-=======
 
->>>>>>> 222e4ae9ad9b20990eb88dca204d7d9a33f80352
     public Integer getPerfectTestCount() {
 
         return perfectTestCount == null ? 0 : perfectTestCount;}
@@ -180,11 +165,8 @@ public class Customer {
         this.totalExp = totalExp;
 
     }
-<<<<<<< HEAD
  
-=======
 
->>>>>>> 222e4ae9ad9b20990eb88dca204d7d9a33f80352
     public String getBackgroundClass() { return backgroundClass; }
 
     public void setBackgroundClass(String backgroundClass) { this.backgroundClass = backgroundClass; }
@@ -192,13 +174,10 @@ public class Customer {
     public String getBackgroundColor() { return backgroundColor; }
 
     public void setBackgroundColor(String backgroundColor) { this.backgroundColor = backgroundColor; }
-<<<<<<< HEAD
  
-=======
     public Integer getBackgroundSeenLevel() { return backgroundSeenLevel; }
     public void setBackgroundSeenLevel(Integer backgroundSeenLevel) { this.backgroundSeenLevel = backgroundSeenLevel; }
 
->>>>>>> 222e4ae9ad9b20990eb88dca204d7d9a33f80352
 }
 
  
