@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<title>検索結果一覧</title>
+<meta charset="UTF-8" />
+</head>
+<body>
+<div class="forms">
+  <p class="label">検索：「<strong th:text="${QuestionResult}"></strong>」</p>
+</div>
+<div th:if="${session.user != null and session.user.permission == 1}">
+  <p class="btn"><a th:href="@{/admin/questions/new}">新規問題登録</a></p>
+</div>
+<div id="pagination-container" class="pagination-container"
+     data-pagination-target="question-table" data-pagination-rows="tbody tr" data-pagination-size="6"></div>
+
+<th:block th:if="${#lists.isEmpty(Questions)}">
+  <div class="message">
+    <p class="back_to_top_message">該当する問題は存在しません。</p>
+    <p class="btn"><a th:href="@{/question}">一覧表示に戻る</a></p>
+    <p class="btn"><a th:href="@{/mypage}">マイページに戻る</a></p>
+  </div>
+</th:block>
+
+<table class="question_list" id="question-table" th:if="${!#lists.isEmpty(Questions)}">
+  <thead>
+    <tr>
+      <th class="category">カテゴリー</th>
+      <th class="difficulty">難易度</th>
+      <th class="questionText">問題文</th>
+      <th class="favorite">気になる問題</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="q:${Questions}">
+      <td class="center" th:text="${q.category != null ? q.category.categoryName : ''}"></td>
+      <td class="center" th:switch="${q.difficulty}" style="color: #FFB11B;">
+        <span th:case="1">★☆☆</span>
+        <span th:case="2">★★☆</span>
+        <span th:case="3">★★★</span>
+      </td>
+      <td class="qtext" th:text="${q.questionText}"></td>
+      <td class="center">
+    <form th:action="@{/favorite/toggle}" method="post">
+        <input type="hidden"
+               name="questionId"
+               th:value="${q.questionId}" />
+
+        <button type="submit"
+                th:text="${favoriteIds != null and favoriteIds.contains(q.questionId)} ? '★' : '☆'"
+                title="気になる問題をマーク">
+        </button>
+    </form>
+</td>
+    </tr>
+  </tbody>
+</table>
+<p class="btn"><a th:href="@{/question}">一覧表示に戻る</a></p>
+
+</body>
+</html>
