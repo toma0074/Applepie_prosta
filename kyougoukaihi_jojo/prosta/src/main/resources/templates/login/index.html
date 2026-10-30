@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/destyle.css@3.0.2/destyle.css">
+<link rel="stylesheet" th:href="@{/css/style.css}"/>
+<link rel="stylesheet" th:href="@{/css/mobile.css}">
+<link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+<title>PROSTA</title>
+</head>
+<body>
+<header>
+  <div class="row">
+    <a href="./" class="logo">
+      <img th:src="@{/images/prostawh.jpg}" alt="logo" class="header_logo_img">
+    </a>
+    <nav>
+      <ul>
+        <li><a th:href="@{/login}">LOGIN</a></li>
+        <li><a th:href="@{/regist}">新規登録</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <section class="main_visual">
+    <div class="container js-fade">
+      <div class="title">
+        <h1>学ぶことで<br>未来を変える</h1>
+        <p class="sub_text">Learing For The Future.</p>
+      </div>
+      <a href="#message" class="more_btn">MORE</a>
+    </div>
+  </section>
+</main>
+<div class="bottom_bg">
+  <section class="section1" id="message">
+    <div class="container js-fade">
+      <div class="row">
+        <div class="col">
+          <p class="sub_title">MESSAGE</p>
+          <h2>未来への一歩を。<br> 新しい知識を。<br> Prostaで学ぼう。</h2>
+        </div>
+        <div class="col">
+          <p class="text">Prostaは,プログラミングを楽しく学ぶための学習サイトです。</p>
+          <p class="text">SPRING, JAVA, SQL, htmlの各問題をご用意しています。<br>
+          難易度、カテゴリ別で受験できます。<br>
+          プロスタを利用して自分のペースで、<br>
+          一歩ずつ成長していきましょう。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section2">
+    <div class="container js-fade">
+      <p class="sub_title">カテゴリ</p>
+      <h2>4つの問題集から学べる</h2>
+      <div class="category_wrapper">
+        <div class="category_grid">
+          <div class="col">
+            <a href="https://www.java.com/ja/">
+              <img th:src="@{/images/java.jpg}" alt="java" class="img-java">
+            </a>
+          </div>
+          <div class="col">
+            <a href="https://spring.io/projects/spring-boot">
+              <img th:src="@{/images/Spring.jpg}" alt="spring">
+            </a>
+          </div>
+          <div class="col">
+            <a href="HTML の基本 | Microsoft Learn">
+              <img th:src="@{/images/html.jpg}" alt="html" class="img-html">
+            </a>
+          </div>
+          <div class="col sql-card">
+            <a href="https://www.oracle.com/technetwork/jp/database/mysql/index.html">
+              <img th:src="@{/images/SQL.jpg}" alt="sql">
+            </a>
+          </div>
+        </div>
+        <div class="category_description">
+          <div class="desc_item">
+            <h4>Java</h4>
+            <p>Webアプリケーションや業務システムなどで広く使われている、バックエンド開発の代表的なプログラミング言語</p>
+          </div>
+          <div class="desc_item">
+            <h4>Spring</h4>
+            <p>Javaを使ったWebアプリケーション開発を効率よく行うためのフレームワーク</p>
+          </div>
+          <div class="desc_item">
+            <h4>HTML</h4>
+            <p>Webページの画面構成を作るための言語</p>
+          </div>
+          <div class="desc_item">
+            <h4>SQL</h4>
+            <p>データベースに保存された情報を操作するための言語</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div class="container">
+      <a href="./" class="logo">PROSTA</a>
+      <ul>
+        <li><a th:href="@{/login}">LOGIN</a></li>
+        <li><a th:href="@{/regist}">新規登録</a></li>
+      </ul>
+      <p class="copyright">Copyright &copy; 2026 Prosta All Rights Reserved.</p>
+    </div>
+  </footer>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const targets = document.querySelectorAll('.js-fade');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-show');
+      } else {
+        entry.target.classList.remove('is-show');
+      }
+    });
+  }, { rootMargin: '0px 0px -20% 0px' });
+  targets.forEach(target => observer.observe(target));
+});
+</script>
+</body>
+</html>

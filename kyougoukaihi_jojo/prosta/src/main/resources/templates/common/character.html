@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/></head>
+<body>
+
+<!--
+  キャラクターフラグメント
+  使い方: th:replace="~{common/character :: character(level=${currentLevel})}"
+  レベル段階:
+    Lv 1-9   : たまご
+    Lv10-24  : Suta1
+    Lv25-49  : Suta2
+    Lv50-75    : Suta3  
+    Lv75-100 : Suta4
+    Lv100+   : Suta5
+-->
+<div th:fragment="character(level)" class="character-wrapper">
+
+  <!-- Lv1-9: たまご -->
+  <div th:if="${level < 10}" class="char-stage char-egg">
+    <div class="char-label">Lv.<span th:text="${level}">1</span></div>
+    <svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg" class="char-svg">
+      <defs>
+        <radialGradient id="eggGrad" cx="45%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#fff9e6"/>
+          <stop offset="100%" stop-color="#f5d67a"/>
+        </radialGradient>
+        <radialGradient id="crackGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#e8c84a"/>
+          <stop offset="100%" stop-color="#c9a82a"/>
+        </radialGradient>
+      </defs>
+      <!-- たまご本体 -->
+      <ellipse cx="60" cy="82" rx="42" ry="52" fill="url(#eggGrad)" stroke="#e0b830" stroke-width="1.5"/>
+      <!-- ひびアニメーション -->
+      <g class="crack-anim">
+        <polyline points="55,58 60,68 52,75 63,88" fill="none" stroke="#c9a82a" stroke-width="1.8" stroke-linecap="round"/>
+        <polyline points="65,62 60,68" fill="none" stroke="#c9a82a" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <!-- 目 -->
+      <ellipse cx="51" cy="80" rx="4" ry="4.5" fill="#1a1a2e"/>
+      <ellipse cx="69" cy="80" rx="4" ry="4.5" fill="#1a1a2e"/>
+      <circle cx="52.5" cy="78.5" r="1.2" fill="white"/>
+      <circle cx="70.5" cy="78.5" r="1.2" fill="white"/>
+      <!-- 口 -->
+      <path d="M55,90 Q60,95 65,90" fill="none" stroke="#c9a82a" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- 星マーク -->
+      <text x="60" y="35" text-anchor="middle" font-size="18" fill="#f5c400" class="float-anim">✦</text>
+    </svg>
+    <div class="char-name">たまご</div>
+  </div>
+
+  <!-- Lv10-24: Suta1 -->
+  <div th:if="${level >= 10 and level < 25}" class="char-stage char-book-star">
+    <div class="char-label">Lv.<span th:text="${level}">10</span></div>
+    <img th:src="@{/images/suta1.png}" alt="suta_level1" class="char-image" />
+   
+    <div class="char-name">SUTA</div>
+  </div>
+
+  <!-- Lv25-49: Suta2 -->
+  <div th:if="${level >= 25 and level < 50}" class="char-stage char-star-wing">
+    <div class="char-label">Lv.<span th:text="${level}">25</span></div>
+    <img th:src="@{/images/suta2.png}"
+         alt="suta_level2"
+         class="char-image" />
+    <div class="char-name">SUTA</div>
+</div>
+
+  <!-- Lv50-75+: Suta3 -->
+  <div th:if="${level >= 50 and level < 75}" class="char-stage char-crown">
+	   <div class="char-label">Lv.<span th:text="${level}">50</span></div>
+    <img th:src="@{/images/suta3.png}" alt="suta_level3" class="char-image" />
+   
+    <div class="char-name">SUTA</div>
+  </div>
+    
+      <!-- Lv75-100: -->
+  <div th:if="${level >= 75 and level < 100}" class="char-stage char-wizard">
+	   <div class="char-label">Lv.<span th:text="${level}">75</span></div>
+    <img th:src="@{/images/suta4.png}" alt="suta_level4" class="char-image" />
+   
+    <div class="char-name">SUTA</div>
+  </div>
+  
+    <!-- Lv100+:  -->
+  <div th:if="${level >= 100}" class="char-stage char-archmage">
+	   <div class="char-label">Lv.<span th:text="${level}">100</span></div>
+    <img th:src="@{/images/suta5.png}" alt="suta_level5" class="char-image" />
+   
+    <div class="char-name">SUTA</div>
+  </div>
+    
+    
+    
+    
+    
+  </div>
+</div>
+
+</body>
+</html>

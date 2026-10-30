@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<title>ユーザー情報更新</title>
+<meta charset="UTF-8" />
+</head>
+<body>
+<h3>ユーザー情報入力</h3>
+<form th:action="@{/user/update/check}" method="post" th:object="${user}">
+  <span th:each="error:${#fields.detailedErrors()}"
+      th:text="${error.message}"
+      class="error-message"></span>
+  <span th:text="${err}"
+      class="error-message"></span>
+
+  <div class="inputform">
+    <table>
+      <tr>
+        <th>ユーザー名</th>
+        <td><input type="text" th:field="*{userName}"></td>
+      </tr>
+      <tr>
+        <th>パスワード</th>
+        <td><input type="password" th:field="*{userPass}"></td>
+      </tr>
+      <tr th:if="${session.user.permission == 1}">
+        <th>権限</th>
+        <td>
+          <select class="permission" th:field="*{permission}">
+            <option value="0">一般</option>
+            <option value="1">管理者</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <input type="hidden" name="userId"     th:value="${user.userId}">
+  <input th:if="${session.user.permission == 0}" type="hidden" name="permission" th:value="${user.permission}">
+  <input type="hidden" name="deleteFlag" th:value="${user.deleteFlag}">
+
+  <div class="inputform">
+    <div class="inputselect">
+      <input type="submit" value="確認">
+    </div>
+  </div>
+</form>
+
+<div th:if="${session.user.permission == 0}">
+    <div class="button-area">
+        <a class="btn" th:href="@{/mypage}">
+            戻る
+        </a>
+    </div>
+</div>
+<div th:if="${session.user.permission == 1}">
+    <div class="button-area">
+        <a class="btn" th:href="@{/user/list}">
+            戻る
+        </a>
+    </div>
+</div>
+</body>
+</html>

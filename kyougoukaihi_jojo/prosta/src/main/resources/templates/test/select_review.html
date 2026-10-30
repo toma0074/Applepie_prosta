@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<title>復習問題</title>
+<meta charset="UTF-8" />
+</head>
+<body>
+<h3>復習問題選択画面</h3>
+<div class="selection-guide">
+    <img th:src="@{/images/suta_teach.png}"
+         alt="問題選択を案内するキャラクター">
+</div>
+<div class="test_select">
+  <p>直近の解答で間違えた（またはわからないを選んだ）問題を、最大15問出題します。</p>
+
+  <th:block th:if="${#lists.isEmpty(reviewList)}">
+    <p>復習する問題はありません。すばらしい！</p>
+    <form th:action="@{/mypage}">
+      <div class="form">
+        <div class="select"><input type="submit" value="戻る" /></div>
+      </div>
+    </form>
+  </th:block>
+
+  <th:block th:unless="${#lists.isEmpty(reviewList)}">
+    <table class="weak-table">
+      <thead>
+        <tr><th>カテゴリ</th><th>問題文</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="q : ${reviewList}">
+          <td th:text="${q.category != null ? q.category.categoryName : '未分類'}"></td>
+          <td th:text="${q.questionText}"></td>
+        </tr>
+      </tbody>
+    </table>
+    <form th:action="@{/test/review/start}" method="get">
+      <div class="form">
+        <div class="select">
+          <input type="submit" th:formaction="@{/mypage}" formmethod="get" value="戻る" />
+          <input type="submit" value="スタート" />
+        </div>
+      </div>
+    </form>
+  </th:block>
+</div>
+</body>
+</html>

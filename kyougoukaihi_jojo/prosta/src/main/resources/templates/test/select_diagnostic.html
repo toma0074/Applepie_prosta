@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<title>苦手範囲特定問題</title>
+<meta charset="UTF-8" />
+</head>
+<body>
+<h3>苦手範囲特定問題選択画面</h3>
+<div class="selection-guide">
+    <img th:src="@{/images/suta_teach.png}"
+         alt="問題選択を案内するキャラクター">
+</div>
+<div class="test_select">
+  <form th:action="@{/test/diagnostic/start}" method="get">
+    <p class="error">
+      <span th:if="${errorMessage}" th:text="${errorMessage}"></span>
+    </p>
+    <div class="form">
+      <div class="label">カテゴリー：</div>
+      <div class="select">
+        <th:block th:each="cat : ${categoryList}">
+          <label>
+            <input type="checkbox" name="categoryIds" th:value="${cat.categoryId}">
+            <span th:text="${cat.categoryName}"></span>
+          </label>
+        </th:block>
+      </div>
+    </div>
+    <div class="form">
+      <div class="label">難易度：</div>
+      <div class="select">
+        <select class="difficulty" name="difficulty" style="color: #FFB11B;">
+          <option value="1">★☆☆</option>
+          <option value="2">★★☆</option>
+          <option value="3">★★★</option>
+        </select>
+      </div>
+    </div>
+    <div class="form">
+      <div class="label">タイマー：</div>
+      <div class="select">
+        <label><input type="checkbox" name="timer" value="true" /> 使う（1問25秒）</label>
+      </div>
+    </div>
+    <div class="form">
+      <div class="label"></div>
+      <div class="select">
+        <input type="submit" th:formaction="@{/mypage}" formmethod="get" formnovalidate="formnovalidate" value="戻る" />
+        <input type="submit" value="スタート" />
+      </div>
+    </div>
+  </form>
+</div>
+</body>
+</html>

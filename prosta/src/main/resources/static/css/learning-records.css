@@ -1,0 +1,1302 @@
+@charset "UTF-8";
+
+/* =========================================================
+   PROSTA Knowledge Ledger
+   My Page and achievement collection
+   ========================================================= */
+
+.ps-mypage-page,
+.ps-achievement-page {
+  --record-ink: var(--ps-ink, #142b45);
+  --record-ink-soft: var(--ps-ink-soft, #334a63);
+  --record-blue: var(--ps-blue-900, #123d78);
+  --record-blue-bright: var(--ps-blue-700, #2165b8);
+  --record-blue-soft: var(--ps-blue-050, #f5f9ff);
+  --record-paper: var(--ps-paper, #f7f9fc);
+  --record-white: var(--ps-white, #ffffff);
+  --record-line: var(--ps-rule, #d8e1ec);
+  --record-muted: var(--ps-muted, #5c6b7a);
+  --record-star: var(--ps-star, #d5a72e);
+  --record-success: var(--ps-success, #18704b);
+  --record-success-soft: var(--ps-success-soft, #e8f5ee);
+  --record-warning: var(--ps-warning, #8a5a00);
+  --record-warning-soft: var(--ps-warning-soft, #fff4d8);
+  --record-danger: var(--ps-danger, #a8323e);
+  --record-danger-soft: var(--ps-danger-soft, #fff0f1);
+
+  width: min(100% - 40px, 1160px);
+  min-width: 0;
+  margin-inline: auto;
+  padding: 24px 0 64px;
+  color: var(--record-ink);
+}
+
+.ps-mypage-page *,
+.ps-mypage-page *::before,
+.ps-mypage-page *::after,
+.ps-achievement-page *,
+.ps-achievement-page *::before,
+.ps-achievement-page *::after {
+  box-sizing: border-box;
+}
+
+.ps-mypage-page :where(a, button, input, select, textarea, summary):focus-visible,
+.ps-achievement-page :where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--record-blue-bright);
+  outline-offset: 3px;
+}
+
+.ps-record-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 12px 0 26px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--record-line);
+}
+
+.ps-record-heading {
+  display: grid;
+  gap: 8px;
+}
+
+.ps-record-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--record-blue-bright);
+  font-family: var(--ps-font-mono, "Cascadia Code", Consolas, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.ps-record-eyebrow::before {
+  width: 18px;
+  height: 1px;
+  background: var(--record-star);
+  content: "";
+}
+
+.ps-record-header h1 {
+  margin: 0;
+  color: var(--record-ink);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.3;
+}
+
+.ps-record-intro {
+  max-width: 56ch;
+  margin: 0;
+  color: var(--record-muted);
+  font-size: 0.92rem;
+  line-height: 1.8;
+}
+
+.ps-record-index {
+  margin: 0;
+  color: var(--record-muted);
+  font-family: var(--ps-font-mono, "Cascadia Code", Consolas, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.ps-record-index strong {
+  color: var(--record-star);
+  font-weight: 700;
+}
+
+/* My Page: learner identity and actual statistics */
+
+.ps-learner-panel {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.34fr) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 48px);
+  align-items: center;
+  padding: clamp(20px, 3.4vw, 36px);
+  border: 1px solid #c9d8e8;
+  border-top: 3px solid var(--record-blue);
+  background:
+    linear-gradient(90deg, rgba(33, 101, 184, 0.035) 1px, transparent 1px)
+      0 0 / 28px 28px,
+    var(--record-white);
+}
+
+.ps-learner-character {
+  display: grid;
+  min-height: 170px;
+  align-content: center;
+  justify-items: center;
+  padding: 14px;
+  border-right: 1px solid var(--record-line);
+}
+
+.ps-learner-character .character-wrapper {
+  gap: 6px;
+}
+
+.ps-learner-character .char-stage {
+  animation: none;
+}
+
+.ps-learner-character .char-label {
+  border-color: #a7bdd6;
+  border-radius: 4px;
+  background: var(--record-white);
+  color: var(--record-blue);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+}
+
+.ps-learner-character .char-name {
+  color: var(--record-blue);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+}
+
+.ps-learner-summary {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+
+.ps-learner-level {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ps-learner-level-label {
+  display: grid;
+  gap: 4px;
+}
+
+.ps-learner-level-label span:first-child {
+  color: var(--record-muted);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.ps-learner-level-label strong {
+  color: var(--record-ink);
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+.ps-level-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--record-blue);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  line-height: 1;
+}
+
+.ps-level-value strong {
+  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+}
+
+.ps-level-value span {
+  color: var(--record-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ps-stat-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--record-line);
+  border-bottom: 1px solid var(--record-line);
+  list-style: none;
+}
+
+.ps-stat-item {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 16px 14px;
+}
+
+.ps-stat-item:first-child {
+  padding-left: 0;
+}
+
+.ps-stat-item + .ps-stat-item {
+  border-left: 1px solid var(--record-line);
+}
+
+.ps-stat-label {
+  color: var(--record-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.ps-stat-value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--record-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-stat-value strong {
+  color: var(--record-blue);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: clamp(1.45rem, 2.8vw, 2rem);
+  line-height: 1.15;
+}
+
+.ps-stat-value span {
+  color: var(--record-muted);
+  font-size: 0.78rem;
+}
+
+/* My Page: one-time real unlock notice */
+
+.ps-achievement-toast {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin: 22px 0;
+  padding: 16px 20px;
+  border: 1px solid #e7d294;
+  border-left: 4px solid var(--record-star);
+  background: #fffaf0;
+  color: var(--record-ink);
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+
+.ps-achievement-toast.is-leaving {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.ps-toast-star {
+  color: var(--record-star);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.ps-toast-content {
+  display: grid;
+  gap: 4px;
+}
+
+.ps-toast-title {
+  margin: 0;
+  color: var(--record-ink);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.ps-toast-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0;
+  color: var(--record-muted);
+  font-size: 0.84rem;
+}
+
+.ps-toast-item {
+  font-weight: 700;
+}
+
+.ps-toast-dismiss {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #e7d294;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--record-ink);
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+/* Section headings and links */
+
+.ps-record-section {
+  margin-top: clamp(34px, 5vw, 58px);
+}
+
+.ps-record-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--record-line);
+}
+
+.ps-record-section-title {
+  display: grid;
+  gap: 5px;
+}
+
+.ps-record-section-title p {
+  margin: 0;
+  color: var(--record-blue-bright);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.ps-record-section-title h2 {
+  margin: 0;
+  color: var(--record-ink);
+  font-size: clamp(1.22rem, 2.2vw, 1.65rem);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.ps-record-section-link {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  color: var(--record-blue);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.ps-record-section-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.ps-record-empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed #b8c9dc;
+  color: var(--record-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* My Page: quests */
+
+.ps-quest-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-quest-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--record-line);
+  background: var(--record-white);
+}
+
+.ps-quest-state {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid #a9bdd3;
+  border-radius: 50%;
+  color: var(--record-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.ps-quest-item.is-complete .ps-quest-state {
+  border-color: var(--record-success);
+  background: var(--record-success-soft);
+  color: var(--record-success);
+}
+
+.ps-quest-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ps-quest-copy strong {
+  color: var(--record-ink);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.ps-quest-copy span {
+  color: var(--record-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.ps-quest-progress {
+  align-self: center;
+  color: var(--record-blue);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* My Page: real recent achievements */
+
+.ps-recent-achievements {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-recent-achievement {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 10px;
+  padding: 14px 12px;
+  border-top: 2px solid var(--record-star);
+  border-bottom: 1px solid var(--record-line);
+  background: var(--record-white);
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+a.ps-recent-achievement:hover {
+  transform: translateY(-2px);
+  border-bottom-color: #a9bdd3;
+  background: #fffdf6;
+}
+
+.ps-recent-achievement-icon {
+  color: var(--record-blue);
+  font-size: 1.55rem;
+  line-height: 1.2;
+}
+
+.ps-recent-achievement-name {
+  color: var(--record-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.ps-recent-achievement-date {
+  color: var(--record-muted);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 0.68rem;
+}
+
+/* My Page: learning destinations */
+
+.ps-learning-doors {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-learning-door {
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--record-line);
+  border-left: 3px solid var(--record-blue);
+  background: var(--record-white);
+  color: var(--record-ink) !important;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.ps-learning-door:hover {
+  transform: translateY(-2px);
+  border-color: #a9bdd3;
+  background: var(--record-blue-soft);
+}
+
+.ps-learning-door span:last-child {
+  color: var(--record-star);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+}
+
+.ps-mypage-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-tool-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 13px;
+  border: 1px solid var(--record-line);
+  background: var(--record-white);
+  color: var(--record-blue) !important;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.ps-tool-link:hover {
+  border-color: #a9bdd3;
+  background: var(--record-blue-soft);
+}
+
+.ps-tool-notice {
+  display: inline-grid;
+  min-width: 21px;
+  min-height: 21px;
+  place-items: center;
+  padding-inline: 5px;
+  border-radius: 3px;
+  background: var(--record-blue);
+  color: var(--record-white);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 0.64rem;
+  line-height: 1;
+}
+
+/* Achievement collection summary */
+
+.ps-collection-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(16px, 3vw, 34px);
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid #c9d8e8;
+  border-left: 4px solid var(--record-star);
+  background:
+    linear-gradient(90deg, rgba(33, 101, 184, 0.035) 1px, transparent 1px)
+      0 0 / 28px 28px,
+    var(--record-white);
+}
+
+.ps-collection-mark {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid #d8bd70;
+  background: #fffaf0;
+  color: #9a7415;
+  font-size: 1.8rem;
+  clip-path: polygon(50% 0, 91% 20%, 100% 50%, 82% 91%, 50% 100%, 18% 91%, 0 50%, 9% 20%);
+}
+
+.ps-collection-copy {
+  display: grid;
+  gap: 5px;
+}
+
+.ps-collection-copy p {
+  margin: 0;
+  color: var(--record-muted);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.ps-collection-count {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  color: var(--record-ink);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.ps-collection-count strong {
+  color: var(--record-blue);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  letter-spacing: -0.05em;
+}
+
+.ps-collection-count span {
+  color: var(--record-muted);
+  font-size: 1rem;
+}
+
+.ps-collection-progress {
+  display: grid;
+  min-width: min(250px, 28vw);
+  gap: 8px;
+}
+
+.ps-collection-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--record-muted);
+  font-size: 0.74rem;
+}
+
+.ps-collection-progress-label strong {
+  color: var(--record-ink);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+}
+
+.ps-progress-track {
+  height: 9px;
+  overflow: hidden;
+  border: 1px solid #c5d3e1;
+  border-radius: 99px;
+  background: #edf1f5;
+}
+
+.ps-progress-fill {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  background: var(--record-blue);
+  transition: width 300ms ease;
+}
+
+/* Achievement collection contents */
+
+.ps-collection-note {
+  margin: 0 0 18px;
+  color: var(--record-muted);
+  font-size: 0.84rem;
+  line-height: 1.75;
+}
+
+.ps-achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-achievement-entry {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: auto 1fr;
+  border: 1px solid var(--record-line);
+  background: var(--record-white);
+}
+
+.ps-achievement-entry.is-unlocked {
+  border-top: 3px solid var(--record-star);
+}
+
+.ps-achievement-entry.is-locked {
+  border-top: 3px solid #bdc7d2;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      #ffffff,
+      #ffffff 12px,
+      #f8fafc 12px,
+      #f8fafc 24px
+    );
+}
+
+.ps-achievement-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 12px 0;
+}
+
+.ps-achievement-number {
+  color: var(--record-muted);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ps-state-label {
+  display: inline-flex;
+  min-height: 25px;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 0.67rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.ps-state-label.is-unlocked {
+  background: var(--record-success-soft);
+  color: var(--record-success);
+}
+
+.ps-state-label.is-locked {
+  background: #f0f3f6;
+  color: #536273;
+}
+
+.ps-state-label.is-new {
+  background: var(--record-blue-soft);
+  color: var(--record-blue);
+}
+
+.ps-badge-stage {
+  display: grid;
+  min-height: 155px;
+  place-items: center;
+  padding: 14px 12px 8px;
+}
+
+.ps-badge-sigil {
+  position: relative;
+  display: grid;
+  width: 104px;
+  height: 104px;
+  place-items: center;
+  border: 1px solid #9eb5ce;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.96) 0 31%, transparent 32%),
+    var(--record-blue-soft);
+  color: var(--record-blue);
+  font-size: 2.5rem;
+  line-height: 1;
+  clip-path: polygon(50% 0, 85% 13%, 100% 43%, 91% 78%, 65% 100%, 35% 100%, 9% 78%, 0 43%, 15% 13%);
+}
+
+.ps-badge-sigil::before {
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(18, 61, 120, 0.32);
+  content: "";
+  clip-path: inherit;
+}
+
+.ps-achievement-entry:nth-child(4n + 2) .ps-badge-sigil {
+  width: 98px;
+  height: 110px;
+  border-radius: 45% 45% 8% 8%;
+  clip-path: polygon(50% 0, 94% 22%, 88% 72%, 50% 100%, 12% 72%, 6% 22%);
+}
+
+.ps-achievement-entry:nth-child(4n + 3) .ps-badge-sigil {
+  width: 112px;
+  height: 94px;
+  border-radius: 50%;
+  clip-path: polygon(50% 0, 63% 13%, 82% 7%, 87% 27%, 100% 42%, 89% 59%, 91% 80%, 69% 84%, 50% 100%, 32% 86%, 10% 86%, 11% 63%, 0 46%, 14% 29%, 17% 9%, 38% 14%);
+}
+
+.ps-achievement-entry:nth-child(4n) .ps-badge-sigil {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  clip-path: circle(48% at 50% 50%);
+}
+
+.ps-achievement-entry.is-unlocked .ps-badge-sigil {
+  border-color: #c7a64b;
+  background:
+    radial-gradient(circle at center, #fffefa 0 31%, transparent 32%),
+    #fff7e2;
+  color: var(--record-blue);
+}
+
+.ps-achievement-entry.is-locked .ps-badge-sigil {
+  border-color: #aeb9c5;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      #e7ebef,
+      #e7ebef 5px,
+      #f4f6f8 5px,
+      #f4f6f8 10px
+    );
+  color: #697787;
+}
+
+.ps-badge-sigil > span {
+  position: relative;
+  z-index: 1;
+}
+
+.ps-achievement-content {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  padding: 0 14px 15px;
+}
+
+.ps-achievement-content h2 {
+  margin: 0;
+  color: var(--record-ink);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.ps-achievement-entry.is-locked .ps-achievement-content h2 {
+  color: var(--record-muted);
+  letter-spacing: 0.12em;
+}
+
+.ps-achievement-description {
+  margin: 0;
+  color: var(--record-muted);
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+
+.ps-achievement-detail {
+  border-top: 1px solid var(--record-line);
+}
+
+.ps-achievement-detail summary {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--record-blue);
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 700;
+  list-style: none;
+}
+
+.ps-achievement-detail summary::-webkit-details-marker {
+  display: none;
+}
+
+.ps-achievement-detail summary::after {
+  color: var(--record-star);
+  content: "+";
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 1rem;
+}
+
+.ps-achievement-detail[open] summary::after {
+  content: "−";
+}
+
+.ps-achievement-detail p {
+  margin: 0;
+  padding: 0 0 12px;
+  color: var(--record-muted);
+  font-size: 0.78rem;
+  line-height: 1.75;
+}
+
+.ps-achievement-date {
+  margin: 0;
+  color: var(--record-muted);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Achievement timeline */
+
+.ps-history-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-history-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 112px 46px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  min-width: 0;
+  padding: 0 0 26px;
+}
+
+.ps-history-item:last-child {
+  padding-bottom: 0;
+}
+
+.ps-history-date {
+  padding-top: 15px;
+  color: var(--record-muted);
+  font-family: var(--ps-font-mono, Consolas, monospace);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-history-mark {
+  position: relative;
+  display: grid;
+  min-height: 100%;
+  justify-items: center;
+}
+
+.ps-history-mark::before {
+  position: absolute;
+  top: 0;
+  bottom: -26px;
+  left: 50%;
+  width: 1px;
+  background: #c4d3e2;
+  content: "";
+}
+
+.ps-history-item:last-child .ps-history-mark::before {
+  bottom: calc(100% - 31px);
+}
+
+.ps-history-mark span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid #d3bd7e;
+  background: #fffaf0;
+  color: var(--record-blue);
+  font-size: 1.1rem;
+}
+
+.ps-history-card {
+  min-width: 0;
+  padding: 13px 16px;
+  border: 1px solid var(--record-line);
+  border-left: 3px solid var(--record-star);
+  background: var(--record-white);
+}
+
+.ps-history-card h3 {
+  margin: 0 0 4px;
+  color: var(--record-ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.ps-history-card p {
+  margin: 0;
+  color: var(--record-muted);
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+
+.ps-back-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 36px;
+}
+
+.ps-back-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 1px solid #9fb4cb;
+  background: var(--record-white);
+  color: var(--record-blue) !important;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.ps-back-link:hover {
+  transform: translateY(-1px);
+  border-color: var(--record-blue);
+  background: var(--record-blue-soft);
+}
+
+/* Existing floating assistant position remains unobtrusive. */
+
+.ps-mypage-page #chatbot,
+.ps-achievement-page #chatbot {
+  z-index: 30;
+}
+
+@media (max-width: 980px) {
+  .ps-achievement-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ps-recent-achievements {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ps-learning-doors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ps-collection-summary {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ps-collection-progress {
+    grid-column: 2;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .ps-mypage-page,
+  .ps-achievement-page {
+    width: min(100% - 28px, 1160px);
+    padding-top: 12px;
+    padding-bottom: 42px;
+  }
+
+  .ps-record-header {
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .ps-record-index {
+    align-self: start;
+  }
+
+  .ps-learner-panel {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .ps-learner-character {
+    min-height: 0;
+    padding: 0 0 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--record-line);
+  }
+
+  .ps-stat-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ps-stat-item,
+  .ps-stat-item:first-child {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    padding: 12px 0;
+  }
+
+  .ps-stat-item + .ps-stat-item {
+    border-top: 1px solid var(--record-line);
+    border-left: 0;
+  }
+
+  .ps-stat-value strong {
+    font-size: 1.45rem;
+  }
+
+  .ps-quest-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ps-recent-achievements {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ps-learning-doors {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ps-learning-door {
+    min-height: 60px;
+  }
+
+  .ps-collection-summary {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .ps-collection-mark {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+
+  .ps-collection-progress {
+    grid-column: 1 / -1;
+  }
+
+  .ps-achievement-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .ps-badge-stage {
+    min-height: 126px;
+  }
+
+  .ps-badge-sigil {
+    width: 86px;
+    height: 86px;
+    font-size: 2rem;
+  }
+
+  .ps-achievement-entry:nth-child(4n + 2) .ps-badge-sigil {
+    width: 82px;
+    height: 92px;
+  }
+
+  .ps-achievement-entry:nth-child(4n + 3) .ps-badge-sigil {
+    width: 94px;
+    height: 80px;
+  }
+
+  .ps-achievement-entry:nth-child(4n) .ps-badge-sigil {
+    width: 86px;
+    height: 86px;
+  }
+
+  .ps-achievement-content {
+    gap: 7px;
+    padding-inline: 10px;
+  }
+
+  .ps-achievement-topline {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .ps-history-item {
+    grid-template-columns: 1fr 38px minmax(0, 2fr);
+    gap: 8px;
+    padding-bottom: 20px;
+  }
+
+  .ps-history-date {
+    font-size: 0.68rem;
+  }
+
+  .ps-history-card {
+    padding: 11px;
+  }
+}
+
+@media (max-width: 390px) {
+  .ps-collection-count {
+    gap: 4px;
+  }
+
+  .ps-collection-count strong {
+    font-size: 1.65rem;
+  }
+
+  .ps-achievement-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ps-achievement-entry {
+    grid-template-columns: 112px minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+
+  .ps-achievement-topline {
+    grid-column: 1 / -1;
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .ps-badge-stage {
+    min-height: 150px;
+    padding: 8px;
+  }
+
+  .ps-achievement-content {
+    align-content: center;
+    padding: 8px 12px 14px 0;
+  }
+
+  .ps-history-item {
+    grid-template-columns: 1fr 32px minmax(0, 2fr);
+    gap: 6px;
+  }
+
+  .ps-history-mark span {
+    width: 31px;
+    height: 31px;
+    font-size: 0.95rem;
+  }
+
+  .ps-history-date {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-mypage-page *,
+  .ps-mypage-page *::before,
+  .ps-mypage-page *::after,
+  .ps-achievement-page *,
+  .ps-achievement-page *::before,
+  .ps-achievement-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .ps-achievement-toast.is-leaving {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>PROSTA | My Page</title></head>
+<body>
+<main class="suku ps-mypage-page">
+<header class="ps-record-header"><div class="ps-record-heading"><p class="ps-record-eyebrow">MY LEARNING RECORD</p><h1>My Page</h1><p class="ps-record-intro">学習の積み重ねを確認して、次の一歩を見つけましょう。</p></div><p class="ps-record-index"><strong>01</strong> / YOUR ARCHIVE</p></header>
+<section class="ps-learner-panel" aria-label="学習レベルと学習データ">
+<div class="ps-learner-character"><p class="ps-record-eyebrow">YOUR PARTNER</p><div th:replace="~{common/character :: character(level=$currentLevel)}"></div></div>
+<div class="ps-learner-summary">
+<div class="ps-learner-level"><div class="ps-learner-level-label"><span>LEARNING LEVEL</span><strong>ここまでの学び</strong></div><div class="ps-level-value" aria-label="現在のレベル"><strong th:text="$currentLevel">1</strong><span>LEVEL</span></div></div>
+<dl class="ps-stat-list">
+<div class="ps-stat-item"><dt class="ps-stat-label">ログイン日数</dt><dd class="ps-stat-value"><strong th:text="$loginCount">0</strong><span>日</span></dd></div>
+<div class="ps-stat-item"><dt class="ps-stat-label">累計正解数</dt><dd class="ps-stat-value"><strong th:text="$totalCorrect">0</strong><span>問</span></dd></div>
+<div class="ps-stat-item"><dt class="ps-stat-label">満点回数</dt><dd class="ps-stat-value"><strong th:text="$perfectCount">0</strong><span>回</span></dd></div>
+</dl></div></section>
+<section th:if="$newAchievements != null and !#lists.isEmpty(newAchievements)" class="ps-achievement-toast" role="status" aria-live="polite" aria-atomic="true">
+<span class="ps-toast-star" aria-hidden="true">✦</span><div class="ps-toast-content"><p class="ps-toast-title">新しい実績を獲得しました</p><p class="ps-toast-items"><span th:each="ach : $newAchievements" class="ps-toast-item" th:text="$ach.icon + ' ' + ach.achievementName}">✦ 実績名</span></p></div>
+<button type="button" class="ps-toast-dismiss" aria-label="実績のお知らせを閉じる">×</button></section>
+<section class="ps-record-section" th:if="$quests != null and !#lists.isEmpty(quests)" aria-labelledby="daily-quests-title">
+<div class="ps-record-section-heading"><div class="ps-record-section-title"><p>DAILY CHECKPOINT</p><h2 id="daily-quests-title">今日のクエスト</h2></div><span class="ps-record-index">TODAY</span></div>
+<ul class="ps-quest-list"><li th:each="q : $quests" class="ps-quest-item" th:classappend="$q.completed ? ' is-complete' : ''">
+<span class="ps-quest-state" aria-hidden="true" th:text="$q.completed ? '✓' : '·'">·</span><span class="ps-quest-copy"><strong th:text="$q.title">クエスト</strong><span th:text="$q.description">クエストの説明</span></span><span class="ps-quest-progress" th:text="$q.progress + '/' + q.target">0/5</span></li></ul></section>
+<section class="ps-record-section" th:if="$achievements != null and !#lists.isEmpty(achievements)" aria-labelledby="recent-achievements-title">
+<div class="ps-record-section-heading"><div class="ps-record-section-title"><p>RECENTLY COLLECTED</p><h2 id="recent-achievements-title">最近の実績</h2></div><a class="ps-record-section-link" th:href="@{/achievement}">コレクションを見る <span aria-hidden="true">→</span></a></div>
+<ul class="ps-recent-achievements"><li th:each="ua, stat : $achievements" th:if="$stat.index < 5"><a class="ps-recent-achievement" th:href="@{/achievement}"><span class="ps-recent-achievement-icon" aria-hidden="true" th:text="$ua.achievement.icon">✦</span><span class="ps-recent-achievement-name" th:text="$ua.achievement.achievementName">実績名</span><time class="ps-recent-achievement-date" th:text="$#temporals.format(ua.unlockedDate, 'yyyy/MM/dd')">2025/01/01</time></a></li></ul></section>
+<section class="ps-record-section" aria-labelledby="learning-start-title">
+<div class="ps-record-section-heading"><div class="ps-record-section-title"><p>CHOOSE YOUR NEXT STEP</p><h2 id="learning-start-title">次に学ぶことを選ぶ</h2></div><span class="ps-record-index">LEARNING</span></div>
+<ul class="ps-learning-doors"><li><a class="ps-learning-door" th:href="@{/test/category}"><span>カテゴリ別問題</span><span aria-hidden="true">01 →</span></a></li><li><a class="ps-learning-door" th:href="@{/test/diagnostic}"><span>苦手範囲を確認</span><span aria-hidden="true">02 →</span></a></li><li><a class="ps-learning-door" th:href="@{/test/weak}"><span>弱点から出題</span><span aria-hidden="true">03 →</span></a></li><li><a class="ps-learning-door" th:href="@{/test/review}"><span>復習モード</span><span aria-hidden="true">04 →</span></a></li></ul></section>
+<section class="ps-record-section" aria-labelledby="mypage-tools-title">
+<div class="ps-record-section-heading"><div class="ps-record-section-title"><p>YOUR RECORDS</p><h2 id="mypage-tools-title">学習の記録と設定</h2></div><span class="ps-record-index">MY PAGE</span></div>
+<ul class="ps-mypage-tools">
+<li th:if="$session.user != null and session.user.permission == 0"><a class="ps-tool-link" th:href="@{/friends}"><span aria-hidden="true">↗</span>フレンド<span th:if="$pendingFriendRequestCount != null and pendingFriendRequestCount > 0" class="ps-tool-notice" th:text="$pendingFriendRequestCount">1</span></a></li>
+<li><a class="ps-tool-link" th:href="@{/mypage/history}"><span aria-hidden="true">↗</span>解答履歴</a></li><li><a class="ps-tool-link" th:href="@{/learning-status}"><span aria-hidden="true">↗</span>学習状況</a></li>
+<li><a class="ps-tool-link" th:href="@{/study-calendar}"><span aria-hidden="true">↗</span>学習カレンダー</a></li><li><a class="ps-tool-link" th:href="@{/achievement}"><span aria-hidden="true">↗</span>実績一覧<span th:if="$unreadAchievementCount != null and unreadAchievementCount > 0" class="ps-tool-notice">NEW</span></a></li>
+<li><a class="ps-tool-link" th:href="@{/user/update/input(returnUrl='/mypage')}"><span aria-hidden="true">↗</span>ユーザー更新</a></li><li><a class="ps-tool-link" th:href="@{/background}"><span aria-hidden="true">↗</span>背景変更<span th:if="$newBackgroundCount != null and newBackgroundCount > 0" class="ps-tool-notice">NEW</span></a></li>
+</ul></section>
+<div th:replace="~{common/chatbot :: chatbot}"></div></main>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var toast = document.querySelector(".ps-achievement-toast");
+  if (!toast) return;
+  var closeButton = toast.querySelector(".ps-toast-dismiss");
+  var timer;
+  function dismissToast() { toast.classList.add("is-leaving"); window.setTimeout(function () { toast.hidden = true; }, 280); }
+  timer = window.setTimeout(dismissToast, 6000);
+  if (closeButton) closeButton.addEventListener("click", function () { window.clearTimeout(timer); dismissToast(); });
+});
+</script>
+</body>
+</html>

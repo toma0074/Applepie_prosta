@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="timer(mode)" th:if="${timerRemainingMillis != null}"
+     id="test-timer" class="tt-box"
+     th:attr="data-remaining=${timerRemainingMillis},data-total=${timerTotalMillis},data-mode=${mode},data-timeup-url=@{/test/timeup}">
+  <div class="tt-label">タイマー（1問25秒）</div>
+  <div class="tt-body" id="tt-body">
+    <div class="tt-bar"><div class="tt-fill" id="tt-fill"></div></div>
+    <span class="tt-text" id="tt-text"></span>
+  </div>
+  <script>
+  (function () {
+    var box = document.getElementById('test-timer');
+    var fill = document.getElementById('tt-fill');
+    var text = document.getElementById('tt-text');
+    var total = Number(box.dataset.total);
+    var loadedAt = Date.now();
+    var remainingAtLoad = Number(box.dataset.remaining);
+    var done = false;
+
+    function remaining() { return Math.max(0, remainingAtLoad - (Date.now() - loadedAt)); }
+
+    function expire() {
+      if (done) return;
+      done = true;
+      var form = document.getElementById(box.dataset.mode === 'answer' ? 'answer-form' : 'question-table');
+      if (!form) return;
+      if (box.dataset.mode === 'answer') form.action = box.dataset.timeupUrl;
+      form.submit();
+    }
+
+    function tick() {
+      var ms = remaining();
+      var sec = Math.ceil(ms / 1000);
+      text.textContent = '残り ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+      fill.style.width = (total > 0 ? ms * 100 / total : 0) + '%';
+      box.classList.toggle('tt-danger', sec <= 5);
+      if (ms <= 0) expire();
+    }
+
+    tick();
+    setInterval(tick, 250);
+  })();
+  </script>
+</div>
+</body>
+</html>

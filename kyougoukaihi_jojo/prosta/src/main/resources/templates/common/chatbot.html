@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+</head>
+<body>
+<th:block th:fragment="chatbot">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/chatbot.css}" />
+
+  <div id="chatbot" th:attr="data-api=@{/api/chat}">
+    <button type="button" id="chatbot-toggle" class="chatbot-toggle" aria-label="チャットを開く">💬</button>
+
+    <div id="chatbot-window" class="chatbot-window" hidden>
+      <div class="chatbot-header">
+        <span>PROSTA アシスタント</span>
+        <button type="button" id="chatbot-close" class="chatbot-close" aria-label="閉じる">×</button>
+      </div>
+      <div id="chatbot-messages" class="chatbot-messages"></div>
+      <div class="chatbot-quick">
+        <button type="button" data-q="苦手な分野は？">苦手を知りたい</button>
+        <button type="button" data-q="弱点問題を出して">弱点から出題</button>
+        <button type="button" data-q="次に何をやればいい？">次にやること</button>
+        <button type="button" data-q="成績を教えて">成績</button>
+        <button type="button" data-q="レベルについて">レベル</button>
+        <button type="button" data-q="使い方">使い方</button>
+      </div>
+      <form id="chatbot-form" class="chatbot-form">
+        <input type="text" id="chatbot-input" maxlength="200" autocomplete="off" placeholder="メッセージを入力" />
+        <button type="submit">送信</button>
+      </form>
+    </div>
+  </div>
+
+  <script th:src="@{/js/chatbot.js}"></script>
+</th:block>
+</body>
+</html>

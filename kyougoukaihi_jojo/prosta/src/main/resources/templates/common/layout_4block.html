@@ -1,0 +1,171 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org"-->
+<!--	th:fragment="layout(body)">-->
+<!--<head>-->
+<!--<meta charset="UTF-8" />-->
+<!--<meta name="viewport" content="width=device-width, initial-scale=1.0" />-->
+<!--<link rel="stylesheet" type="text/css" th:href="@{/css/layout.css}" />-->
+<!--<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />-->
+<!--<link rel="stylesheet" type="text/css" th:href="@{/css/stylesheet.css}" />-->
+<!--<link rel="stylesheet" type="text/css" th:href="@{/css/gamification.css}" />-->
+<!--<link rel="stylesheet" type="text/css" th:href="@{/css/test.css}" />-->
+<!--<link rel="stylesheet" type="text/css" th:href="@{/css/study-calendar.css}" />-->
+<!--<link rel="stylesheet" type="text/css" th:href="@{/css/learning-status.css}" />-->
+<!--<link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">-->
+<!--<title>PROSTA</title>-->
+<!--</head>-->
+<!--<body-->
+<!--	th:class="${session.backgroundClass != null ? session.backgroundClass : 'bg-default'}"-->
+<!--	th:style="${session.backgroundColor != null ?-->
+<!--	'background-color:' + session.backgroundColor + ';background-image:none;' : ''}">-->
+<!--/* ヘッダー */-->
+<!--<header>-->
+<!--<div th:replace="~{common/header :: layout-header}">-->
+<!--</div>-->
+<!--</header>-->
+<!--<button type="button" class="sidebar-toggle" aria-label="メニューを開閉" aria-expanded="false">☰ MENU</button>-->
+<!--<div class="contents">-->
+<!--/* サイドバー */-->
+<!--<asaide th:replace="~{common/sidebar :: layout-sidebar}">-->
+<!--</asaide>-->
+<!--/* メイン */-->
+<!--<article class="main">-->
+<!--<div th:replace="${body}">-->
+<!--</div>-->
+<!--</article>-->
+<!--</div>-->
+<!--/* フッター */-->
+<!--<footer>-->
+<!--<div th:replace="~{common/footer :: layout-footer}">-->
+<!--</div>-->
+<!--</footer>-->
+<!--<script>-->
+<!--document.addEventListener('DOMContentLoaded', function () {-->
+<!--  var btn = document.querySelector('.sidebar-toggle');-->
+<!--  var side = document.querySelector('.contents aside');-->
+<!--  if (!btn || !side) return;-->
+<!--  btn.addEventListener('click', function () {-->
+<!--    var open = side.classList.toggle('is-open');-->
+<!--    side.style.top = btn.getBoundingClientRect().bottom + 'px';-->
+<!--    btn.setAttribute('aria-expanded', open ? 'true' : 'false');-->
+<!--  });-->
+<!--});-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!--<script th:inline="javascript">-->
+<!--document.addEventListener("DOMContentLoaded", function () {-->
+<!--    const INTERVAL_TIME = 60000;-->
+<!--    const heartbeatUrl = /*[[@{/api/login-status/heartbeat}]]*/ '/api/login-status/heartbeat';-->
+
+<!--    function sendHeartbeat() {-->
+<!--        fetch(heartbeatUrl, { method: 'POST', credentials: 'same-origin' })-->
+<!--            .then(response => {-->
+<!--                if (!response.ok) {-->
+<!--                    console.warn("セッションが切れている可能性があります");-->
+<!--                }-->
+<!--            })-->
+<!--            .catch(error => console.error("状態同期エラー:", error));-->
+<!--    }-->
+
+<!--    sendHeartbeat();-->
+<!--    setInterval(sendHeartbeat, INTERVAL_TIME);-->
+<!--    document.addEventListener("visibilitychange", function () {-->
+<!--        if (!document.hidden) sendHeartbeat();-->
+<!--    });-->
+<!--});-->
+<!--</script>-->
+
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(body)">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" th:href="@{/css/layout.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/css/stylesheet.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/css/gamification.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/css/test.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/css/study-calendar.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/css/learning-status.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/css/prosta-system.css}" />
+  <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+  <title>PROSTA</title>
+</head>
+<body
+  th:class="${(session.backgroundClass != null ? session.backgroundClass : 'bg-default') + ' prosta-app'}"
+  th:style="${session.backgroundColor != null ?
+    'background-color:' + session.backgroundColor + ';background-image:none;' : ''}">
+  <header>
+    <div th:replace="~{common/header :: layout-header}"></div>
+  </header>
+
+  <button type="button"
+          class="sidebar-toggle"
+          aria-label="メニューを開閉"
+          aria-expanded="false">☰ MENU</button>
+
+  <div class="contents">
+    <aside th:replace="~{common/sidebar :: layout-sidebar}"></aside>
+    <article class="main">
+      <div th:replace="${body}"></div>
+    </article>
+  </div>
+
+  <footer>
+    <div th:replace="~{common/footer :: layout-footer}"></div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var button = document.querySelector(".sidebar-toggle");
+      var sidebar = document.querySelector(".contents aside");
+
+      if (!button || !sidebar) {
+        return;
+      }
+
+      button.addEventListener("click", function () {
+        var isOpen = sidebar.classList.toggle("is-open");
+        sidebar.style.top = button.getBoundingClientRect().bottom + "px";
+        button.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+    });
+  </script>
+</body>
+</html>
+
+<script th:inline="javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    const INTERVAL_TIME = 60000;
+    const heartbeatUrl =
+      /*[[@{/api/login-status/heartbeat}]]*/ "/api/login-status/heartbeat";
+
+    function sendHeartbeat() {
+      fetch(heartbeatUrl, {
+        method: "POST",
+        credentials: "same-origin"
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            console.warn("セッションが切れている可能性があります");
+          }
+        })
+        .catch(function (error) {
+          console.error("状態同期エラー:", error);
+        });
+    }
+
+    sendHeartbeat();
+    setInterval(sendHeartbeat, INTERVAL_TIME);
+
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        sendHeartbeat();
+      }
+    });
+  });
+</script>

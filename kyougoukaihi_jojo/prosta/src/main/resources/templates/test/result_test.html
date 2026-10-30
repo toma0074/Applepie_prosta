@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_3block :: layout(~{::body/content()})}">
+<head>
+<title>テスト結果</title>
+<meta charset="UTF-8" />
+</head>
+<body class="test_category_result">
+<h3>テスト結果</h3>
+
+<!-- ===== 新規実績解除フラッシュ ===== -->
+<div th:if="${newAchievements != null and !#lists.isEmpty(newAchievements)}" class="achievement-toast">
+  <div class="achievement-toast-inner">
+    <span class="toast-icon">🎉</span>
+    <span class="toast-title">実績解除！</span>
+    <span th:each="ach : ${newAchievements}"
+          th:text="${ach.icon + ' ' + ach.achievementName}"
+          class="toast-item"></span>
+  </div>
+</div>
+
+<!-- ===== レベル変化パネル ===== -->
+
+
+<!-- ===== EXP・Level・Sutaのパネル ===== -->
+<div class="result-status-panel">
+
+    <!-- EXPバーとLevel表示 -->
+    <div class="exp-bar-wrap">
+
+        <div class="exp-bar-label">
+            累計EXP：
+            <strong th:text="${totalExp}">0</strong> EXP
+        </div>
+
+        <div class="exp-bar-bg">
+            <div class="exp-bar-fill"
+                 th:style="'width:' + ${expProgressPercent} + '%'">
+            </div>
+        </div>
+
+        <!-- Levelは中央、EXP詳細は右側 -->
+        <div class="result-level-row">
+
+            <span class="result-level-change" th:if="${leveledUp}">
+                <span class="level-value"
+                      th:text="|Level ${previousLevel}|">Level 1</span>
+                <span class="level-arrow">→</span>
+                <span class="level-value"
+                      th:text="|Level ${currentLevel}|">Level 2</span>
+            </span>
+
+            <span class="result-level-change"
+                  th:unless="${leveledUp}"
+                  th:text="|Level ${currentLevel}|">
+                Level 1
+            </span>
+
+            <div class="exp-bar-sub">
+                <span th:text="${expInLevel}">0</span> / 15 EXP
+                ・次のレベルまであと
+                <span th:text="${expRemaining}">15</span> EXP
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 満点バッジ -->
+    <div class="result-exp-gained">
+        <span th:if="${isPerfect}" class="perfect-badge">
+            🌟 満点！
+        </span>
+    </div>
+
+    <!-- Sutaと吹き出し -->
+    <div class="result-character"
+         th:if="${displayCharacter != null}">
+
+        <img th:src="@{/images/{filename}(filename=${displayCharacter})}"
+             alt="Suta">
+
+        <div class="result-speech-bubble"
+             th:if="${characterMessage != null and !#strings.isEmpty(characterMessage)}"
+             th:text="${characterMessage}">
+            テストおつかれさま！
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===== 解答結果 ===== -->
+<div>
+  <form th:action="@{/mypage}" method="get" id="question-table">
+
+    <div class="form_group" th:each="ans,count : ${ans}">
+      <div class="question_row">
+        <span class="label" th:text="'問題' + ${count.count} + '：'"></span>
+        <button type="button" class="question-link"
+                th:data-question="${ans.questionText}"
+                th:data-option-a="${ans.optionA}"
+                th:data-option-b="${ans.optionB}"
+                th:data-option-c="${ans.optionC}"
+                th:data-correct="${ans.correctOption}"
+                th:data-chosen="${ans.ansOption}"
+                th:data-explanation="${ans.explanation}"
+                th:text="${ans.questionText}"></button>
+      </div>
+      <div class="ans_row">
+        <span class="label">選んだ選択肢：</span>
+        <span th:if="${ans.ansOption == 1}">A</span>
+        <span th:if="${ans.ansOption == 2}">B</span>
+        <span th:if="${ans.ansOption == 3}">C</span>
+        <span th:if="${ans.ansOption == 4}">わからない</span>
+        <!-- 正誤マーク -->
+        <span th:if="${ans.ansOption == ans.correctOption}" class="correct-mark">✔</span>
+        <span th:if="${ans.ansOption != ans.correctOption and ans.ansOption != 4}" class="wrong-mark">✘</span>
+      </div>
+      <div class="ans_row">
+        <span class="label">正解：</span>
+        <span th:if="${ans.correctOption == 1}">A</span>
+        <span th:if="${ans.correctOption == 2}">B</span>
+        <span th:if="${ans.correctOption == 3}">C</span>
+      </div>
+    </div>
+
+    <div id="pagination-container"class="pagination-container"></div>
+
+    <div th:text="'正答数 ' + ${ca} + '/' + ${qc}"></div>
+
+    <th:block th:if="${session.testFlag == null}">
+      <p th:if="${cateCount[0] != 0}" th:text="${'Java : ' + cateCorrect[0] + '/' + cateCount[0]}"></p>
+      <p th:if="${cateCount[1] != 0}" th:text="${'Spring : ' + cateCorrect[1] + '/' + cateCount[1]}"></p>
+      <p th:if="${cateCount[2] != 0}" th:text="${'HTML : ' + cateCorrect[2] + '/' + cateCount[2]}"></p>
+      <p th:if="${cateCount[3] != 0}" th:text="${'SQL : ' + cateCorrect[3] + '/' + cateCount[3]}"></p>
+    </th:block>
+
+    <div class="button-area">
+    <div class="inputselect">
+    <input type="submit" value="マイページに戻る" />
+    </div>
+    </div>
+  </form>
+</div>
+
+<div id="question-modal" class="question-modal" hidden>
+  <div class="question-modal-backdrop" data-close="true"></div>
+  <div class="question-modal-body" role="dialog" aria-modal="true" aria-labelledby="question-modal-text">
+    <button type="button" class="question-modal-close" data-close="true" aria-label="閉じる">×</button>
+    <p id="question-modal-text" class="question-modal-text"></p>
+    <ul id="question-modal-options" class="question-modal-options"></ul>
+    <p id="question-modal-result" class="question-modal-result"></p>
+    <p id="question-modal-explanation" class="question-modal-explanation"></p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // ---- 問題文モーダル ----
+  const modal = document.getElementById('question-modal');
+  if (modal) {
+    const labels = ['A', 'B', 'C'];
+    const textEl = document.getElementById('question-modal-text');
+    const optionsEl = document.getElementById('question-modal-options');
+    const resultEl = document.getElementById('question-modal-result');
+    const explanationEl = document.getElementById('question-modal-explanation');
+    const closeModal = () => { modal.hidden = true; };
+
+    function openModal(btn) {
+      const correct = Number(btn.dataset.correct);
+      const chosen = Number(btn.dataset.chosen);
+      const options = [btn.dataset.optionA, btn.dataset.optionB, btn.dataset.optionC];
+      textEl.textContent = btn.dataset.question;
+      optionsEl.replaceChildren();
+      options.forEach((text, i) => {
+        const no = i + 1;
+        const li = document.createElement('li');
+        const tags = [];
+        if (no === correct) { li.classList.add('is-correct'); tags.push('正解'); }
+        if (no === chosen) { li.classList.add('is-chosen'); tags.push('あなたの解答'); }
+        li.textContent = labels[i] + '. ' + text + (tags.length ? '  [' + tags.join(' / ') + ']' : '');
+        optionsEl.appendChild(li);
+      });
+      resultEl.textContent = chosen === 4 ? '解答：わからない' : (chosen === correct ? '正解でした' : '不正解でした');
+      resultEl.className = 'question-modal-result ' + (chosen === correct ? 'ok' : 'ng');
+      explanationEl.textContent = '解説：' + (btn.dataset.explanation || '解説はまだ登録されていません。');
+      modal.hidden = false;
+    }
+
+    document.querySelectorAll('.question-link').forEach((btn) => {
+      btn.addEventListener('click', () => openModal(btn));
+    });
+    modal.addEventListener('click', (e) => { if (e.target.dataset.close) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+  }
+
+  // ---- ページネーション ----
+  const rowsPerPage = 3;
+  const table = document.getElementById('question-table');
+  if (!table) return;
+  const rows = table.querySelectorAll('.form_group');
+  const pageCount = Math.ceil(rows.length / rowsPerPage);
+  const container = document.getElementById('pagination-container');
+  if (pageCount <= 1) return;
+  let currentPage = 1;
+  function showPage(page) {
+    currentPage = page;
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    Array.from(rows).forEach((r, i) => r.style.display = (i >= start && i < end) ? '' : 'none');
+    document.getElementById('p-prev').disabled = (currentPage === 1);
+    document.getElementById('p-next').disabled = (currentPage === pageCount);
+  }
+  const prev = document.createElement('button');
+  prev.id = 'p-prev'; prev.type = 'button'; prev.innerText = '前へ'; prev.className = 'btn-pagination';
+  prev.addEventListener('click', () => { if (currentPage > 1) showPage(currentPage - 1); });
+  const next = document.createElement('button');
+  next.id = 'p-next'; next.type = 'button'; next.innerText = '次へ'; next.className = 'btn-pagination';
+  next.addEventListener('click', () => { if (currentPage < pageCount) showPage(currentPage + 1); });
+  container.appendChild(prev);
+  container.appendChild(next);
+  showPage(1);
+
+  // ---- 実績トースト自動非表示 ----
+  const toast = document.querySelector('.achievement-toast');
+  if (toast) {
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-30px)'; }, 4000);
+    setTimeout(() => { toast.style.display = 'none'; }, 4600);
+  }
+});
+</script>
+</body>
+</html>
+
