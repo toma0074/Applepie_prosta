@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+</head>
+<body>
+<aside th:fragment="layout-sidebar"
+       th:class="${session.user == null or session.user.permission == 0} ? 'search' : 'admin_menu'">
+  <div class="side-inner">
+    <div class="title">MENU</div>
+		<div>
+			<ul class="sidebar-menu">
+				<li><a class="sidebar-link" th:href="@{/mypage}">MyPage</a></li>
+				<li><a class="sidebar-link" th:href="@{/test/category}">カテゴリ別問題</a></li>
+				<li><a class="sidebar-link" th:href="@{/test/diagnostic}">苦手範囲特定問題</a></li>
+				<li><a class="sidebar-link" th:href="@{/test/weak}">弱点から出題</a></li>
+				<li><a class="sidebar-link" th:href="@{/test/review}">復習モード</a></li>
+				<li><a class="sidebar-link" th:href="@{/question}">問題検索</a></li>
+				<li th:if="${session.user != null and session.user.permission == 1}">
+					<a class="sidebar-link" th:href="@{/admin/menu}">管理者メニュー</a></li>
+			</ul>
+			
+			<div class="sidebar-search">
+				<div class="sidebar-search-item">
+					<form th:action="@{/question/list/text}" method="get">
+						<label for="sidebar-question-text">問題文あいまい検索</label>
+						<div class="sidebar-search-controls search-box">
+						<input id="sidebar-question-text"
+						type="text"
+						name="questionText"
+						class="search-inset-input"/>
+						<input type="submit" value="検索"class="search-inset-btn" />
+						</div>
+					</form>
+				</div>
+
+				<div class="sidebar-search-item">
+					<form th:action="@{/question/list/category}" method="get">
+						<label for="sidebar-category">カテゴリ検索</label>
+						<div class="sidebar-search-controls">
+							<select id="sidebar-category" class="category" name="category">
+								<option th:each="cat : ${sidebarCategoryList}"
+								        th:value="${cat.categoryId}"
+								        th:text="${cat.categoryName}"></option>
+							</select>
+							<input type="submit" value="検索"class="search-inset-btn" />
+						</div>
+					</form>
+				</div>
+
+				<div class="sidebar-search-item">
+					<form th:action="@{/question/list/difficulty}" method="get">
+						<label for="sidebar-difficulty">難易度検索</label>
+						<div class="sidebar-search-controls">
+							<select id="sidebar-difficulty" class="difficulty" name="difficulty" style="color: #FFB11B;">
+								<option value="1">★☆☆</option>
+								<option value="2">★★☆</option>
+								<option value="3">★★★</option>
+							</select>
+							<input type="submit" value="検索"class="search-inset-btn" />
+						</div>
+					</form>
+				</div>
+
+			</div>
+    </div>
+  </div>
+</aside>
+</body>
+</html>
