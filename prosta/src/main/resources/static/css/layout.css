@@ -12,20 +12,17 @@ html, body {
 }
 
 body {
-/*	margin: 0;*/
-/*	padding: 0;*/
-/*	background-image: linear-gradient( rgba(255,255,255,0.5),rgba(255,255,255,0.5)),url('../images/sta.jpg');*/
-	background-position: left bottom; /* 元のオブジェクトポジションの代わり */
-	background-repeat: no-repeat; /* 画像の繰り返しを防止 */
+	background-position: center center;
+	background-repeat: no-repeat;
 	background-attachment: fixed;
-	background-size: cover; /* 画像のアスペクト比を保ったまま画面全体を覆う */
+	background-size: cover;
+
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
 	/* ページ全体ではなくarticle/aside側をスクロールさせ、ヘッダー・フッターを枠内に残す。 */
 	overflow: hidden;
 	box-sizing: border-box;
-	
 }
 body.bg-default{
 	background-image:
@@ -353,9 +350,8 @@ footer {
 /*	box-shadow: none;*/
 /*}*/
 .logo{
-	height: 30px;
-	width: auto;
-	
+	height:clamp(30px, 2vw, 45px);
+	width:auto;
 }
 
 /* ---- スマホ: サイドバー開閉 ---- */
@@ -599,3 +595,70 @@ body.bg-game{
     margin-right: auto;
   }
  }
+ /* ---- スマホ用 背景 ---- */
+ @media (max-width: 1184px){
+	 
+	 .background-list{
+        text-align:center;
+    }
+
+    .background-list form{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .background-list .btn{
+        margin-top:10px;
+    }
+
+    body.bg-default{
+		background-image:
+		linear-gradient(
+			rgba(255,255,255,0.5),
+			rgba(255,255,255,0.5)),
+		url('../images/sta_sp.jpg');
+	}
+	
+	body.bg-grass{
+		background-image:
+		linear-gradient(rgba(255,255,255,0.5),
+		rgba(255,255,255,0.5)),
+		url("../images/bg_grass_sp.jpg");
+	}
+
+	body.bg-mori{
+		background-image:
+		linear-gradient(rgba(255,255,255,0.5),
+		rgba(255,255,255,0.5)),
+		url("../images/mori_sp.jpg");
+	}
+
+	body.bg-sky{
+		background-image:
+		linear-gradient(rgba(255,255,255,0.5),
+		rgba(255,255,255,0.5)),
+		url("../images/bg_sky_sp.jpg");
+	}
+
+	body.bg-game{
+		background-image:
+		linear-gradient(rgba(255,255,255,0.5),
+		rgba(255,255,255,0.5)),
+		url("../images/game_sp.jpg");
+	}
+
+	body.bg-forest{
+		background-image:
+		linear-gradient(rgba(255,255,255,0.5),
+		rgba(255,255,255,0.5)),
+		url("../images/bg_forest_sp.jpg");
+	}
+
+	body.bg-castle{
+		background-image:
+		linear-gradient(rgba(255,255,255,0.5),
+		rgba(255,255,255,0.5)),
+		url("../images/bg_castle_sp.jpg");
+	}
+}

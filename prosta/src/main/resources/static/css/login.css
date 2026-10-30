@@ -30,21 +30,21 @@ body {
 /* ---- ヘッダー ---- */
 .site-header {
     width: 90%;
-    margin:0 auto;
+    margin: 0 auto;
     padding: 15px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 2); 
+    border-bottom: 1px solid rgba(255,255,255,0.8);
 }
 
 .site-header .header-inner {
-    width: 90%;
+   width: 100%;
     max-width: 1280px;
-    margin: 0 auto;
+    margin: 0;
 }
 
 .header_logo_img {
     height: 30px;     
     width: auto;
-    vertical-align: middle; /* ロゴが上下の真ん中に来るようにする */
+   vertical-align: middle; /* ロゴが上下の真ん中に来るようにする */
 }
 /* ---- メインコンテンツ（中央配置） ---- */
 .main-content {
@@ -203,7 +203,8 @@ input:focus {
 /* ---- ボタン設定 ---- */
 button {
     color: #252537;
-    width: 280px;
+    width: 70%;
+    max-width: 280px;
     height: 50px;
     background: #fff;
     border-radius: 5px;
