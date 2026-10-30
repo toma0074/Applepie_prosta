@@ -4,13 +4,11 @@ import java.time.LocalDateTime;
 
 public class CustomerBean {
 
-<<<<<<< HEAD
     private Integer userId;
     private String userName;
     private String userPass;
     private Integer permission;
     private Boolean deleteFlag;
-=======
 	private Integer userId;
 	
 	private String userName;
@@ -36,7 +34,6 @@ public class CustomerBean {
 	public Integer getUserId() {
 		return userId;
 	}
->>>>>>> dbbeeff4a6dc45b31000f5bdad3215498d51e015
 
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
@@ -50,10 +47,8 @@ public class CustomerBean {
     public Integer getPermission() { return permission; }
     public void setPermission(Integer permission) { this.permission = permission; }
 
-<<<<<<< HEAD
     public Boolean getDeleteFlag() { return deleteFlag; }
     public void setDeleteFlag(Boolean deleteFlag) { this.deleteFlag = deleteFlag; }
-=======
 	public void setUserPass(String userPass) {
 		this.userPass = userPass;
 	}
@@ -110,5 +105,4 @@ public class CustomerBean {
 	
 //	【追加終了】2026/10/01 大塚
 	
->>>>>>> dbbeeff4a6dc45b31000f5bdad3215498d51e015
 }

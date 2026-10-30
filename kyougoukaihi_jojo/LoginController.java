@@ -1,14 +1,11 @@
 package jp.co.sss.pr.login_function;
 
-<<<<<<< HEAD
 import java.util.List;
-=======
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
->>>>>>> dbbeeff4a6dc45b31000f5bdad3215498d51e015
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +29,8 @@ public class LoginController {
     @Autowired
     CustomerRepository customerRepository;
 
-<<<<<<< HEAD
     @Autowired
     HttpSession session;
-=======
 		if (customer != null && customer.getDeleteFlag()==0) {
 			
 			// 今回の最終ログイン日時を「現在時刻」に更新
@@ -56,7 +51,6 @@ public class LoginController {
 			customerRepository.save(customer);
 			// 一覧へリダイレクト
 			return "redirect:/mypage";
->>>>>>> dbbeeff4a6dc45b31000f5bdad3215498d51e015
 
     @Autowired
     LevelService levelService;

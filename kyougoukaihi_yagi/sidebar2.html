@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 </head>
 <body>
-<<<<<<< HEAD
 	<aside th:fragment="layout-sidebar"
 		th:class="${session.user == null or session.user.permission == 2} ? ${'search'} : ${'admin_menu'}">
 		<div class="sidebar-title">MENU</div>
@@ -23,7 +22,6 @@
 					
 				<div class="input">
 				<input type="text" name="userName" />
-=======
 <aside th:fragment="layout-sidebar"
        th:class="${session.user == null or session.user.permission == 2} ? 'search' : 'admin_menu'">
   <div class="title">MENU</div>
@@ -57,7 +55,6 @@
           <input type="submit" value="検索" />
         </div>
       </form>
->>>>>>> aa1f263ec89914af726eb9f4d7b00b6acbe7949a
 
       <div>権限検索</div>
       <form th:action="@{/user/list/permission}" method="post">

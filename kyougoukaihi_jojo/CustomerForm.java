@@ -14,7 +14,6 @@ public class CustomerForm {
     @Size(min = 1, max = 8)
     private String userName;
 
-<<<<<<< HEAD
     @NotBlank
     @Size(min = 4, max = 16)
     @Pattern(regexp = "^[a-zA-Z0-9]+$")
@@ -41,7 +40,6 @@ public class CustomerForm {
 
     public Boolean getDeleteFlag() { return deleteFlag; }
     public void setDeleteFlag(Boolean deleteFlag) { this.deleteFlag = deleteFlag; }
-=======
 	  private Integer permission;
 	  
 	  private Integer deleteFlag;
@@ -125,5 +123,4 @@ public class CustomerForm {
 		}
 		
 //		【追加終了】2026/10/01 大塚
->>>>>>> dbbeeff4a6dc45b31000f5bdad3215498d51e015
 }

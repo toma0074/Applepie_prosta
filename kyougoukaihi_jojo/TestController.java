@@ -33,7 +33,6 @@ import jp.co.sss.pr.service.LevelService;
 @Controller
 public class TestController {
 
-<<<<<<< HEAD
     @Autowired
     QuestionRepository quesRpstry;
 
@@ -222,7 +221,6 @@ public class TestController {
         return list;
     }
 }
-=======
 	@Autowired
 	QuestionRepository quesRpstry;
 
@@ -490,4 +488,3 @@ public class TestController {
 	}
 
 }
->>>>>>> dbbeeff4a6dc45b31000f5bdad3215498d51e015
