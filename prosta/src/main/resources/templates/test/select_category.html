@@ -7,11 +7,13 @@
 </head>
 <body>
 <h3>カテゴリ別問題選択画面</h3>
-<div class="selection-guide">
+<div class="test_select test_select--with-guide">
+  <!-- PCではフォーム中央・吹き出し右で縦の空白を作らない -->
+  <div class="selection-guide selection-guide--aside">
+    <div class="selection-speech-bubble">好きなカテゴリで挑戦しよう！</div>
     <img th:src="@{/images/suta_teach.png}"
          alt="問題選択を案内するキャラクター">
-</div>
-<div class="test_select">
+  </div>
   <form th:action="@{/test/category/start}" method="get" th:object="${questionForm}">
     <div class="form">
       <div class="label">カテゴリー：</div>

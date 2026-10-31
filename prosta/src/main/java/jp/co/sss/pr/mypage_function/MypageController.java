@@ -70,10 +70,20 @@ public class MypageController {
         int totalCorrect  = levelService.getTotalCorrect(user);
         int perfectCount  = levelService.getPerfectCount(user);
 
+        // EXP進捗バー表示用（1レベル=15EXP。テスト結果画面と同じ計算）
+        long totalExp = user.getTotalExp() == null ? 0L : user.getTotalExp();
+        int expInLevel = (int) (totalExp % 15L);
+        int expRemaining = 15 - expInLevel;
+        int expProgressPercent = expInLevel * 100 / 15;
+
         model.addAttribute("currentLevel",  currentLevel);
         model.addAttribute("loginCount",    loginCount);
         model.addAttribute("totalCorrect",  totalCorrect);
         model.addAttribute("perfectCount",  perfectCount);
+        model.addAttribute("totalExp", totalExp);
+        model.addAttribute("expInLevel", expInLevel);
+        model.addAttribute("expRemaining", expRemaining);
+        model.addAttribute("expProgressPercent", expProgressPercent);
 
         // 実績一覧（解除済み）
         List<UserAchievement> achievements =

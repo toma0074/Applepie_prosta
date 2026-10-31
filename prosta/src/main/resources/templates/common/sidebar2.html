@@ -33,8 +33,12 @@
       <div>名前あいまい検索</div>
       <form th:action="@{/user/list/text}" method="post">
         <div class="input">
-          <input type="text" name="userName" />
-          <input type="submit" value="検索" />
+         <input type="text" name="userName" class="search-inset-input" />
+
+		<input
+			type="submit"
+			value="検索"
+			class="search-inset-btn" />
         </div>
       </form>
 
@@ -45,7 +49,7 @@
             <option value="0">一般</option>
             <option value="1">管理者</option>
           </select>
-          <input type="submit" value="検索" />
+          <input type="submit" value="検索" class="search-inset-btn"/>
         </div>
       </form>
 
@@ -56,7 +60,7 @@
             <option value="false">アクティブ</option>
             <option value="true">削除済み</option>
           </select>
-          <input type="submit" value="検索" />
+          <input type="submit" value="検索" class="search-inset-btn"/>
         </div>
       </form>
     </div>

@@ -7,17 +7,17 @@
   キャラクターフラグメント
   使い方: th:replace="~{common/character :: character(level=${currentLevel})}"
   レベル段階:
-    Lv 1-9   : たまご
-    Lv10-24  : Suta1
+    Lv 1-2   : たまご
+    Lv 3-24  : Suta1
     Lv25-49  : Suta2
-    Lv50-75    : Suta3  
-    Lv75-100 : Suta4
+    Lv50-74  : Suta3
+    Lv75-99  : Suta4
     Lv100+   : Suta5
 -->
 <div th:fragment="character(level)" class="character-wrapper">
 
-  <!-- Lv1-9: たまご -->
-  <div th:if="${level < 10}" class="char-stage char-egg">
+  <!-- Lv1-2: たまご -->
+  <div th:if="${level < 3}" class="char-stage char-egg">
     <div class="char-label">Lv.<span th:text="${level}">1</span></div>
     <svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg" class="char-svg">
       <defs>
@@ -50,8 +50,8 @@
     <div class="char-name">たまご</div>
   </div>
 
-  <!-- Lv10-24: Suta1 -->
-  <div th:if="${level >= 10 and level < 25}" class="char-stage char-book-star">
+  <!-- Lv3-24: Suta1 -->
+  <div th:if="${level >= 3 and level < 25}" class="char-stage char-book-star">
     <div class="char-label">Lv.<span th:text="${level}">10</span></div>
     <img th:src="@{/images/suta1.png}" alt="suta_level1" class="char-image" />
    

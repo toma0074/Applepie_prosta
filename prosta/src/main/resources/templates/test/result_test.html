@@ -26,7 +26,7 @@
 <div class="result-status-panel">
 
     <!-- EXPバーとLevel表示 -->
-    <div class="exp-bar-wrap">
+    <div class="exp-progress-component">
 
         <div class="exp-bar-label">
             累計EXP：
@@ -39,31 +39,33 @@
             </div>
         </div>
 
-        <!-- Levelは中央、EXP詳細は右側 -->
-        <div class="result-level-row">
+       <div class="result-level-row">
 
-            <span class="result-level-change" th:if="${leveledUp}">
-                <span class="level-value"
-                      th:text="|Level ${previousLevel}|">Level 1</span>
-                <span class="level-arrow">→</span>
-                <span class="level-value"
-                      th:text="|Level ${currentLevel}|">Level 2</span>
-            </span>
+    <!-- Level表示：中央 -->
+    <div class="result-level-center">
+        <span class="result-level-change" th:if="${leveledUp}">
+            <span class="level-value"
+                  th:text="|Level ${previousLevel}|">Level 1</span>
+            <span class="level-arrow">→</span>
+            <span class="level-value"
+                  th:text="|Level ${currentLevel}|">Level 2</span>
+        </span>
 
-            <span class="result-level-change"
-                  th:unless="${leveledUp}"
-                  th:text="|Level ${currentLevel}|">
-                Level 1
-            </span>
-
-            <div class="exp-bar-sub">
-                <span th:text="${expInLevel}">0</span> / 15 EXP
-                ・次のレベルまであと
-                <span th:text="${expRemaining}">15</span> EXP
-            </div>
-
-        </div>
+        <span class="result-level-change"
+              th:unless="${leveledUp}"
+              th:text="|Level ${currentLevel}|">
+            Level 1
+        </span>
     </div>
+
+    <!-- EXP詳細：右側 -->
+    <div class="exp-bar-sub">
+        <span th:text="${expInLevel}">0</span> / 15 EXP
+        ・次のレベルまであと
+        <span th:text="${expRemaining}">15</span> EXP
+    </div>
+  </div>
+</div>
 
     <!-- 満点バッジ -->
     <div class="result-exp-gained">
@@ -90,7 +92,7 @@
 </div>
 
 <!-- ===== 解答結果 ===== -->
-<div>
+<div class="test-result-answers">
   <form th:action="@{/mypage}" method="get" id="question-table">
 
     <div class="form_group" th:each="ans,count : ${ans}">
@@ -143,6 +145,7 @@
     </div>
   </form>
 </div>
+
 
 <div id="question-modal" class="question-modal" hidden>
   <div class="question-modal-backdrop" data-close="true"></div>

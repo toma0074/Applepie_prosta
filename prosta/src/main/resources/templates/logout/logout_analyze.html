@@ -8,11 +8,15 @@
 </head>
 <body>
 <main class="suku learning-status-page">
-  <div class="learning-status-header">
+  <div class="learning-status-header logout-farewell">
     <div>
       <h3>本日の学習サマリー</h3>
-      <p>おつかれさまでした。ログアウト前に今日の学習を振り返りましょう。</p>
+      <p class="logout-farewell-title">おつかれさまでした！</p>
+      <p th:if="${todayAnswers > 0}" th:text="|今日は${todayAnswers}問に挑戦しました。また一緒にがんばろうね！|">今日は0問に挑戦しました。</p>
+      <p th:unless="${todayAnswers > 0}">また次回、一緒に学習しようね！</p>
+      <p>ログアウト前に今日の学習を振り返りましょう。</p>
     </div>
+    <img class="logout-farewell-image" th:src="@{/images/suta_logout.png}" alt="おつかれさまでした！とあいさつするスタ">
   </div>
 
   <section class="learning-overview" aria-label="本日の学習">

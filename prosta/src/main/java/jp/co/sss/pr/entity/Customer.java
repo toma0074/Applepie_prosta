@@ -12,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 @Entity
 
@@ -73,12 +72,11 @@ public class Customer {
 
     private LocalDateTime lastSeenAt;
  
-    @Transient
-
     @Column(name = "perfect_test_count", nullable = false)
     private Integer perfectTestCount = 0;
 
-    @Transient
+    // レベル・クエスト・フィード表示の元になる累計EXP。DBへ永続化する。
+    @Column(name = "total_exp", nullable = false)
     private Long totalExp = 0L;
 
  

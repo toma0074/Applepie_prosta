@@ -17,11 +17,40 @@
       <div th:replace="~{common/character :: character(level=${currentLevel})}"></div>
     </div>
 
-    <div class="status-info">
-      <div class="level-badge">
-        <span class="level-label">LEVEL</span>
-        <span class="level-num" th:text="${currentLevel}">1</span>
-      </div>
+<div class="status-info">
+
+    <!-- EXP進捗表示 -->
+    <div class="exp-progress-component">
+
+        <!-- 累計EXP -->
+        <div class="exp-bar-label">
+            累計EXP：
+            <strong th:text="${totalExp}">0</strong> EXP
+        </div>
+
+        <!-- 進捗バーと王冠 -->
+        <div class="exp-bar-track">
+            <div class="exp-bar-bg">
+                <div class="exp-bar-fill"
+                     th:style="'width:' + ${expProgressPercent} + '%'">
+                </div>
+            </div>
+
+            <!-- 王冠は残す -->
+            <span class="exp-bar-crown" aria-hidden="true">👑</span>
+        </div>
+
+        <!-- バーの右下：現在のEXPと残りEXP -->
+        <div class="exp-bar-sub">
+            <span th:text="${expInLevel}">0</span> / 15 EXP
+            ・次のレベルまであと
+            <span th:text="${expRemaining}">15</span> EXP
+        </div>
+
+    </div>
+
+    <!-- 統計情報 -->
+
       <div class="stats-row" style="margin-top:8px;">
         <div class="stat-chip">
           <span class="stat-icon">📅</span>

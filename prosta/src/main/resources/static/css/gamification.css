@@ -275,6 +275,53 @@
 
 .mypage-reset { text-decoration: none !important; }
 
+
+/* マイページのLevel・EXP表示 */
+.mypage-exp-wrap {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Levelと累計EXPを同じ行に表示 */
+.mypage-exp-heading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 5px;
+    color: #0B346E;
+}
+
+/* 累計EXPを右側に配置 */
+.mypage-exp-total {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: normal;
+    text-align: right;
+}
+
+/* 進捗バーと王冠の配置基準 */
+.exp-bar-track {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    padding-top: 22px;
+}
+
+/* 王冠：進捗バーの右上 */
+.exp-bar-crown {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+
+    font-size: 20px;
+    line-height: 1;
+
+    filter: drop-shadow(
+        0 2px 2px rgba(190, 125, 0, 0.25)
+    );
+}
+
 table.mypage-table {
     width: calc(100% - 24px);
     margin: 0 auto 16px;
@@ -1310,7 +1357,11 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
     gap: 8px 12px;
     margin: 0;
 }
-
+.result-level-row .result-level-center {
+    grid-column: 2;
+    justify-self: center;
+    text-align: center;
+}
 /* Levelは常に中央 */
 .result-level-change {
     grid-column: 2;
@@ -1438,23 +1489,13 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
     padding: 10px 12px;
     font-size: 14px;
 }
-	.selection-guide {
-        top: 84px;
-        right: 8px;
-        width: 76px;
-    }
-
-    .selection-guide img {
-        max-height: 88px;
-    }
 }
-/* 選択画面の先生キャラクター：右寄せ＋浮遊 */
+/* 選択画面の先生キャラクター */
 .selection-guide {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     margin: 8px 24px 16px 0;
-    animation: charFloat 3s ease-in-out infinite;
 }
 
 .selection-guide img {
@@ -1462,6 +1503,7 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
     width: 100px;
     max-height: 115px;
     object-fit: contain;
+    animation: charFloat 3s ease-in-out infinite;
 }
 
 /* 試験中のキャラクター：右上固定 */
@@ -1627,9 +1669,10 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
         table-layout: fixed;
     }
 
-    table.question_list th.category { width: 22%; }
-    table.question_list th.difficulty { width: 24%; }
-    table.question_list th.questionText { width: 54%; }
+    table.question_list th.category { width: 20%; }
+    table.question_list th.difficulty { width: 18%; }
+    table.question_list th.questionText { width: 40%; }
+    table.question_list th.bookmark { width: 22%; }
 
     table.question_list td {
         overflow-wrap: anywhere;
@@ -1654,4 +1697,259 @@ table.aq-table { width: 100%; margin: 0; box-sizing: border-box; border-collapse
     align-items: center;
     gap: 6px;
     white-space: nowrap;
+}
+
+
+/* 問題選択画面：一言吹き出し＋キャラ */
+.selection-guide {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 14px;
+
+    width: 100% !important;
+    max-width: 620px;
+    box-sizing: border-box !important;
+
+    padding: 0 12px !important;
+    margin: 4px auto 8px !important;
+
+    position: relative !important;
+}
+
+.selection-guide img {
+    display: block !important;
+    flex: 0 0 auto;
+    width: 100px !important;
+    height: auto !important;
+    max-height: 115px !important;
+    object-fit: contain !important;
+    margin-bottom: 0 !important;
+}
+
+/* 先端はキャラ側（右） */
+.selection-speech-bubble {
+    position: relative;
+    flex: 1 1 auto;
+    max-width: 420px;
+    box-sizing: border-box;
+    padding: 10px 16px;
+
+    background: #fff;
+    border: 2px solid #0B346E;
+    border-radius: 18px;
+
+    color: #0B346E;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 1.6;
+    text-align: left;
+
+    box-shadow: 0 4px 10px rgba(11, 52, 110, 0.12);
+}
+
+.selection-speech-bubble::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -9px;
+
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+
+    background: #fff;
+    border-top: 2px solid #0B346E;
+    border-right: 2px solid #0B346E;
+    transform: rotate(45deg);
+}
+
+.test_select .error {
+    color: #cc0000;
+    font-weight: bold;
+}
+
+/* PC：フォームは中央、吹き出しは右側に置いて縦の空白をなくす */
+@media (min-width: 1185px) {
+    .test_select--with-guide {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: start;
+        column-gap: 16px;
+    }
+
+    .test_select--with-guide > form {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .selection-guide.selection-guide--aside {
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+        justify-content: flex-end !important;
+        gap: 10px;
+        width: auto !important;
+        max-width: none;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .selection-guide--aside img {
+        width: 80px !important;
+    }
+
+    .selection-guide--aside .selection-speech-bubble {
+        flex: 0 0 160px;
+        font-size: 14px;
+    }
+}
+
+/* =========================================
+   受験画面：タイマーとキャラクターを拡大
+   ========================================= */
+
+.exam-fixed-tools {
+    width: 195px !important;
+    gap: 10px !important;
+}
+
+.exam-fixed-tools #test-timer.tt-box {
+    width: 100% !important;
+    padding: 12px 14px !important;
+    box-sizing: border-box;
+}
+
+.exam-fixed-tools #test-timer .tt-label {
+    font-size: 15px !important;
+    margin-bottom: 7px !important;
+}
+
+.exam-fixed-tools #test-timer .tt-text {
+    min-width: 75px !important;
+    font-size: 15px !important;
+}
+
+.exam-fixed-tools #test-timer .tt-bar {
+    height: 10px !important;
+}
+
+.exam-character {
+    width: 145px !important;
+    max-width: none !important;
+}
+
+.exam-character img {
+    width: 100% !important;
+    max-height: 160px !important;
+}
+
+/* スマートフォン */
+@media (max-width: 600px) {
+    .selection-guide {
+        gap: 10px;
+        padding: 0 6px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .selection-guide img {
+        width: 72px !important;
+        max-height: 85px !important;
+    }
+
+    .selection-speech-bubble {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .exam-fixed-tools {
+        width: 160px !important;
+    }
+
+    .exam-fixed-tools #test-timer .tt-label {
+        font-size: 13px !important;
+    }
+
+    .exam-fixed-tools #test-timer .tt-text {
+        font-size: 13px !important;
+    }
+
+    .exam-character {
+        width: 115px !important;
+    }
+
+    .exam-character img {
+        max-height: 130px !important;
+    }
+}
+
+/* テスト結果画面：EXP表示を見やすくする */
+.result-status-panel .exp-bar-label {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+.result-status-panel .exp-bar-label strong {
+    font-size: 18px !important;
+}
+
+.result-status-panel .exp-bar-sub {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+}
+
+.result-status-panel .exp-bar-sub span {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+/* MyPage・テスト結果画面 共通EXP表示 */
+.exp-progress-component {
+    width: 100%;
+}
+
+.exp-progress-component .exp-bar-label {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.exp-progress-component .exp-bar-label strong {
+    font-size: inherit;
+    font-weight: 800;
+}
+
+.exp-progress-component .exp-bar-bg {
+    width: 100%;
+}
+
+.exp-progress-component .exp-bar-sub {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 6px;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.exp-progress-component .exp-bar-sub span {
+    font-size: inherit;
+    font-weight: 700;
+}
+
+.test-result-answers,
+.test-result-answers #question-table,
+.test-result-answers .form_group,
+.test-result-answers .question_row,
+.test-result-answers .ans_row {
+    text-align: left;
+}
+.test-result-answers {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    margin: 16px 20px 0;
+    padding: 0;
 }

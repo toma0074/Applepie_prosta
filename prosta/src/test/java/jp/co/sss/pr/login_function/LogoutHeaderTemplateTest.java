@@ -26,6 +26,7 @@ import jp.co.sss.pr.question_function.QuestionController;
 import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.CategoryRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
+import jp.co.sss.pr.repository.FavoriteRepository;
 import jp.co.sss.pr.repository.FriendConnectionRepository;
 import jp.co.sss.pr.repository.QuestionRepository;
 import jp.co.sss.pr.service.LevelService;
@@ -52,6 +53,8 @@ class LogoutHeaderTemplateTest {
     private LevelService levelService;
     @MockBean
     private PasswordService passwordService;
+    @MockBean
+    private FavoriteRepository favoriteRepository;
 
     private MockHttpSession loggedInSession() {
         CustomerBean user = new CustomerBean();

@@ -24,9 +24,12 @@
 				<div class="sidebar-search-item">
 					<form th:action="@{/question/list/text}" method="get">
 						<label for="sidebar-question-text">問題文あいまい検索</label>
-						<div class="sidebar-search-controls">
-							<input id="sidebar-question-text" type="text" name="questionText" class="qt" />
-							<input type="submit" value="検索" />
+						<div class="sidebar-search-controls search-box">
+						<input id="sidebar-question-text"
+						type="text"
+						name="questionText"
+						class="search-inset-input"/>
+						<input type="submit" value="検索" class="search-inset-btn" />
 						</div>
 					</form>
 				</div>
@@ -40,7 +43,7 @@
 								        th:value="${cat.categoryId}"
 								        th:text="${cat.categoryName}"></option>
 							</select>
-							<input type="submit" value="検索" />
+							<input type="submit" value="検索" class="search-inset-btn" />
 						</div>
 					</form>
 				</div>
@@ -54,7 +57,7 @@
 								<option value="2">★★☆</option>
 								<option value="3">★★★</option>
 							</select>
-							<input type="submit" value="検索" />
+							<input type="submit" value="検索" class="search-inset-btn" />
 						</div>
 					</form>
 				</div>

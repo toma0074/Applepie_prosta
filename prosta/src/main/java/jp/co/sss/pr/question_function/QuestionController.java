@@ -1,6 +1,8 @@
 package jp.co.sss.pr.question_function;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,9 +10,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpSession;
+import jp.co.sss.pr.bean.CustomerBean;
 import jp.co.sss.pr.entity.Category;
+import jp.co.sss.pr.entity.Customer;
+import jp.co.sss.pr.entity.Favorite;
 import jp.co.sss.pr.entity.Question;
 import jp.co.sss.pr.repository.CategoryRepository;
+import jp.co.sss.pr.repository.CustomerRepository;
+import jp.co.sss.pr.repository.FavoriteRepository;
 import jp.co.sss.pr.repository.QuestionRepository;
 
 @Controller
@@ -24,6 +31,12 @@ public class QuestionController {
 
     @Autowired
     HttpSession session;
+    
+    @Autowired
+    FavoriteRepository favoriteRepository;
+
+    @Autowired
+    CustomerRepository customerRepository;
 
     // 問題一覧（全件検索）
     @RequestMapping(path = "/question")
@@ -34,6 +47,9 @@ public class QuestionController {
 
         model.addAttribute("Questions", questionList);
         model.addAttribute("QuestionResult", "全件検索");
+
+        // ブックマーク情報を画面に渡す
+        addFavoriteIds(model);
 
         return "question/question_list";
     }
@@ -52,6 +68,9 @@ public class QuestionController {
             model.addAttribute("Questions",
                     qRepository.findByCategoryOrderByDifficultyAscCategoryAsc(categoryEntity));
         }
+
+        // ブックマーク情報を画面に渡す
+        addFavoriteIds(model);
 
         return "question/question_list";
     }
@@ -76,7 +95,10 @@ public class QuestionController {
 
         model.addAttribute("Questions", textList);
 
-        return "question/question_list";
+     // ブックマーク情報を画面に渡す
+     addFavoriteIds(model);
+
+     return "question/question_list";
     }
 
     // 難易度別検索
@@ -106,8 +128,40 @@ public class QuestionController {
         }
 
         model.addAttribute("Questions", difList);
-
+        
+     // ブックマーク情報を画面に渡す
+        addFavoriteIds(model);
+        
         return "question/question_list";
+    }
+    private void addFavoriteIds(Model model) {
+
+        Set<Integer> favoriteIds = new HashSet<>();
+
+        CustomerBean userBean =
+            (CustomerBean) session.getAttribute("user");
+
+        if (userBean != null) {
+
+            Customer customer = customerRepository
+                .findById(userBean.getUserId())
+                .orElse(null);
+
+            if (customer != null) {
+
+                for (Favorite favorite :
+                        favoriteRepository.findByCustomer(customer)) {
+
+                    if (favorite.getQuestion() != null) {
+                        favoriteIds.add(
+                            favorite.getQuestion().getQuestionId()
+                        );
+                    }
+                }
+            }
+        }
+
+        model.addAttribute("favoriteIds", favoriteIds);
     }
 }
 

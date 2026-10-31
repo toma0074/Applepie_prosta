@@ -7,15 +7,15 @@
 </head>
 <body>
 <h3>苦手範囲特定問題選択画面</h3>
-<div class="selection-guide">
+<div class="test_select test_select--with-guide">
+  <!-- PCではフォーム中央・吹き出し右で縦の空白を作らない -->
+  <div class="selection-guide selection-guide--aside">
+    <div class="selection-speech-bubble">3つ以上選んで苦手を見つけよう！</div>
     <img th:src="@{/images/suta_teach.png}"
          alt="問題選択を案内するキャラクター">
-</div>
-<div class="test_select">
+  </div>
   <form th:action="@{/test/diagnostic/start}" method="get">
-    <p class="error">
-      <span th:if="${errorMessage}" th:text="${errorMessage}"></span>
-    </p>
+    <p class="error" th:if="${errorMessage}" th:text="${errorMessage}"></p>
     <div class="form">
       <div class="label">カテゴリー：</div>
       <div class="select">

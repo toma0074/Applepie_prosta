@@ -26,9 +26,10 @@
 <table class="question_list" id="question-table" th:if="${!#lists.isEmpty(Questions)}">
   <thead>
     <tr>
-      <th class="category">カテゴリ</th>
+      <th class="category">カテゴリー</th>
       <th class="difficulty">難易度</th>
       <th class="questionText">問題文</th>
+      <th class="bookmark">ブックマーク</th>
     </tr>
   </thead>
   <tbody>
@@ -40,6 +41,17 @@
         <span th:case="3">★★★</span>
       </td>
       <td class="qtext" th:text="${q.questionText}"></td>
+      <td class="center bookmark-cell">
+        <!-- ブックマークの切り替え。★=登録済み、☆=未登録。ボタンの見た目は共通の送信ボタンと同じ -->
+        <form th:action="@{/favorite/toggle}" method="post">
+          <input type="hidden" name="questionId" th:value="${q.questionId}" />
+          <input type="submit" class="bookmark-button"
+                 th:with="marked=${favoriteIds != null and favoriteIds.contains(q.questionId)}"
+                 th:value="${marked} ? '★' : '☆'"
+                 th:title="${marked} ? 'ブックマークを解除' : 'ブックマークに追加'"
+                 th:attr="aria-label=${marked} ? 'ブックマークを解除' : 'ブックマークに追加'" />
+        </form>
+      </td>
     </tr>
   </tbody>
 </table>

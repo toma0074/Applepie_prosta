@@ -19,6 +19,7 @@ END;
 /
 --------------------------------------------------------
 --  ファイルを作成しました - 金曜日-10月-30-2026   
+--  更新 2026-10-31: FAVORITE(ブックマーク)に (USER_ID, QUESTION_ID) の一意制約を追加
 --------------------------------------------------------
 --------------------------------------------------------
 --  DDL for Sequence SEQ_ANSWER
@@ -188,10 +189,10 @@ END;
  NOCOMPRESS LOGGING
   TABLESPACE "USERS" ;
 
-   COMMENT ON COLUMN "PROSTA_USER"."FAVORITE"."FAVORITE_ID" IS 'お気に入りID';
+   COMMENT ON COLUMN "PROSTA_USER"."FAVORITE"."FAVORITE_ID" IS 'ブックマークID';
    COMMENT ON COLUMN "PROSTA_USER"."FAVORITE"."USER_ID" IS 'ユーザーID';
    COMMENT ON COLUMN "PROSTA_USER"."FAVORITE"."QUESTION_ID" IS '問題ID';
-   COMMENT ON TABLE "PROSTA_USER"."FAVORITE"  IS 'お気に入り管理テーブル';
+   COMMENT ON TABLE "PROSTA_USER"."FAVORITE"  IS 'ブックマーク管理テーブル(問題の後で見返す印)';
 --------------------------------------------------------
 --  DDL for Table FRIEND_CONNECTION
 --------------------------------------------------------
@@ -658,6 +659,8 @@ Insert into PROSTA_USER.USER_ACHIEVEMENT (USER_ACH_ID,USER_ID,ACHIEVEMENT_ID,UNL
   ALTER TABLE "PROSTA_USER"."FAVORITE" MODIFY ("QUESTION_ID" NOT NULL ENABLE);
   ALTER TABLE "PROSTA_USER"."FAVORITE" ADD CONSTRAINT "PK_FAVORITE" PRIMARY KEY ("FAVORITE_ID")
   USING INDEX "PROSTA_USER"."PK_FAVORITE"  ENABLE;
+  -- 同じユーザーが同じ問題を二重にブックマークしないための一意制約
+  ALTER TABLE "PROSTA_USER"."FAVORITE" ADD CONSTRAINT "UQ_FAVORITE_USER_QUESTION" UNIQUE ("USER_ID", "QUESTION_ID") ENABLE;
 --------------------------------------------------------
 --  Constraints for Table USER_ACHIEVEMENT
 --------------------------------------------------------

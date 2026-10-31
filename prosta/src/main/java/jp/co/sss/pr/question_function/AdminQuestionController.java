@@ -161,7 +161,7 @@ public class AdminQuestionController {
         Question q = find(id);
         if (answerRepository.existsByQuestion(q) || favoriteRepository.existsByQuestion(q)) {
             redirect.addFlashAttribute("error",
-                    "解答履歴またはお気に入りに使われている問題は削除できません。");
+                    "解答履歴またはブックマークに使われている問題は削除できません。");
             return "redirect:/admin/questions";
         }
         try {

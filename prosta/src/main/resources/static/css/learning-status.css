@@ -27,6 +27,18 @@
     padding: 0;
 }
 
+.logout-farewell-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #0b346e;
+}
+
+.logout-farewell-image {
+    width: 180px;
+    height: auto;
+    flex-shrink: 0;
+}
+
 .learning-overview {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -196,6 +208,11 @@
     .learning-section-header {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .logout-farewell-image {
+        width: 140px;
+        align-self: center;
     }
 
     .learning-overview {

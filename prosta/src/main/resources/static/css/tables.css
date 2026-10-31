@@ -52,6 +52,27 @@ article table.question_list th.questionText {
     width: auto;
 }
 
+/* ブックマーク列：共通の送信ボタン(stylesheet.css)の見た目のまま、★/☆を中央に揃える */
+article table.question_list th.bookmark {
+    width: 7.5rem;
+}
+
+article table.question_list td.bookmark-cell {
+    text-align: center;
+}
+
+article table.question_list td.bookmark-cell form {
+    margin: 0;
+}
+
+article table.question_list input.bookmark-button {
+    min-width: 3rem;
+    margin: 0;
+    font-family: inherit;
+    font-size: 12pt;
+    line-height: 1.4;
+}
+
 article table.mypage-table th.category {
     width: 15%;
 }
@@ -117,11 +138,15 @@ article table:not(.qcheck) input[type="password"] {
     }
 
     article table.question_list th.category {
-        width: 22%;
+        width: 20%;
     }
 
     article table.question_list th.difficulty {
-        width: 24%;
+        width: 18%;
+    }
+
+    article table.question_list th.bookmark {
+        width: 22%;
     }
 
     article table.aq-table td.num {
