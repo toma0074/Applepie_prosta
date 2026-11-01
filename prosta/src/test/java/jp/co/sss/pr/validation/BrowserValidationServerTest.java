@@ -23,7 +23,7 @@ class BrowserValidationServerTest extends ValidationSupport {
     void serveIsolatedFixtureUntilExplicitStopOrTimeout() throws Exception {
         acceptedFriendship();
         Achievement a = new Achievement();
-        a.setAchievementId(7);
+        a.setAchievementId(6);
         a.setAchievementName("レベル25到達");
         a.setDescription("レベル25に到達する");
         a.setIcon("⭐");

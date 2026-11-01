@@ -43,11 +43,13 @@ class AchievementControllerTest {
             achievement.setAchievementId(id);
             rows.add(achievement);
         }
-        when(achievements.findAll()).thenReturn(rows);
+        when(achievements.findAll()).thenReturn(List.copyOf(rows));
         ExtendedModelMap model = new ExtendedModelMap();
 
         assertEquals("mypage/achievement", controller.achievement(model, session));
-        assertEquals(List.of(5, 6, 7, 8, 9), rows.stream().map(achievement -> achievement.getAchievementId()).toList());
-        assertEquals(rows, model.get("allAchievements"));
+        assertEquals(List.of(rows.get(2), rows.get(4), rows.get(1), rows.get(3), rows.get(0)),
+                model.get("allAchievements"));
+        assertEquals(List.of(9, 7, 5, 8, 6),
+                rows.stream().map(achievement -> achievement.getAchievementId()).toList());
     }
 }

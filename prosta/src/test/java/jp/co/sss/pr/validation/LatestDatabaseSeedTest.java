@@ -175,8 +175,23 @@ class LatestDatabaseSeedTest {
                 try (var result = statement.executeQuery("SELECT COALESCE(MAX(" + target[1]
                         + "), 0) FROM " + target[0])) {
                     assertTrue(result.next());
-                    assertEquals(result.getLong(1) + 1, start, entry.getKey() + " must follow inserted IDs");
+                    long maximum = result.getLong(1);
+                    assertEquals(maximum + 1, start, entry.getKey() + " must follow inserted IDs");
+                    try (var ids = connection.createStatement();
+                            var contiguous = ids.executeQuery("SELECT COUNT(*), MIN(" + target[1]
+                                    + ") FROM " + target[0])) {
+                        assertTrue(contiguous.next());
+                        assertEquals(maximum, contiguous.getLong(1), target[0] + " must have contiguous IDs");
+                        if (maximum > 0) assertEquals(1L, contiguous.getLong(2), target[0] + " must start at 1");
+                    }
                 }
+            }
+            try (var result = statement.executeQuery(
+                    "SELECT COUNT(*), MIN(ACHIEVEMENT_ID), MAX(ACHIEVEMENT_ID) FROM ACHIEVEMENT")) {
+                assertTrue(result.next());
+                assertEquals(20, result.getInt(1));
+                assertEquals(1, result.getInt(2));
+                assertEquals(20, result.getInt(3));
             }
             assertThrows(SQLException.class, () -> statement.executeUpdate(
                     "INSERT INTO FAVORITE (FAVORITE_ID,USER_ID,QUESTION_ID)"
@@ -206,7 +221,7 @@ class LatestDatabaseSeedTest {
     void preservesExistingIconsAndKeepsPasswordsHashed() throws Exception {
         List<String> expectedIcons = List.of(
                 "\uD83D\uDCC5", "\uD83C\uDFAF", "\uD83E\uDD49", "\uD83C\uDFC6", "\uD83C\uDF31",
-                "\u2B50", "\uD83D\uDEE1", "\uD83D\uDCAB", "\uD83D\uDC51", "\uD83D\uDCD8",
+                "\u2B50", "\u2694\uFE0F", "\uD83D\uDCAB", "\uD83D\uDC51", "\uD83D\uDCD8",
                 "\uD83D\uDCDA", "\uD83D\uDC8E", "\uD83D\uDD25", "\uD83C\uDF93", "\uD83C\uDF31",
                 "\uD83E\uDD1D", "\uD83D\uDC65", "\uD83C\uDF1F", "\uD83D\uDC51", "\uD83D\uDCDA");
         var matcher = INSERT.matcher(sql());

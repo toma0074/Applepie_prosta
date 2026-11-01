@@ -48,7 +48,7 @@ public class AchievementController {
         Customer user = customerRepository.getReferenceById(userBean.getUserId());
 
         // 全実績マスター
-        List<Achievement> allAchievements = achievementRepository.findAll();
+        List<Achievement> allAchievements = new ArrayList<>(achievementRepository.findAll());
         allAchievements.sort(Comparator.comparingInt(achievement -> achievement.getAchievementId()));
 
         // 未確認の実績を控えてから確認済みにする（今回のページでNEW表示するため）

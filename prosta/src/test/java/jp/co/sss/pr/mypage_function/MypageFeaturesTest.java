@@ -207,6 +207,8 @@ class MypageFeaturesTest {
         a1.setAchievementId(10);
         Achievement a2 = new Achievement();
         a2.setAchievementId(11);
+        Achievement a3 = new Achievement();
+        a3.setAchievementId(12);
         UserAchievement unseen = new UserAchievement();
         unseen.setAchievement(a1);
         unseen.setSeen(false);
@@ -216,7 +218,7 @@ class MypageFeaturesTest {
         AchievementRepository aRepo = mock(AchievementRepository.class);
         UserAchievementRepository uaRepo = mock(UserAchievementRepository.class);
         LevelService level = mock(LevelService.class);
-        when(aRepo.findAll()).thenReturn(List.of(a1, a2, new Achievement()));
+        when(aRepo.findAll()).thenReturn(List.of(a1, a2, a3));
         when(uaRepo.findByCustomerAndSeenFalse(customer)).thenReturn(List.of(unseen));
         when(uaRepo.findByCustomerOrderByUnlockedDateDesc(customer)).thenReturn(List.of(unseen, seen));
         when(level.getPerfectCount(customer)).thenReturn(3);
