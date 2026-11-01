@@ -35,7 +35,6 @@ import jp.co.sss.pr.service.LevelService;
 @WebMvcTest(MypageController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class MypageHistoryTemplateTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -53,6 +52,28 @@ class MypageHistoryTemplateTest {
     private FriendConnectionRepository friendConnectionRepository;
     @MockBean
     private jp.co.sss.pr.service.QuestService questService;
+
+    @Test
+    void mypageDoesNotShowRecommendationOrReviewTiles() throws Exception {
+        Customer customer = new Customer();
+        customer.setUserId(1);
+        customer.setUserLevel(1);
+        customer.setLoginCount(1);
+        when(customerRepository.getReferenceById(1)).thenReturn(customer);
+        when(userAchievementRepository.findByCustomerOrderByUnlockedDateDesc(customer)).thenReturn(List.of());
+        CustomerBean bean = new CustomerBean();
+        bean.setUserId(1);
+        bean.setPermission(0);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", bean);
+
+        mockMvc.perform(get("/mypage").session(session))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.not(Matchers.containsString("今日のおすすめ学習"))))
+                .andExpect(content().string(Matchers.not(Matchers.containsString("今日の復習："))))
+                .andExpect(content().string(Matchers.containsString("解答履歴")))
+                .andExpect(content().string(Matchers.containsString("フレンド")));
+    }
 
     @Test
     void questionTextCarriesAllOptionsAndTheCorrectAnswerForTheModal() throws Exception {

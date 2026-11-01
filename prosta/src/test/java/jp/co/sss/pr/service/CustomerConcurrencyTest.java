@@ -19,6 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import jp.co.sss.pr.entity.Customer;
+import jp.co.sss.pr.entity.Answer;
+import jp.co.sss.pr.entity.Question;
+import jp.co.sss.pr.repository.AnswerRepository;
+import jp.co.sss.pr.repository.QuestionRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
 
 @DataJpaTest(properties = {
@@ -27,12 +31,81 @@ import jp.co.sss.pr.repository.CustomerRepository;
         "spring.jpa.show-sql=false"
 })
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-@Import(LevelService.class)
+@Import({LevelService.class, QuestService.class})
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class CustomerConcurrencyTest {
     @Autowired private CustomerRepository customers;
     @Autowired private LevelService levels;
     @Autowired private PlatformTransactionManager transactions;
+    @Autowired private AnswerRepository answers;
+    @Autowired private QuestionRepository questions;
+
+    private void completedQuests(Customer customer) {
+        Question question = new Question();
+        question.setDifficulty(1);
+        question.setQuestionText("Quest test");
+        question.setOptionA("A");
+        question.setOptionB("B");
+        question.setOptionC("C");
+        question.setCorrectOption(1);
+        questions.saveAndFlush(question);
+        for (int i = 0; i < 5; i++) {
+            Answer answer = new Answer();
+            answer.setCustomer(customer);
+            answer.setQuestion(question);
+            answer.setCorrectFlag(true);
+            answer.setAnsOption(1);
+            answer.setCorrectOption(1);
+            answer.setAnsDate(LocalDate.now());
+            answer.setAnsCount(1);
+            answers.saveAndFlush(answer);
+        }
+    }
+
+    @Test
+    void concurrentQuestCompletionsPersistOnlyOneReward() throws Exception {
+        Customer original = customer();
+        completedQuests(original);
+        CountDownLatch loaded = new CountDownLatch(2);
+        var executor = Executors.newFixedThreadPool(2);
+        try {
+            var task = (java.util.concurrent.Callable<Void>) () -> {
+                new TransactionTemplate(transactions).executeWithoutResult(status -> {
+                    Customer snapshot = customers.findById(original.getUserId()).orElseThrow();
+                    loaded.countDown();
+                    await(loaded);
+                    levels.processTestResult(snapshot, 0, 1);
+                });
+                return null;
+            };
+            var first = executor.submit(task);
+            var second = executor.submit(task);
+            first.get(10, TimeUnit.SECONDS);
+            second.get(10, TimeUnit.SECONDS);
+            Customer result = customers.findById(original.getUserId()).orElseThrow();
+            assertEquals(10L, result.getTotalExp());
+            assertEquals(LocalDate.now(), result.getQuestRewardDate());
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void rollbackDoesNotConsumeTheRewardAndRetryCanReceiveIt() {
+        Customer original = customer();
+        completedQuests(original);
+        new TransactionTemplate(transactions).executeWithoutResult(status -> {
+            levels.processTestResult(customers.findById(original.getUserId()).orElseThrow(), 0, 1);
+            status.setRollbackOnly();
+        });
+        Customer rolledBack = customers.findById(original.getUserId()).orElseThrow();
+        assertEquals(0L, rolledBack.getTotalExp());
+        assertNull(rolledBack.getQuestRewardDate());
+        levels.processTestResult(rolledBack, 0, 1);
+        Customer result = customers.findById(original.getUserId()).orElseThrow();
+        assertEquals(10L, result.getTotalExp());
+        assertEquals(LocalDate.now(), result.getQuestRewardDate());
+    }
 
     private Customer customer() {
         Customer customer = new Customer();

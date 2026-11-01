@@ -7,6 +7,7 @@
 </head>
 <body class="test_category_result">
 <h3>テスト結果</h3>
+<p th:if="${questRewardEarned == true}" class="achievement-toast">今日のクエスト全達成！追加で10 EXPを獲得しました。</p>
 
 <!-- ===== 新規実績解除フラッシュ ===== -->
 <div th:if="${newAchievements != null and !#lists.isEmpty(newAchievements)}" class="achievement-toast">
@@ -93,7 +94,7 @@
 
 <!-- ===== 解答結果 ===== -->
 <div class="test-result-answers">
-  <form th:action="@{/mypage}" method="get" id="question-table">
+  <div id="question-table">
 
     <div class="form_group" th:each="ans,count : ${ans}">
       <div class="question_row">
@@ -110,9 +111,9 @@
       </div>
       <div class="ans_row">
         <span class="label">選んだ選択肢：</span>
-        <span th:if="${ans.ansOption == 1}">A</span>
-        <span th:if="${ans.ansOption == 2}">B</span>
-        <span th:if="${ans.ansOption == 3}">C</span>
+        <span th:if="${ans.ansOption == 1}" th:text="|A: ${ans.optionA}|"></span>
+        <span th:if="${ans.ansOption == 2}" th:text="|B: ${ans.optionB}|"></span>
+        <span th:if="${ans.ansOption == 3}" th:text="|C: ${ans.optionC}|"></span>
         <span th:if="${ans.ansOption == 4}">わからない</span>
         <!-- 正誤マーク -->
         <span th:if="${ans.ansOption == ans.correctOption}" class="correct-mark">✔</span>
@@ -120,10 +121,19 @@
       </div>
       <div class="ans_row">
         <span class="label">正解：</span>
-        <span th:if="${ans.correctOption == 1}">A</span>
-        <span th:if="${ans.correctOption == 2}">B</span>
-        <span th:if="${ans.correctOption == 3}">C</span>
+        <span th:if="${ans.correctOption == 1}" th:text="|A: ${ans.optionA}|"></span>
+        <span th:if="${ans.correctOption == 2}" th:text="|B: ${ans.optionB}|"></span>
+        <span th:if="${ans.correctOption == 3}" th:text="|C: ${ans.optionC}|"></span>
       </div>
+      <p th:if="${ans.previousAnswer != null}" th:text="${ans.previousAnswer}"></p>
+      <p><strong>解説：</strong><span th:text="${#strings.isEmpty(ans.explanation) ? '解説はまだ登録されていません。' : ans.explanation}"></span></p>
+      <form th:action="@{/favorite/toggle}" method="post">
+        <input type="hidden" name="questionId" th:value="${ans.questionId}" />
+        <input type="hidden" name="resultPage" value="true" />
+        <button type="submit" class="btn"
+                th:text="${favoriteIds != null and favoriteIds.contains(ans.questionId)} ? '★ 解除' : '☆ ブックマーク'"></button>
+      </form>
+      <p class="btn"><a th:href="@{/question/{id}/study(id=${ans.questionId},returnUrl='/test/result')}">学習メモ・問題報告</a></p>
     </div>
 
     <div id="pagination-container" class="pagination-container"
@@ -140,10 +150,10 @@
 
     <div class="button-area">
     <div class="inputselect">
-    <input type="submit" value="マイページに戻る" />
+    <a class="btn" th:href="@{/mypage}">マイページに戻る</a>
     </div>
     </div>
-  </form>
+  </div>
 </div>
 
 

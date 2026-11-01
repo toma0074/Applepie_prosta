@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="selector" class="question-count">
+  <div class="form">
+    <div class="label"><label for="question-count">出題数：</label></div>
+    <div class="inputselect">
+      <select id="question-count" class="question-count-select" name="questionCount"
+              aria-describedby="question-count-note">
+        <option value="5">5問</option>
+        <option value="10">10問</option>
+        <option value="15" selected="selected">15問</option>
+      </select>
+    </div>
+  </div>
+  <p id="question-count-note" class="question-count-note">（対象問題が少ない場合はその件数で出題します。）</p>
+</div>
+</body>
+</html>

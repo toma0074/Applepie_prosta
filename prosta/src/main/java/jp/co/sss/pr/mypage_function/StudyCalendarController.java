@@ -23,11 +23,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.pr.bean.CustomerBean;
 import jp.co.sss.pr.entity.Customer;
+import jp.co.sss.pr.entity.Category;
 import jp.co.sss.pr.entity.StudyPlan;
 import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.DailyStudySummary;
 import jp.co.sss.pr.repository.StudyPlanRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
+import jp.co.sss.pr.repository.CategoryRepository;
 
 @Controller
 public class StudyCalendarController {
@@ -39,14 +41,17 @@ public class StudyCalendarController {
     private final AnswerRepository answerRepository;
     private final StudyPlanRepository studyPlanRepository;
     private final CustomerRepository customerRepository;
+    private final CategoryRepository categoryRepository;
 
     public StudyCalendarController(
             AnswerRepository answerRepository,
             StudyPlanRepository studyPlanRepository,
-            CustomerRepository customerRepository) {
+            CustomerRepository customerRepository,
+            CategoryRepository categoryRepository) {
         this.answerRepository = answerRepository;
         this.studyPlanRepository = studyPlanRepository;
         this.customerRepository = customerRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @GetMapping("/study-calendar")
@@ -70,6 +75,11 @@ public class StudyCalendarController {
         }
 
         Customer customer = customerRepository.getReferenceById(userBean.getUserId());
+        StudyPlan editingPlan = edit == null ? null : findOwnedPlan(edit, customer);
+        if (editingPlan != null) {
+            selectedDate = editingPlan.getPlanDate();
+            selectedMonth = YearMonth.from(selectedDate);
+        }
         LocalDate firstDate = selectedMonth.atDay(1);
         LocalDate lastDate = selectedMonth.atEndOfMonth();
         List<DailyStudySummary> summaries =
@@ -87,13 +97,6 @@ public class StudyCalendarController {
         List<StudyPlan> selectedPlans =
                 studyPlanRepository.findAllByCustomerAndPlanDateOrderByStudyPlanIdAsc(customer, selectedDate);
 
-        StudyPlan editingPlan = null;
-        if (edit != null) {
-            editingPlan = studyPlanRepository.findByStudyPlanIdAndCustomer(edit, customer)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-            selectedDate = editingPlan.getPlanDate();
-        }
-
         DailyStudySummary selectedSummary = summariesByDate.get(selectedDate);
         long answerCount = selectedSummary == null ? 0 : selectedSummary.getAnswerCount();
         long correctCount = selectedSummary == null ? 0 : selectedSummary.getCorrectCount();
@@ -106,6 +109,7 @@ public class StudyCalendarController {
         model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("selectedPlans", selectedPlans);
         model.addAttribute("editingPlan", editingPlan);
+        model.addAttribute("planCategories", categoryRepository.findAll());
         model.addAttribute("answerCount", answerCount);
         model.addAttribute("correctCount", correctCount);
         model.addAttribute("incorrectCount", answerCount - correctCount);
@@ -118,9 +122,15 @@ public class StudyCalendarController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate planDate,
             @RequestParam String title,
             @RequestParam(required = false) String details,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(defaultValue = "10") Integer targetQuestionCount,
             RedirectAttributes redirectAttributes) {
         Customer customer = currentCustomer(session);
-        String validationError = validatePlan(title, details);
+        String validationError = validatePlan(title, details, targetQuestionCount);
+        Category category = categoryId == null ? null : categoryRepository.findById(categoryId).orElse(null);
+        if (categoryId != null && category == null) {
+            validationError = "カテゴリが無効です。";
+        }
         if (validationError != null) {
             redirectAttributes.addFlashAttribute("planError", validationError);
             return redirectToCalendar(YearMonth.from(planDate), planDate);
@@ -131,6 +141,8 @@ public class StudyCalendarController {
         plan.setPlanDate(planDate);
         plan.setTitle(title.trim());
         plan.setDetails(normalizeDetails(details));
+        plan.setCategory(category);
+        plan.setTargetQuestionCount(targetQuestionCount);
         studyPlanRepository.save(plan);
         redirectAttributes.addFlashAttribute("planMessage", "学習予定を登録しました。");
         return redirectToCalendar(YearMonth.from(planDate), planDate);
@@ -143,10 +155,16 @@ public class StudyCalendarController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate planDate,
             @RequestParam String title,
             @RequestParam(required = false) String details,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(defaultValue = "10") Integer targetQuestionCount,
             RedirectAttributes redirectAttributes) {
         Customer customer = currentCustomer(session);
         StudyPlan plan = findOwnedPlan(id, customer);
-        String validationError = validatePlan(title, details);
+        String validationError = validatePlan(title, details, targetQuestionCount);
+        Category category = categoryId == null ? null : categoryRepository.findById(categoryId).orElse(null);
+        if (categoryId != null && category == null) {
+            validationError = "カテゴリが無効です。";
+        }
         if (validationError != null) {
             redirectAttributes.addFlashAttribute("planError", validationError);
             return redirectToCalendar(YearMonth.from(plan.getPlanDate()), plan.getPlanDate());
@@ -155,6 +173,8 @@ public class StudyCalendarController {
         plan.setPlanDate(planDate);
         plan.setTitle(title.trim());
         plan.setDetails(normalizeDetails(details));
+        plan.setCategory(category);
+        plan.setTargetQuestionCount(targetQuestionCount);
         studyPlanRepository.save(plan);
         redirectAttributes.addFlashAttribute("planMessage", "学習予定を更新しました。");
         return redirectToCalendar(YearMonth.from(planDate), planDate);
@@ -218,7 +238,7 @@ public class StudyCalendarController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    private String validatePlan(String title, String details) {
+    private String validatePlan(String title, String details, Integer targetQuestionCount) {
         if (title == null || title.trim().isEmpty()) {
             return "予定のタイトルを入力してください。";
         }
@@ -227,6 +247,9 @@ public class StudyCalendarController {
         }
         if (details != null && details.length() > MAX_DETAILS_LENGTH) {
             return "詳細は500文字以内で入力してください。";
+        }
+        if (targetQuestionCount == null || !List.of(5, 10, 15).contains(targetQuestionCount)) {
+            return "目標問題数は5・10・15問から選択してください。";
         }
         return null;
     }

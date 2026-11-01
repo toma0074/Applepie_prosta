@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head><meta charset="UTF-8" /><title>今日のおすすめ学習</title></head>
+<body>
+<h3>今日のおすすめ学習</h3>
+<h4 th:text="${recommendationTitle}"></h4>
+<p th:text="${reason}"></p>
+<p class="btn" th:if="${mode == 'category'}"><a th:href="@{/test/category/start(category=${categoryId},difficulty=${difficulty},questionCount=5)}">5問スタート</a></p>
+<p class="btn" th:if="${mode == 'spaced'}"><a th:href="@{/test/spaced/start(questionCount=5)}">5問スタート</a></p>
+<p class="btn" th:if="${mode == 'review'}"><a th:href="@{/test/review/start(questionCount=5)}">5問スタート</a></p>
+<p class="btn" th:if="${mode == 'weak'}"><a th:href="@{/test/weak/start(questionCount=5)}">5問スタート</a></p>
+<p class="btn"><a th:href="@{/mypage}">マイページに戻る</a></p>
+</body></html>

@@ -42,5 +42,25 @@ class QuestServiceTest {
         assertFalse(service.buildQuests(3, 3).get(2).completed());
         assertFalse(service.buildQuests(10, 7).get(2).completed());
         assertTrue(service.buildQuests(10, 8).get(2).completed());
+        assertTrue(service.buildQuests(5, 4).stream().allMatch(quest -> quest.completed()));
+    }
+
+    @Test
+    void completedQuestStaysCompletedAfterAccuracyFallsAndResetsNextDay() {
+        var repository = org.mockito.Mockito.mock(jp.co.sss.pr.repository.AnswerRepository.class);
+        var quests = new QuestService(repository);
+        var customer = new jp.co.sss.pr.entity.Customer();
+        var today = java.time.LocalDate.of(2026, 11, 2);
+        var summary = org.mockito.Mockito.mock(jp.co.sss.pr.repository.DailyStudySummary.class);
+        org.mockito.Mockito.when(summary.getAnswerCount()).thenReturn(5L);
+        org.mockito.Mockito.when(summary.getCorrectCount()).thenReturn(4L);
+        org.mockito.Mockito.when(repository.summarizeDailyStudy(customer, today, today)).thenReturn(List.of(summary));
+        quests.recordDailyCompletion(customer, today);
+        assertEquals(7, customer.getQuestCompletedMask());
+        org.mockito.Mockito.when(summary.getAnswerCount()).thenReturn(10L);
+        assertTrue(quests.allCompleted(customer, today));
+        assertFalse(quests.allCompleted(customer, today.plusDays(1)));
+        quests.recordDailyCompletion(customer, today.plusDays(1));
+        assertEquals(0, customer.getQuestCompletedMask());
     }
 }

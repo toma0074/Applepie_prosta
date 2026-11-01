@@ -150,6 +150,28 @@ div.form {
 	display: flex;
 }
 
+.question-count {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.question-count > .form {
+    justify-content: center;
+    align-items: center;
+}
+
+.question-count > .form > .label {
+    width: auto;
+    height: auto;
+    white-space: nowrap;
+}
+
+.question-count .question-count-note {
+    margin: 4px 0 0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
 div.label {
 	display: flex;
 	flex-direction: column;

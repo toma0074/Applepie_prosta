@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<title>問題・解説の報告</title>
+<meta charset="UTF-8" />
+</head>
+<body>
+<style>
+  .qr-table { width: 100%; border-collapse: collapse; }
+  .qr-table th, .qr-table td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: top; text-align: left; }
+  .qr-detail { white-space: pre-wrap; word-break: break-word; max-height: 12em; overflow: auto; }
+  .qr-filter a.is-active { font-weight: bold; text-decoration: underline; }
+  .qr-filter { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+  .qr-table select { font: inherit; max-width: 100%; }
+  .qr-table form .btn { width: auto; max-width: 100%; box-sizing: border-box; padding: 0 12px; white-space: normal; }
+  @media (max-width: 700px) {
+    .qr-table thead { display: none; }
+    .qr-table, .qr-table tbody, .qr-table tr, .qr-table td { display: block; width: 100%; box-sizing: border-box; }
+    .qr-table tr { margin-bottom: 12px; border: 1px solid #ddd; }
+    .qr-table td { border: 0; overflow-wrap: anywhere; }
+    .qr-table td::before { content: attr(data-label); display: block; font-weight: bold; margin-bottom: 4px; }
+    .qr-table form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0; }
+  }
+</style>
+<div class="aq-wrap">
+  <h3>問題・解説の報告</h3>
+  <p th:if="${message}" class="aq-msg ok" th:text="${message}"></p>
+  <p th:if="${error}" class="aq-msg ng" th:text="${error}"></p>
+
+  <p><a class="btn" th:href="@{/admin/menu}">管理メニュー</a></p>
+
+  <nav class="qr-filter" aria-label="対応状況で絞り込み">
+    <a class="btn" th:classappend="${status == null} ? 'is-active'" th:href="@{/admin/question-reports}">すべて</a>
+    <a th:each="s : ${statuses}" class="btn" th:classappend="${status == s} ? 'is-active'"
+       th:href="@{/admin/question-reports(status=${s.name()})}"
+       th:text="${s.label + '(' + counts.get(s) + ')'}">未対応(0)</a>
+  </nav>
+
+  <p th:if="${reports.totalElements == 0}">該当する報告はありません。</p>
+
+  <table class="qr-table" th:if="${reports.totalElements > 0}">
+    <thead>
+      <tr><th>No.</th><th>受付日時</th><th>問題</th><th>理由・内容</th><th>報告者</th><th>対応状況</th></tr>
+    </thead>
+    <tbody>
+      <tr th:each="r : ${reports.content}">
+        <td data-label="No." th:text="${r.reportId}"></td>
+        <td data-label="受付日時" th:text="${#temporals.format(r.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+        <td data-label="問題">
+          <a th:href="@{/admin/questions/{id}/edit(id=${r.question.questionId},returnUrl='/admin/questions')}"
+             th:text="${'No.' + r.question.questionId}">No.1</a>
+          <div th:text="${#strings.abbreviate(r.question.questionText, 80)}"></div>
+        </td>
+        <td data-label="理由・内容">
+          <strong th:text="${r.reason.label}"></strong>
+          <div class="qr-detail" th:if="${r.detail != null}" th:text="${r.detail}"></div>
+        </td>
+        <td data-label="報告者" th:text="${r.customer.userName}"></td>
+        <td data-label="対応状況">
+          <form th:action="@{/admin/question-reports/{id}/status(id=${r.reportId})}" method="post">
+            <input type="hidden" name="filter" th:value="${status != null ? status.name() : ''}" />
+            <input type="hidden" name="page" th:value="${reports.number}" />
+            <select name="status" aria-label="対応状況">
+              <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.label}"
+                      th:selected="${r.status == s}"></option>
+            </select>
+            <button type="submit" class="btn">更新</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="aq-pager" th:if="${reports.totalPages > 1}">
+    <a class="aq-page-btn" th:classappend="${!reports.hasPrevious()} ? 'disabled'"
+       th:href="${reports.hasPrevious()} ? @{/admin/question-reports(status=${status != null ? status.name() : null},page=${reports.number - 1})} : '#'">前へ</a>
+    <span th:text="${(reports.number + 1) + ' / ' + reports.totalPages}"></span>
+    <a class="aq-page-btn" th:classappend="${!reports.hasNext()} ? 'disabled'"
+       th:href="${reports.hasNext()} ? @{/admin/question-reports(status=${status != null ? status.name() : null},page=${reports.number + 1})} : '#'">次へ</a>
+  </div>
+</div>
+</body>
+</html>

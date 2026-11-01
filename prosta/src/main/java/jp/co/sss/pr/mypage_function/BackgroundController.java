@@ -124,6 +124,10 @@ public class BackgroundController {
     public String defaultBackground(
             HttpSession session) {
 
+        Customer customer = currentCustomer(session);
+        customer.setBackgroundClass(null);
+        customer.setBackgroundColor(null);
+        customerRepository.save(customer);
         session.removeAttribute("backgroundClass");
         session.removeAttribute("backgroundColor");
 

@@ -203,6 +203,74 @@ class FriendControllerApiTest {
     }
 
     @Test
+    void answerCountSortUsesSharedFilteredSamplesRatherThanAccuracy() throws Exception {
+        when(customerRepository.findById(1)).thenReturn(Optional.of(currentUser));
+        when(friendConnectionRepository.findAllForUserAndStatus(
+                currentUser, FriendConnection.ACCEPTED)).thenReturn(List.of(acceptedConnection));
+        LocalDate from = LocalDate.now().minusDays(10);
+        LocalDate to = LocalDate.now();
+        List<FriendStudySummary> samples = List.of(summary(1, 100, 50), summary(2, 1, 1));
+        when(answerRepository.summarizeStudy(List.of(1, 2), null, 2, from, to))
+                .thenReturn(samples);
+        mockMvc.perform(get("/api/friends/leaderboard").session(session)
+                .param("sort", "answerCount").param("difficulty", "2")
+                .param("from", from.toString()).param("to", to.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sort").value("answerCount"))
+                .andExpect(jsonPath("$.entries[0].userId").value(1))
+                .andExpect(jsonPath("$.entries[0].answerCount").value(100))
+                .andExpect(jsonPath("$.entries[0].correctCount").value(50))
+                .andExpect(jsonPath("$.entries[0].accuracy").value(50.0))
+                .andExpect(jsonPath("$.entries[1].answerCount").value(1))
+                .andExpect(jsonPath("$.entries[1].accuracy").value(100.0));
+        verify(answerRepository).summarizeStudy(List.of(1, 2), null, 2, from, to);
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"accuracy", "answerCount"})
+    void unansweredParticipantsAreLastWithoutDividingByZero(String sort) throws Exception {
+        when(customerRepository.findById(1)).thenReturn(Optional.of(currentUser));
+        when(friendConnectionRepository.findAllForUserAndStatus(
+                currentUser, FriendConnection.ACCEPTED)).thenReturn(List.of(acceptedConnection));
+        List<FriendStudySummary> samples = List.of(summary(1, 0, 0), summary(2, 3, 0));
+        when(answerRepository.summarizeStudy(anyList(), isNull(), isNull(), any(), any()))
+                .thenReturn(samples);
+        mockMvc.perform(get("/api/friends/leaderboard").session(session).param("sort", sort))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entries[0].userId").value(2))
+                .andExpect(jsonPath("$.entries[0].answerCount").value(3))
+                .andExpect(jsonPath("$.entries[0].accuracy").value(0.0))
+                .andExpect(jsonPath("$.entries[1].userId").value(1))
+                .andExpect(jsonPath("$.entries[1].answerCount").value(0))
+                .andExpect(jsonPath("$.entries[1].accuracy").value(0.0));
+    }
+
+    @Test
+    void accuracySortUsesAnswerDenominatorAndSampleCountAsTieBreak() throws Exception {
+        when(customerRepository.findById(1)).thenReturn(Optional.of(currentUser));
+        when(friendConnectionRepository.findAllForUserAndStatus(
+                currentUser, FriendConnection.ACCEPTED)).thenReturn(List.of(acceptedConnection));
+        List<FriendStudySummary> samples = List.of(summary(1, 10, 5), summary(2, 2, 1));
+        when(answerRepository.summarizeStudy(anyList(), isNull(), isNull(), any(), any()))
+                .thenReturn(samples);
+        mockMvc.perform(get("/api/friends/leaderboard").session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sort").value("accuracy"))
+                .andExpect(jsonPath("$.entries[0].userId").value(1))
+                .andExpect(jsonPath("$.entries[0].accuracy").value(50.0))
+                .andExpect(jsonPath("$.entries[1].accuracy").value(50.0));
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"userName", "answerCount,desc", "accuracy desc; DROP TABLE answer", "ACCURACY"})
+    void rejectsNonAllowlistedSortingWithoutQueryingAnswers(String sort) throws Exception {
+        when(customerRepository.findById(1)).thenReturn(Optional.of(currentUser));
+        mockMvc.perform(get("/api/friends/leaderboard").session(session).param("sort", sort))
+                .andExpect(status().isBadRequest());
+        verify(answerRepository, org.mockito.Mockito.never()).summarizeStudy(anyList(), any(), any(), any(), any());
+    }
+
+    @Test
     void rejectsFriendApiRequestWithoutLogin() throws Exception {
         mockMvc.perform(get("/api/friends"))
                 .andExpect(status().isUnauthorized());

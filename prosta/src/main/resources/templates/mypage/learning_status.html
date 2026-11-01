@@ -35,6 +35,38 @@
     </div>
   </section>
 
+  <section class="learning-status-card" aria-labelledby="weekly-title">
+    <h4 id="weekly-title">直近8週間の学習推移</h4>
+    <p>月曜始まり。今週は今日まで、先週は月曜〜日曜の実績です。未学習の正答率は「—」で表示します。</p>
+    <p class="weekly-delta">今週の先週比：
+      解答数 <strong th:text="${(weeklyTrend.answerDelta > 0 ? '+' : '') + weeklyTrend.answerDelta + '問'}">0問</strong>
+      ／ 正答率 <strong th:text="${weeklyTrend.accuracyDelta == null ? '比較データなし' : (weeklyTrend.accuracyDelta > 0 ? '+' : '') + weeklyTrend.accuracyDelta + 'ポイント'}">比較データなし</strong>
+    </p>
+    <div class="weekly-chart" role="img" aria-label="直近8週間の解答数と正答率。数値は下の表に記載しています。">
+      <div class="weekly-chart-week" th:each="week : ${weeklyTrend.weeks}" aria-hidden="true">
+        <div class="weekly-chart-bars">
+          <span class="weekly-answer-bar" th:style="|height: ${week.answerBarPercent}%;|"></span>
+          <span class="weekly-accuracy-bar" th:if="${week.accuracy != null}"
+                th:style="|height: ${week.accuracy}%;|"></span>
+        </div>
+        <span th:text="${#temporals.format(week.start, 'M/d')}">10/1</span>
+      </div>
+    </div>
+    <p class="weekly-chart-legend">■ 解答数（青・期間内の最大値基準） ／ ▧ 正答率（緑・0〜100%）</p>
+    <div class="weekly-table-wrapper">
+      <table class="weekly-table">
+        <caption>週別の解答数・正解数・正答率</caption>
+        <thead><tr><th scope="col">期間</th><th scope="col">解答数</th><th scope="col">正解数</th><th scope="col">正答率</th></tr></thead>
+        <tbody><tr th:each="week : ${weeklyTrend.weeks}">
+          <th scope="row" th:text="${#temporals.format(week.start, 'M/d') + '〜' + #temporals.format(week.end, 'M/d')}">10/1〜10/7</th>
+          <td th:text="${week.answerCount + '問'}">0問</td>
+          <td th:text="${week.correctCount + '問'}">0問</td>
+          <td th:text="${week.accuracy == null ? '—（未学習）' : week.accuracy + '%'}">—（未学習）</td>
+        </tr></tbody>
+      </table>
+    </div>
+  </section>
+
   <section class="learning-status-card" aria-labelledby="weakness-title">
     <div class="learning-section-header">
       <div>

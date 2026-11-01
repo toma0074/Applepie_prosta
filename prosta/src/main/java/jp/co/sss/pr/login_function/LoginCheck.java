@@ -48,7 +48,14 @@ public class LoginCheck extends HttpFilter {
         HttpSession session = request.getSession(false);
         Object user = session == null ? null : session.getAttribute("user");
         if (user == null) {
-            response.sendRedirect(request.getContextPath() + "/login/error");
+            if (path.startsWith("/api/")) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setHeader("X-Prosta-Login-Expired", "true");
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"message\":\"ログインの有効期限が切れました。再度ログインしてください。\"}");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/login/error");
+            }
             return;
         }
 

@@ -205,6 +205,21 @@
     margin: 0;
 }
 
+.study-plan-actions {
+    flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.study-plan-actions > .btn,
+.study-plan-actions form,
+.study-plan-actions button {
+    box-sizing: border-box;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
 .study-plan-delete,
 .study-plan-submit {
     padding: 7px 12px;
@@ -237,6 +252,7 @@
 }
 
 .study-plan-form input,
+.study-plan-form select,
 .study-plan-form textarea {
     box-sizing: border-box;
     width: 100%;
@@ -268,6 +284,11 @@
     .study-calendar-month-nav > .btn {
         grid-row: 1;
         justify-self: start;
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        box-sizing: border-box;
+        white-space: normal;
     }
 
     .study-calendar-month-nav > .btn:last-child {

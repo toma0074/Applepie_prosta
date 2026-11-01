@@ -37,6 +37,7 @@
       </tbody>
     </table>
     <form th:action="@{/test/review/start}" method="get">
+      <div th:replace="~{common/question_count :: selector}"></div>
       <div class="form">
         <div class="select">
           <input type="submit" th:formaction="@{/mypage}" formmethod="get" value="戻る" />

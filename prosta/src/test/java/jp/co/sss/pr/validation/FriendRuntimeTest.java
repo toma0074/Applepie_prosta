@@ -12,7 +12,8 @@ class FriendRuntimeTest extends ValidationSupport {
     void requestAcceptFeedAndRevokeAccessAfterRemoval() throws Exception {
         mvc.perform(get("/api/friends/" + friend.getUserId() + "/feed").session(browser)
                         .param("_tab", java.util.UUID.randomUUID().toString()))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("X-Prosta-Login-Expired", "true"));
         tab = login(user);
         mvc.perform(post("/api/friends/requests/" + friend.getUserId()).session(browser).param("_tab", tab))
                 .andExpect(status().isCreated());

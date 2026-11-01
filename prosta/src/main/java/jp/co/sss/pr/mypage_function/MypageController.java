@@ -63,6 +63,7 @@ public class MypageController {
         Customer user = customerRepository.getReferenceById(userBean.getUserId());
 
         model.addAttribute("quests", questService.dailyQuests(user, LocalDate.now()));
+        model.addAttribute("questRewardReceived", LocalDate.now().equals(user.getQuestRewardDate()));
 
         // レベル・ログイン情報（customer テーブルから直接取得）
         int currentLevel  = user.getUserLevel();

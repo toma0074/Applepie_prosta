@@ -60,6 +60,8 @@ class TestControllerFlowTest {
         controller.categoryRepository = catRepo;
         controller.customerRepository = customers;
         controller.weakQuestionService = weak;
+        controller.gradingService = mock(jp.co.sss.pr.service.AnswerGradingService.class);
+        controller.favoriteRepository = mock(jp.co.sss.pr.repository.FavoriteRepository.class);
     }
 
     private List<Question> questions(int n) {
@@ -289,7 +291,7 @@ class TestControllerFlowTest {
     @Test
     void resultSavesEveryAnswerScoresThemAndClearsTheTest() {
         List<AnswerForm> forms = List.of(
-                answer(1, 2, 2, 1), answer(2, 1, 3, 1), answer(3, 4, 4, 2), answer(4, null, 1, 9));
+                answer(1, 2, 2, 1), answer(2, 1, 3, 1), answer(3, 3, 3, 2), answer(4, 4, 1, 9));
         jp.co.sss.pr.repository.AnswerRepository ans = prepareResult(forms);
 
         assertEquals("redirect:/test/result", controller.resulttTest(new ExtendedModelMap(), new AnswerListForm()));
@@ -305,6 +307,14 @@ class TestControllerFlowTest {
         assertEquals(1, ((int[]) view.get("cateCount"))[1]);
         assertNull(session.getAttribute("question"));
         assertNull(session.getAttribute("ans"));
+    }
+
+    @Test
+    void unselectedAnswerCannotBeSubmittedForGrading() {
+        var repository = prepareResult(List.of(answer(1, null, 1, 1)));
+        org.junit.jupiter.api.Assertions.assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                () -> controller.resulttTest(new ExtendedModelMap(), new AnswerListForm()));
+        verify(repository, org.mockito.Mockito.never()).save(any());
     }
 
     @Test

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<title>フレンド対戦</title>
+<meta charset="UTF-8" />
+</head>
+<body>
+<h3>フレンド対戦</h3>
+<div class="friends-page">
+  <p th:if="${noticeMessage}" class="notice-message" th:text="${noticeMessage}"></p>
+  <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
+
+  <section class="friends-card">
+    <h4>新しい対戦を作る</h4>
+    <p>同じ問題セットにフレンドと別々のタイミングで解答し、正解数を比べます。結果は2人とも提出した後に表示されます。</p>
+    <p th:if="${#lists.isEmpty(friendList)}">対戦できるフレンドがいません。先にフレンド申請を承認してもらいましょう。</p>
+    <div class="test_select" th:unless="${#lists.isEmpty(friendList)}">
+      <form th:action="@{/challenges}" method="post" th:object="${challengeCreateForm}">
+        <div class="form">
+          <div class="label">対戦相手：</div>
+          <div class="inputselect">
+            <select class="category" th:field="*{friendUserId}">
+              <option th:each="f : ${friendList}" th:value="${f.userId}" th:text="${f.userName}"></option>
+            </select>
+          </div>
+        </div>
+        <div class="form">
+          <div class="label">カテゴリー：</div>
+          <div class="inputselect">
+            <select class="category" th:field="*{categoryId}">
+              <option th:each="cat : ${categoryList}" th:value="${cat.categoryId}" th:text="${cat.categoryName}"></option>
+            </select>
+          </div>
+        </div>
+        <div class="form">
+          <div class="label">難易度：</div>
+          <div class="inputselect">
+            <select class="difficulty" th:field="*{difficulty}" style="color: #FFB11B;">
+              <option value="1">★☆☆</option>
+              <option value="2">★★☆</option>
+              <option value="3">★★★</option>
+            </select>
+          </div>
+        </div>
+        <div class="form">
+          <div class="label">問題数：</div>
+          <div class="inputselect">
+            <select class="question-count-select" th:field="*{questionCount}">
+              <option th:each="n : ${questionCounts}" th:value="${n}" th:text="${n} + '問'"></option>
+            </select>
+          </div>
+        </div>
+        <div class="form">
+          <div class="label"></div>
+          <div class="select">
+            <input type="submit" value="対戦を作成" />
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="friends-card">
+    <h4>対戦一覧</h4>
+    <p th:if="${#lists.isEmpty(challengeList)}">まだ対戦はありません。</p>
+    <table class="challenge-list" th:unless="${#lists.isEmpty(challengeList)}">
+      <thead>
+        <tr><th>作成日時</th><th>相手</th><th>カテゴリ</th><th>難易度</th><th>問題数</th><th>状態</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="c : ${challengeList}">
+          <td th:text="${#temporals.format(c.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+          <td th:text="${c.opponentName}"></td>
+          <td th:text="${c.categoryName}"></td>
+          <td th:text="${c.difficulty == 1 ? '★☆☆' : (c.difficulty == 2 ? '★★☆' : '★★★')}"></td>
+          <td th:text="${c.questionCount} + '問'"></td>
+          <td th:text="${c.statusLabel}"></td>
+          <td><a th:href="@{/challenges/{id}(id=${c.challengeId})}" th:text="${c.mySubmitted ? '見る' : '解答する'}"></a></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="button-area">
+    <a class="btn" th:href="@{/mypage}">マイページへ戻る</a>
+  </div>
+</div>
+</body>
+</html>

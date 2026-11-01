@@ -9,7 +9,7 @@ import jp.co.sss.pr.entity.Customer;
 import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.DailyStudySummary;
 
-/** 今日のクエスト。当日の解答実績から達成状況を算出する（DBへの保存はしない）。 */
+/** 当日の実績と保存済みの達成状態を組み合わせる。保存は採点トランザクション内で行う。 */
 @Service
 public class QuestService {
 
@@ -17,6 +17,7 @@ public class QuestService {
     static final int CORRECT_TARGET = 3;
     static final int ACCURACY_MIN_ANSWERS = 5;
     static final int ACCURACY_TARGET = 80;
+    public static final int COMPLETION_REWARD_EXP = 10;
 
     private final AnswerRepository answerRepository;
 
@@ -37,7 +38,31 @@ public class QuestService {
             answers += daily.getAnswerCount();
             correct += daily.getCorrectCount();
         }
-        return buildQuests(answers, correct);
+        List<Quest> actual = buildQuests(answers, correct);
+        int mask = today.equals(customer.getQuestRewardDate()) ? 7
+                : today.equals(customer.getQuestProgressDate()) ? customer.getQuestCompletedMask() : 0;
+        java.util.ArrayList<Quest> result = new java.util.ArrayList<>();
+        for (int i = 0; i < actual.size(); i++) {
+            Quest quest = actual.get(i);
+            boolean completed = quest.completed() || (mask & (1 << i)) != 0;
+            result.add(new Quest(quest.title(), quest.description(), completed ? quest.target() : quest.progress(),
+                    quest.target(), completed));
+        }
+        return result;
+    }
+
+    public void recordDailyCompletion(Customer customer, LocalDate today) {
+        List<Quest> quests = dailyQuests(customer, today);
+        int mask = 0;
+        for (int i = 0; i < quests.size(); i++) {
+            if (quests.get(i).completed()) mask |= 1 << i;
+        }
+        customer.setQuestProgressDate(today);
+        customer.setQuestCompletedMask(mask);
+    }
+
+    public boolean allCompleted(Customer customer, LocalDate today) {
+        return dailyQuests(customer, today).stream().allMatch(quest -> quest.completed());
     }
 
     List<Quest> buildQuests(long answers, long correct) {

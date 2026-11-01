@@ -79,6 +79,24 @@ public class Customer {
     @Column(name = "total_exp", nullable = false)
     private Long totalExp = 0L;
 
+    @Column(name = "quest_reward_date")
+    private LocalDate questRewardDate;
+
+    public LocalDate getQuestRewardDate() { return questRewardDate; }
+
+    public void setQuestRewardDate(LocalDate questRewardDate) { this.questRewardDate = questRewardDate; }
+
+    @Column(name = "quest_progress_date")
+    private LocalDate questProgressDate;
+
+    @Column(name = "quest_completed_mask", nullable = false)
+    private Integer questCompletedMask = 0;
+
+    public LocalDate getQuestProgressDate() { return questProgressDate; }
+    public void setQuestProgressDate(LocalDate date) { this.questProgressDate = date; }
+    public Integer getQuestCompletedMask() { return questCompletedMask; }
+    public void setQuestCompletedMask(Integer mask) { this.questCompletedMask = mask; }
+
  
     
 

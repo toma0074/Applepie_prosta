@@ -250,8 +250,22 @@ public class FriendController {
             @RequestParam(required = false) Integer difficulty,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(defaultValue = "accuracy") String sort,
             HttpSession session) {
         Customer currentUser = currentUser(session);
+        Comparator<LeaderboardEntry> primaryOrder = switch (sort) {
+            case "accuracy" -> Comparator.comparingDouble((LeaderboardEntry entry) -> entry.accuracy()).reversed();
+            case "answerCount" -> Comparator.comparingLong((LeaderboardEntry entry) -> entry.answerCount()).reversed();
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "並び順が無効です");
+        };
+        Comparator<LeaderboardEntry> rankingOrder = Comparator
+                .comparing((LeaderboardEntry entry) -> entry.answerCount() > 0).reversed()
+                .thenComparing(primaryOrder)
+                .thenComparing(Comparator.comparingLong((LeaderboardEntry entry) -> entry.answerCount()).reversed())
+                .thenComparing(Comparator.comparingDouble((LeaderboardEntry entry) -> entry.accuracy()).reversed())
+                .thenComparing(entry -> entry.userName(),
+                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER))
+                .thenComparing(entry -> entry.userId());
         Category category = null;
         if (categoryId != null) {
             category = categoryRepository.findById(categoryId)
@@ -296,17 +310,14 @@ public class FriendController {
                     return new LeaderboardEntry(
                             userId, user.getUserName(), answers, correct, accuracy);
                 })
-                .sorted(Comparator.comparingDouble((LeaderboardEntry entry) -> entry.accuracy()).reversed()
-                        .thenComparing(Comparator.comparingLong((LeaderboardEntry entry) -> entry.correctCount()).reversed())
-                        .thenComparing(Comparator.comparingLong((LeaderboardEntry entry) -> entry.answerCount()).reversed())
-                        .thenComparing(entry -> entry.userName(), String.CASE_INSENSITIVE_ORDER))
+                .sorted(rankingOrder)
                 .toList();
 
         return new Leaderboard(
                 category == null ? null : category.getCategoryId(),
                 category == null ? "すべてのカテゴリ" : category.getCategoryName(),
                 difficulty,
-                fromDate, toDate, entries);
+                fromDate, toDate, entries, sort);
     }
 
     private Customer currentUser(HttpSession session) {
@@ -425,6 +436,7 @@ public class FriendController {
             Integer difficulty,
             LocalDate from,
             LocalDate to,
-            List<LeaderboardEntry> entries) {
+            List<LeaderboardEntry> entries,
+            String sort) {
     }
 }

@@ -1,5 +1,6 @@
 package jp.co.sss.pr.mypage_function;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.CategoryRepository;
 import jp.co.sss.pr.repository.CategoryStudySummary;
 import jp.co.sss.pr.repository.CustomerRepository;
+import jp.co.sss.pr.service.LearningTrendService;
 
 @Controller
 public class LearningStatusController {
@@ -81,6 +83,10 @@ public class LearningStatusController {
         model.addAttribute("totalCorrect", totalCorrect);
         model.addAttribute("totalIncorrect", totalAnswers - totalCorrect);
         model.addAttribute("overallAccuracy", overallAccuracy);
+        LocalDate today = LocalDate.now();
+        var trend = LearningTrendService.summarize(today, answerRepository.summarizeDailyStudy(
+                customer, LearningTrendService.firstWeek(today), today));
+        model.addAttribute("weeklyTrend", trend);
         model.addAttribute("recentActivities",
                 answerRepository.findRecentActivities(customer, PageRequest.of(0, RECENT_ACTIVITY_LIMIT))
                         .getContent());

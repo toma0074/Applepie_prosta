@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import jp.co.sss.pr.bean.CustomerBean;
 import jp.co.sss.pr.entity.Customer;
+import jp.co.sss.pr.entity.Category;
 import jp.co.sss.pr.entity.StudyPlan;
 import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.CategoryRepository;
@@ -63,6 +64,12 @@ class StudyCalendarTemplateTest {
         plan.setPlanDate(LocalDate.of(2026, 3, 12));
         plan.setTitle("Java復習");
         plan.setDetails("配列を復習する");
+        Category category = new Category();
+        category.setCategoryId(2);
+        category.setCategoryName("Java");
+        plan.setCategory(category);
+        plan.setTargetQuestionCount(15);
+        when(categoryRepository.findAll()).thenReturn(List.of(category));
         when(studyPlanRepository.findAllByCustomerAndPlanDateBetweenOrderByPlanDateAscStudyPlanIdAsc(
                 customer, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 3, 31)))
                 .thenReturn(List.of(plan));
@@ -103,6 +110,10 @@ class StudyCalendarTemplateTest {
                 .andExpect(content().string(Matchers.containsString("Javaの問題を10問解く")))
                 .andExpect(content().string(Matchers.containsString("Java復習")))
                 .andExpect(content().string(Matchers.containsString("配列を復習する")))
+                .andExpect(content().string(Matchers.containsString(
+                        contextPath + "/test/category/start?category=2&amp;difficulty=1&amp;questionCount=15")))
+                .andExpect(content().string(Matchers.containsString("name=\"targetQuestionCount\"")))
+                .andExpect(content().string(Matchers.containsString("学習カテゴリ（任意）")))
                 .andExpect(content().string(Matchers.containsString(contextPath + "/study-calendar/plans/3/delete")))
                 .andExpect(content().string(Matchers.containsString("予定を登録")));
     }

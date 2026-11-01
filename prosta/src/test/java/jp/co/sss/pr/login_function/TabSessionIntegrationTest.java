@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,6 +27,7 @@ import jp.co.sss.pr.repository.CategoryRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.repository.QuestionRepository;
 import jp.co.sss.pr.service.PasswordService;
+import jp.co.sss.pr.service.LevelService;
 
 @SpringBootTest(properties = {
         "spring.jpa.hibernate.ddl-auto=create-drop",
@@ -41,6 +43,7 @@ class TabSessionIntegrationTest {
     @Autowired private AnswerRepository answers;
     @Autowired private CategoryRepository categories;
     @Autowired private QuestionRepository questions;
+    @SpyBean private LevelService levels;
 
     private String login(MockHttpSession browser, String name) throws Exception {
         Customer customer = new Customer();
@@ -62,6 +65,23 @@ class TabSessionIntegrationTest {
         assertNotNull(token);
         assertNotEquals(oldToken, token);
         return token;
+    }
+
+    @Test
+    void expiredBrowserSessionReturnsUnauthorizedForFriendsAndHeartbeat() throws Exception {
+        String tab = UUID.randomUUID().toString();
+        MockHttpSession expiredBrowser = new MockHttpSession();
+        expiredBrowser.invalidate();
+        MockHttpSession newBrowser = new MockHttpSession();
+        for (String path : java.util.List.of("/api/friends", "/api/login-status/heartbeat")) {
+            mvc.perform(get(path).session(newBrowser).header("X-Prosta-Tab", tab))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(header().string("X-Prosta-Login-Expired", "true"))
+                    .andExpect(content().contentTypeCompatibleWith("application/json"))
+                    .andExpect(jsonPath("$.message").value("ログインの有効期限が切れました。再度ログインしてください。"));
+        }
+        mvc.perform(get("/friends").session(newBrowser).param("_tab", tab))
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
@@ -240,23 +260,30 @@ class TabSessionIntegrationTest {
             question.setCorrectOption(1);
             batch.add(questions.saveAndFlush(question));
         }
-        mvc.perform(get("/test/category/start").session(browser).param("_tab", tab)
+        String html = mvc.perform(get("/test/category/start").session(browser).param("_tab", tab)
                         .param("category", category.getCategoryId().toString()).param("difficulty", "1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        var ids = java.util.regex.Pattern.compile("name=\"results\\[(\\d+)\\]\\.questionId\"\\s+value=\"(\\d+)\"")
+                .matcher(html);
         var check = post("/test/check").session(browser).param("_tab", tab);
-        for (int i = 0; i < batch.size(); i++) {
-            check.param("results[" + i + "].questionId", batch.get(i).getQuestionId().toString())
-                    .param("results[" + i + "].ansOption", "1");
+        int submitted = 0;
+        while (ids.find()) {
+            check.param("results[" + ids.group(1) + "].questionId", ids.group(2))
+                    .param("results[" + ids.group(1) + "].ansOption", "1");
+            submitted++;
         }
-        check.param("results[0].correctOption", "1");
+        assertEquals(batch.size(), submitted);
         mvc.perform(check).andExpect(status().isOk());
+        org.mockito.Mockito.doThrow(new IllegalStateException("Simulated reward failure"))
+                .doCallRealMethod().when(levels).processTestResult(
+                        org.mockito.ArgumentMatchers.any(Customer.class),
+                        org.mockito.ArgumentMatchers.eq(2), org.mockito.ArgumentMatchers.eq(2));
         assertThrows(jakarta.servlet.ServletException.class,
                 () -> mvc.perform(post("/test/result").session(browser).param("_tab", tab)));
         Customer user = customers.findByUserName("rollback");
         assertEquals(0, answers.countByCustomerAndCorrectFlagTrue(user));
         assertEquals(0L, user.getTotalExp());
 
-        check.param("results[1].correctOption", "1");
         mvc.perform(check).andExpect(status().isOk());
         mvc.perform(post("/test/result").session(browser).param("_tab", tab))
                 .andExpect(status().is3xxRedirection());

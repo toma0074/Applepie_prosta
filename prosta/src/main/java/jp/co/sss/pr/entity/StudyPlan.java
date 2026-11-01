@@ -35,6 +35,29 @@ public class StudyPlan {
     @Column(name = "details", length = 500)
     private String details;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @Column(name = "target_question_count", nullable = false)
+    private Integer targetQuestionCount = 10;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Integer getTargetQuestionCount() {
+        return targetQuestionCount;
+    }
+
+    public void setTargetQuestionCount(Integer targetQuestionCount) {
+        this.targetQuestionCount = targetQuestionCount;
+    }
+
     public Integer getStudyPlanId() {
         return studyPlanId;
     }

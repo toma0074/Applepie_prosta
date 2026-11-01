@@ -1,5 +1,41 @@
 @charset "UTF-8";
 
+.weekly-chart {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 16px;
+    text-align: center;
+    font-size: .8rem;
+}
+.weekly-chart-bars {
+    height: 150px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    border-bottom: 1px solid #0b346e;
+    background: repeating-linear-gradient(to top, transparent 0 36px, #d2dbe8 37px 38px);
+}
+.weekly-answer-bar, .weekly-accuracy-bar {
+    width: 32%;
+    max-width: 28px;
+}
+.weekly-answer-bar { background: #0b346e; }
+.weekly-accuracy-bar {
+    background: repeating-linear-gradient(45deg, #20705a 0 4px, #9bd7bf 4px 6px);
+}
+.weekly-chart-legend, .weekly-delta { font-size: .88rem; }
+.weekly-table-wrapper { overflow-x: auto; }
+.weekly-table { width: 100%; border-collapse: collapse; }
+.weekly-table caption { text-align: left; font-weight: bold; margin-bottom: 8px; }
+.weekly-table th, .weekly-table td {
+    padding: 7px;
+    text-align: left;
+    border-bottom: 1px solid #ccd5e2;
+    white-space: nowrap;
+}
+
 .learning-status-page {
     padding-bottom: 24px;
 }

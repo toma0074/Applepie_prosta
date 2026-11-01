@@ -15,7 +15,10 @@
 				<li><a class="sidebar-link" th:href="@{/test/diagnostic}">苦手範囲特定問題</a></li>
 				<li><a class="sidebar-link" th:href="@{/test/weak}">弱点から出題</a></li>
 				<li><a class="sidebar-link" th:href="@{/test/review}">復習モード</a></li>
+				<li><a class="sidebar-link" th:href="@{/test/spaced}">今日の復習</a></li>
+				<li><a class="sidebar-link" th:href="@{/learning/recommendation}">おすすめ学習</a></li>
 				<li><a class="sidebar-link" th:href="@{/question}">問題検索</a></li>
+				<li><a class="sidebar-link" th:href="@{/question/bookmarks}">ブックマーク一覧</a></li>
 				<li th:if="${session.user != null and session.user.permission == 1}">
 					<a class="sidebar-link" th:href="@{/admin/menu}">管理者メニュー</a></li>
 			</ul>

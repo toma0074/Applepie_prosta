@@ -15,17 +15,25 @@ class LearningRuntimeTest extends ValidationSupport {
                         .param("planDate", LocalDate.now().toString()).param("title", "拒否対象"))
                 .andExpect(status().is3xxRedirection());
         tab = login(user);
-        mvc.perform(get("/test/category/start").session(browser).param("_tab", tab)
-                        .param("category", category.getCategoryId().toString()).param("difficulty", "1"))
-                .andExpect(status().isOk());
-        mvc.perform(post("/test/check").session(browser).param("_tab", tab)
-                        .param("results[0].questionId", question.getQuestionId().toString())
-                        .param("results[0].category", category.getCategoryId().toString())
-                        .param("results[0].ansOption", "1").param("results[0].correctOption", "1"))
-                .andExpect(status().isOk());
+        String html = mvc.perform(get("/test/category/start").session(browser).param("_tab", tab)
+                        .param("category", category.getCategoryId().toString()).param("difficulty", "1")
+                        .param("questionCount", "5")).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        var ids = java.util.regex.Pattern.compile("name=\"results\\[(\\d+)\\]\\.questionId\"\\s+value=\"(\\d+)\"")
+                .matcher(html);
+        var check = post("/test/check").session(browser).param("_tab", tab);
+        int count = 0;
+        while (ids.find()) {
+            check.param("results[" + ids.group(1) + "].questionId", ids.group(2))
+                    .param("results[" + ids.group(1) + "].ansOption", "1")
+                    .param("results[" + ids.group(1) + "].correctOption", "3");
+            count++;
+        }
+        assertEquals(5, count);
+        mvc.perform(check).andExpect(status().isOk());
         mvc.perform(post("/test/result").session(browser).param("_tab", tab))
                 .andExpect(status().is3xxRedirection());
-        assertEquals(1, answers.countByCustomerAndCorrectFlagTrue(user));
+        assertEquals(5, answers.countByCustomerAndCorrectFlagTrue(user));
         protectedPage("/test/result");
         protectedPage("/mypage/history");
         mvc.perform(post("/study-calendar/plans").session(browser).param("_tab", tab)

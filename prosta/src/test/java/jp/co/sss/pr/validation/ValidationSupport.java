@@ -98,6 +98,24 @@ abstract class ValidationSupport {
                 .andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.containsString("<html")));
     }
 
+    int submitRenderedQuiz(String html, int choice) throws Exception {
+        var ids = java.util.regex.Pattern.compile("name=\"results\\[(\\d+)\\]\\.questionId\"\\s+value=\"(\\d+)\"")
+                .matcher(html);
+        var check = post("/test/check").session(browser).param("_tab", tab);
+        int count = 0;
+        while (ids.find()) {
+            check.param("results[" + ids.group(1) + "].questionId", ids.group(2))
+                    .param("results[" + ids.group(1) + "].ansOption", Integer.toString(choice))
+                    .param("results[" + ids.group(1) + "].correctOption", "3");
+            count++;
+        }
+        assertTrue(count > 0);
+        mvc.perform(check).andExpect(status().isOk());
+        mvc.perform(post("/test/result").session(browser).param("_tab", tab))
+                .andExpect(status().is3xxRedirection());
+        return count;
+    }
+
     void acceptedFriendship() {
         FriendConnection c = new FriendConnection();
         c.setUserLow(user);

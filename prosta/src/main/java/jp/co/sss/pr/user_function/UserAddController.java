@@ -50,6 +50,7 @@ public class UserAddController {
     // ユーザー削除確認
     @RequestMapping(path = "/user/delete/check", method = RequestMethod.POST)
     public String userDeleteCheck(@ModelAttribute CustomerForm customerForm, Model model) {
+        Customer target = confirmationTarget(customerForm);
         CustomerBean loginUser = (CustomerBean) session.getAttribute("user");
 
         if (customerForm.getUserId().equals(loginUser.getUserId())) {
@@ -57,7 +58,7 @@ public class UserAddController {
             model.addAttribute("back", "一覧に戻る");
             return "user/user_list";
 
-        } else if (Boolean.TRUE.equals(customerForm.getDeleteFlag())) {
+        } else if (Boolean.TRUE.equals(target.getDeleteFlag())) {
             // ← Integer==1 の比較を Boolean.TRUE.equals() に変更
             model.addAttribute("errorMessage", "選択したユーザーは削除済みです");
             model.addAttribute("back", "一覧に戻る");
@@ -71,6 +72,7 @@ public class UserAddController {
     // ユーザー復元確認
     @RequestMapping(path = "/user/restore/check", method = RequestMethod.POST)
     public String userRestoreCheck(@ModelAttribute CustomerForm customerForm, Model model) {
+        Customer target = confirmationTarget(customerForm);
         CustomerBean loginUser = (CustomerBean) session.getAttribute("user");
 
         if (customerForm.getUserId().equals(loginUser.getUserId())) {
@@ -78,7 +80,7 @@ public class UserAddController {
             model.addAttribute("back", "一覧に戻る");
             return "user/user_list";
 
-        } else if (!Boolean.TRUE.equals(customerForm.getDeleteFlag())) {
+        } else if (!Boolean.TRUE.equals(target.getDeleteFlag())) {
             // ← Integer==0 の比較を !Boolean.TRUE.equals() に変更
             model.addAttribute("errorMessage", "選択したユーザーはアクティブです");
             model.addAttribute("back", "一覧に戻る");
@@ -98,6 +100,11 @@ public class UserAddController {
             throw new org.springframework.web.server.ResponseStatusException(
                     org.springframework.http.HttpStatus.NOT_FOUND);
         }
+        CustomerBean loginUser = (CustomerBean) session.getAttribute("user");
+        if (user.getUserId().equals(loginUser.getUserId())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "ログイン中のユーザーは操作できません");
+        }
         String m = "";
 
         if (!Boolean.TRUE.equals(user.getDeleteFlag())) {
@@ -115,5 +122,20 @@ public class UserAddController {
         model.addAttribute("userName", user.getUserName() + m);
 
         return "user/user_delete_complete";
+    }
+
+    private Customer confirmationTarget(CustomerForm form) {
+        if (form.getUserId() == null || form.getUserId() <= 0) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST, "ユーザーを選択してください");
+        }
+        Customer target = userRepository.findByUserId(form.getUserId());
+        if (target == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND, "対象のユーザーが見つかりません");
+        }
+        form.setUserName(target.getUserName());
+        form.setDeleteFlag(target.getDeleteFlag());
+        return target;
     }
 }

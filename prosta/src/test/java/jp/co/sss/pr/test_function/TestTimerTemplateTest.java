@@ -26,6 +26,7 @@ import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.CategoryRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
 import jp.co.sss.pr.repository.FriendConnectionRepository;
+import jp.co.sss.pr.repository.FavoriteRepository;
 import jp.co.sss.pr.repository.QuestionRepository;
 import jp.co.sss.pr.service.LevelService;
 import jp.co.sss.pr.service.WeakQuestionService;
@@ -52,6 +53,12 @@ class TestTimerTemplateTest {
     private WeakQuestionService weakQuestionService;
     @MockBean
     private FriendConnectionRepository friendConnectionRepository;
+    @MockBean
+    private FavoriteRepository favoriteRepository;
+    @MockBean
+    private jp.co.sss.pr.service.AnswerGradingService gradingService;
+    @MockBean
+    private jp.co.sss.pr.service.StudyReviewService studyReviewService;
 
     private MockHttpSession loggedIn() {
         CustomerBean user = new CustomerBean();

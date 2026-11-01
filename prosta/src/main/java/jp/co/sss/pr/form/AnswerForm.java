@@ -1,6 +1,8 @@
 package jp.co.sss.pr.form;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 
 public class AnswerForm {
 
@@ -10,6 +12,8 @@ public class AnswerForm {
     private Integer questionId;
 
     @NotNull
+    @Min(1)
+    @Max(4)
     private Integer ansOption;
 
     private Integer correctOption;
@@ -19,6 +23,10 @@ public class AnswerForm {
     private String optionB;
     private String optionC;
     private String explanation;
+    private String previousAnswer;
+
+    public String getPreviousAnswer() { return previousAnswer; }
+    public void setPreviousAnswer(String previousAnswer) { this.previousAnswer = previousAnswer; }
 
     public String getExplanation() { return explanation; }
     public void setExplanation(String explanation) { this.explanation = explanation; }

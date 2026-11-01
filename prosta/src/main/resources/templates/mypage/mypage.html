@@ -93,6 +93,7 @@
 
   <section class="ach-preview quest-panel" th:if="${!#lists.isEmpty(quests)}" aria-label="今日のクエスト">
     <div class="ach-preview-title">🎯 今日のクエスト</div>
+    <p th:text="${questRewardReceived == true} ? '全クエスト達成報酬：10 EXP獲得済み' : 'すべて達成すると10 EXP（1日1回）'"></p>
     <div class="ach-chips">
       <span th:each="q : ${quests}" class="ach-chip" th:title="${q.description}">
         <span th:text="${q.completed ? '✅' : '⬜'}">⬜</span>

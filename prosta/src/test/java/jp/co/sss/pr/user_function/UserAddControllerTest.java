@@ -180,4 +180,30 @@ class UserAddControllerTest {
         assertEquals(404, e.getStatusCode().value());
         verify(repo, never()).save(any());
     }
+
+    @Test
+    void confirmationRequiresAnExistingTargetAndUsesStoredState() {
+        for (boolean restore : List.of(false, true)) {
+            var missing = org.junit.jupiter.api.Assertions.assertThrows(
+                    org.springframework.web.server.ResponseStatusException.class,
+                    () -> {
+                        if (restore) controller.userRestoreCheck(new CustomerForm(), new ExtendedModelMap());
+                        else controller.userDeleteCheck(new CustomerForm(), new ExtendedModelMap());
+                    });
+            assertEquals(400, missing.getStatusCode().value());
+            var unknown = org.junit.jupiter.api.Assertions.assertThrows(
+                    org.springframework.web.server.ResponseStatusException.class,
+                    () -> {
+                        if (restore) controller.userRestoreCheck(target(99, true), new ExtendedModelMap());
+                        else controller.userDeleteCheck(target(99, false), new ExtendedModelMap());
+                    });
+            assertEquals(404, unknown.getStatusCode().value());
+        }
+        ExtendedModelMap model = new ExtendedModelMap();
+        controller.userDeleteCheck(target(3, false), model);
+        assertEquals("選択したユーザーは削除済みです", model.get("errorMessage"));
+        controller.userRestoreCheck(target(2, true), model);
+        assertEquals("選択したユーザーはアクティブです", model.get("errorMessage"));
+        verify(repo, never()).save(any());
+    }
 }

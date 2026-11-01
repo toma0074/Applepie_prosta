@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head><meta charset="UTF-8" /><title>間隔を空けた復習</title></head>
+<body>
+<h3>今日の復習</h3>
+<p>正解が続くと1日・3日・7日・14日・30日と間隔を延ばします。不正解は翌日に再確認します。</p>
+<p th:if="${#lists.isEmpty(dueReviews)}">今日の復習はありません。</p>
+<form th:unless="${#lists.isEmpty(dueReviews)}" th:action="@{/test/spaced/start}" method="get">
+  <div th:replace="~{common/question_count :: selector}"></div>
+  <button type="submit" class="btn">復習スタート</button>
+</form>
+<table class="weak-table">
+<thead><tr><th>問題</th><th>次回復習日</th><th>前回の解答</th></tr></thead>
+<tbody><tr th:each="r : ${reviewSchedule}">
+  <td th:text="${r.question.questionText}"></td>
+  <td th:text="${r.nextDate}"></td>
+  <td th:text="${r.previousAnswer}"></td>
+</tr></tbody>
+</table>
+<p class="btn"><a th:href="@{/mypage}">マイページに戻る</a></p>
+</body></html>

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.pr.bean.CustomerBean;
@@ -37,6 +39,39 @@ public class QuestionController {
 
     @Autowired
     CustomerRepository customerRepository;
+
+    @GetMapping("/question/bookmarks")
+    public String filteredBookmarks(Model model, @RequestParam(required = false) Integer category,
+            @RequestParam(required = false) Integer difficulty) {
+        String view = bookmarks(model);
+        if (view.startsWith("redirect:")) return view;
+        @SuppressWarnings("unchecked")
+        List<Question> all = (List<Question>) model.getAttribute("Questions");
+        model.addAttribute("Questions", all.stream()
+                .filter(q -> category == null || q.getCategory() != null && category.equals(q.getCategory().getCategoryId()))
+                .filter(q -> difficulty == null || difficulty.equals(q.getDifficulty())).toList());
+        model.addAttribute("categoryList", categoryRepository.findAll());
+        model.addAttribute("bookmarkCategory", category);
+        model.addAttribute("bookmarkDifficulty", difficulty);
+        return view;
+    }
+
+    public String bookmarks(Model model) {
+        CustomerBean user = (CustomerBean) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/";
+        }
+        List<Question> questions = favoriteRepository.findBookmarkedQuestions(user.getUserId());
+        model.addAttribute("Questions", questions);
+        model.addAttribute("QuestionResult", "ブックマーク一覧");
+        model.addAttribute("isBookmarkList", true);
+        Set<Integer> favoriteIds = new HashSet<>();
+        for (Question question : questions) {
+            favoriteIds.add(question.getQuestionId());
+        }
+        model.addAttribute("favoriteIds", favoriteIds);
+        return "question/question_list";
+    }
 
     // 問題一覧（全件検索）
     @RequestMapping(path = "/question")
@@ -164,4 +199,3 @@ public class QuestionController {
         model.addAttribute("favoriteIds", favoriteIds);
     }
 }
-

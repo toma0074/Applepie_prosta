@@ -41,6 +41,9 @@ class LevelServiceTest {
     private AnswerRepository answerRepository;
 
     @Mock
+    private QuestService questService;
+
+    @Mock
     private AchievementRepository achievementRepository;
 
     @Mock
@@ -111,5 +114,45 @@ class LevelServiceTest {
         customer.setConsecutiveLoginDays(streak);
         customer.setUserLevel(1);
         return customer;
+    }
+
+    @Test
+    void allQuestsAddTenExpOnlyOnceAndRaiseLevel() {
+        Customer customer = customerWithLogin(LocalDate.now(), 1, 1);
+        when(questService.allCompleted(customer, LocalDate.now())).thenReturn(true);
+
+        levelService.processTestResult(customer, 4, 5);
+        assertEquals(18L, customer.getTotalExp());
+        assertEquals(2, customer.getUserLevel());
+        assertEquals(LocalDate.now(), customer.getQuestRewardDate());
+
+        levelService.processTestResult(customer, 1, 2);
+        assertEquals(20L, customer.getTotalExp());
+    }
+
+    @Test
+    void incompleteQuestsKeepNormalPerfectScoreReward() {
+        Customer customer = customerWithLogin(LocalDate.now(), 1, 1);
+        levelService.processTestResult(customer, 2, 2);
+        assertEquals(9L, customer.getTotalExp());
+        org.junit.jupiter.api.Assertions.assertNull(customer.getQuestRewardDate());
+    }
+
+    @Test
+    void previousDaysRewardDoesNotBlockTodaysReward() {
+        Customer customer = customerWithLogin(LocalDate.now(), 1, 1);
+        customer.setQuestRewardDate(LocalDate.now().minusDays(1));
+        when(questService.allCompleted(customer, LocalDate.now())).thenReturn(true);
+        levelService.processTestResult(customer, 5, 5);
+        assertEquals(25L, customer.getTotalExp());
+        assertEquals(LocalDate.now(), customer.getQuestRewardDate());
+    }
+
+    @Test
+    void emptyTestCannotAwardQuestReward() {
+        Customer customer = customerWithLogin(LocalDate.now(), 1, 1);
+        levelService.processTestResult(customer, 0, 0);
+        assertEquals(0L, customer.getTotalExp());
+        org.mockito.Mockito.verifyNoInteractions(questService);
     }
 }

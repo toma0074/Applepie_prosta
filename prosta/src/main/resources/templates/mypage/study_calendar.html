@@ -82,8 +82,12 @@
         <div class="study-plan-text">
           <strong th:text="${plan.title}">予定タイトル</strong>
           <p th:if="${plan.details != null and !plan.details.isBlank()}" th:text="${plan.details}">予定詳細</p>
+          <p th:text="${(plan.category == null ? 'カテゴリ未指定' : plan.category.categoryName) + ' ／ 目標 ' + plan.targetQuestionCount + '問'}">カテゴリ未指定 ／ 目標10問</p>
         </div>
         <div class="study-plan-actions">
+          <a class="btn" th:if="${plan.category != null}"
+             th:href="@{/test/category/start(category=${plan.category.categoryId},difficulty=1,questionCount=${plan.targetQuestionCount})}">この予定で学習する</a>
+          <a class="btn" th:if="${plan.category == null}" th:href="@{/test/category}">カテゴリを選んで学習</a>
           <a class="btn" th:href="@{/study-calendar(month=${month},date=${selectedDate},edit=${plan.studyPlanId})}">編集</a>
           <form th:action="@{/study-calendar/plans/{id}/delete(id=${plan.studyPlanId})}" method="post">
             <button type="submit" class="study-plan-delete"
@@ -108,6 +112,20 @@
       <textarea id="plan-details" name="details" maxlength="500" rows="3"
                 placeholder="学習内容や目標をメモできます"
                 th:text="${editingPlan == null ? '' : editingPlan.details}"></textarea>
+      <label for="plan-category">学習カテゴリ（任意）</label>
+      <select id="plan-category" name="categoryId">
+        <option value="">指定しない</option>
+        <option th:each="category : ${planCategories}" th:value="${category.categoryId}"
+                th:selected="${editingPlan != null and editingPlan.category != null and editingPlan.category.categoryId == category.categoryId}"
+                th:text="${category.categoryName}">Java</option>
+      </select>
+      <label for="plan-target">目標問題数</label>
+      <select id="plan-target" name="targetQuestionCount">
+        <option th:each="count : ${ {5, 10, 15} }" th:value="${count}"
+                th:selected="${count == (editingPlan == null ? 10 : editingPlan.targetQuestionCount)}"
+                th:text="${count + '問'}">10問</option>
+      </select>
+      <p>カテゴリを指定すると、難易度★☆☆・目標問題数で直接学習を始められます。問題が少ない場合は出題可能な数になります。</p>
       <div class="study-plan-form-actions">
         <button type="submit" class="study-plan-submit"
                 th:text="${editingPlan == null} ? '予定を登録' : '変更を保存'">予定を登録</button>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_4block :: layout(~{::body/content()})}">
+<head>
+<title>PROSTA | 問題の学習</title>
+<meta charset="UTF-8" />
+</head>
+<body>
+<style>
+  .aq-wrap.qs-wrap { max-width: 900px; margin: 0 auto; text-align: left; }
+  .qs-wrap > h3 { margin-left: 0; text-align: center; }
+  .qs-wrap .btn { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 34px; padding: 0 10px; margin: 0; line-height: 1.4; text-align: center; white-space: normal; max-width: 100%; }
+  .qs-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
+  .qs-card h4 { margin: 0 0 8px; }
+  .qs-text, .qs-pre { white-space: pre-wrap; word-break: break-word; }
+  .qs-options { list-style: none; padding: 0; margin: 8px 0; }
+  .qs-options li { padding: 6px 10px; border-radius: 6px; margin: 4px 0; background: #f6f6f6; }
+  .qs-options li.is-correct { background: #e3f6e8; font-weight: bold; }
+  .qs-card textarea { width: 100%; box-sizing: border-box; min-height: 120px; }
+  .qs-actions { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .qs-toolbar { margin: 12px 0; }
+  .qs-toolbar form { margin: 0; }
+  .qs-reasons label { display: inline-block; margin-right: 14px; }
+  .qs-meta { color: #666; font-size: 0.9em; }
+  .qs-reports { padding-left: 18px; }
+</style>
+<div class="aq-wrap qs-wrap">
+  <h3>問題の学習</h3>
+  <p th:if="${error}" class="aq-msg ng" th:text="${error}"></p>
+  <div class="qs-actions qs-toolbar">
+  <a class="btn" th:href="@{${returnUrl}}" th:text="${returnLabel}">問題一覧に戻る</a>
+  <form th:action="@{/favorite/toggle}" method="post">
+    <input type="hidden" name="questionId" th:value="${question.questionId}" />
+    <input type="hidden" name="studyPage" value="true" />
+    <input type="hidden" name="returnUrl" th:value="${returnUrl}" />
+    <button type="submit" class="btn"
+            th:text="${bookmarked} ? '★ 登録解除' : '☆ 登録する'"
+            th:attr="aria-label=${bookmarked} ? 'ブックマークを解除' : 'ブックマークに追加'">☆ 登録する</button>
+  </form>
+  </div>
+
+  <section class="qs-card" aria-label="問題">
+    <p class="qs-meta">
+      <span th:text="${'問題No.' + question.questionId}">問題No.1</span>
+      <span th:if="${question.category != null}" th:text="${' / ' + question.category.categoryName}"></span>
+      <span th:text="${' / 難易度 ' + (question.difficulty == 1 ? '★☆☆' : (question.difficulty == 2 ? '★★☆' : '★★★'))}"></span>
+    </p>
+    <p class="qs-text" th:text="${question.questionText}">問題文</p>
+    <ul class="qs-options">
+      <li th:classappend="${question.correctOption == 1} ? 'is-correct'">
+        A. <span th:text="${question.optionA}"></span><span th:if="${question.correctOption == 1}"> (正解)</span></li>
+      <li th:classappend="${question.correctOption == 2} ? 'is-correct'">
+        B. <span th:text="${question.optionB}"></span><span th:if="${question.correctOption == 2}"> (正解)</span></li>
+      <li th:classappend="${question.correctOption == 3} ? 'is-correct'">
+        C. <span th:text="${question.optionC}"></span><span th:if="${question.correctOption == 3}"> (正解)</span></li>
+    </ul>
+    <h4>解説</h4>
+    <p class="qs-text" th:if="${question.explanation != null and !#strings.isEmpty(question.explanation)}"
+       th:text="${question.explanation}">解説</p>
+    <p class="qs-meta" th:unless="${question.explanation != null and !#strings.isEmpty(question.explanation)}">この問題には解説が登録されていません。</p>
+  </section>
+
+  <section class="qs-card" id="note" aria-label="学習メモ">
+    <h4>学習メモ <span class="qs-meta">(自分だけが見られます)</span></h4>
+    <p th:if="${noteMessage}" class="aq-msg ok" th:text="${noteMessage}"></p>
+    <p th:if="${noteError}" class="aq-msg ng" th:text="${noteError}"></p>
+    <form th:action="@{/question/{id}/note(id=${question.questionId})}" method="post">
+      <input type="hidden" name="returnUrl" th:value="${returnUrl}" />
+      <textarea name="content" th:maxlength="${maxLength}" aria-label="学習メモ"
+                th:placeholder="${'覚えておきたいポイントなどを' + maxLength + '文字以内で入力'}"
+                th:text="${noteForm.content}"></textarea>
+      <p class="qs-meta" th:if="${note != null}"
+         th:text="${'最終更新: ' + #temporals.format(note.updatedAt, 'yyyy/MM/dd HH:mm')}"></p>
+      <div class="qs-actions">
+        <button type="submit" class="btn" th:text="${note == null ? 'メモを保存' : 'メモを更新'}">メモを保存</button>
+      </div>
+    </form>
+    <form th:if="${note != null}" th:action="@{/question/{id}/note/delete(id=${question.questionId})}" method="post"
+          onsubmit="return confirm('このメモを削除しますか？');">
+      <input type="hidden" name="returnUrl" th:value="${returnUrl}" />
+      <div class="qs-actions"><button type="submit" class="btn">メモを削除</button></div>
+    </form>
+  </section>
+
+  <section class="qs-card" id="report" aria-label="問題・解説の報告">
+    <h4>問題・解説の不備を報告</h4>
+    <p th:if="${reportMessage}" class="aq-msg ok" th:text="${reportMessage}"></p>
+    <p th:if="${reportError}" class="aq-msg ng" th:text="${reportError}"></p>
+    <form th:action="@{/question/{id}/report(id=${question.questionId})}" method="post">
+      <input type="hidden" name="returnUrl" th:value="${returnUrl}" />
+      <div class="qs-reasons" role="radiogroup" aria-label="報告理由">
+        <label th:each="r : ${reasons}">
+          <input type="radio" name="reason" th:value="${r.name()}" th:checked="${reportForm.reason == r.name()}" required />
+          <span th:text="${r.label}">理由</span>
+        </label>
+      </div>
+      <textarea name="detail" th:maxlength="${maxLength}" aria-label="報告内容"
+                th:placeholder="${'詳しい内容(' + maxLength + '文字以内。「その他」の場合は必須)'}"
+                th:text="${reportForm.detail}"></textarea>
+      <div class="qs-actions"><button type="submit" class="btn">報告する</button></div>
+    </form>
+    <div th:if="${!#lists.isEmpty(myReports)}">
+      <p class="qs-meta">あなたの最近の報告(最大5件)</p>
+      <ul class="qs-reports">
+        <li th:each="r : ${myReports}">
+          <span th:text="${#temporals.format(r.createdAt, 'yyyy/MM/dd HH:mm')}"></span>
+          <span th:text="${r.reason.label}"></span>
+          ― <strong th:text="${r.status.label}">未対応</strong>
+        </li>
+      </ul>
+    </div>
+  </section>
+</div>
+</body>
+</html>

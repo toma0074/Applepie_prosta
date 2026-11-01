@@ -33,6 +33,7 @@ import jp.co.sss.pr.repository.UserAchievementRepository;
  * <p>レベル計算式：
  * <pre>
  *   獲得EXP = 今回の正解数×2 + 満点時のみ5
+ *   当日の全クエスト達成で追加10 EXP（1日1回）
  *   レベル = floor(累計EXP / 15) + 1
  *   ※ ログインではEXPを加算しない。ログイン日数は実績判定に使用する。
  * </pre>
@@ -48,6 +49,9 @@ public class LevelService {
 
     @Autowired
     private AnswerRepository answerRepository;
+
+    @Autowired
+    private QuestService questService;
 
     @Autowired
     private AchievementRepository achievementRepository;
@@ -134,6 +138,15 @@ public class LevelService {
         // 満点の場合は追加で5 EXP
         if (totalCount > 0 && correctCount == totalCount) {
             earnedExp += 5L;
+        }
+
+        LocalDate today = LocalDate.now();
+        if (totalCount > 0) questService.recordDailyCompletion(customer, today);
+        // 解答履歴の保存後、顧客行ロック下で報酬と付与日を同じトランザクションに保存する。
+        if (totalCount > 0 && !today.equals(customer.getQuestRewardDate())
+                && questService.allCompleted(customer, today)) {
+            earnedExp += QuestService.COMPLETION_REWARD_EXP;
+            customer.setQuestRewardDate(today);
         }
 
         // 累計EXPに加算

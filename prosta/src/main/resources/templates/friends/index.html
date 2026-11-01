@@ -12,6 +12,7 @@
     <div>
       <h3>フレンド</h3>
       <p>友達と学習状況を共有し、同じカテゴリの学習量を比べてみましょう。</p>
+      <p><a class="btn" th:href="@{/challenges}">フレンド対戦</a></p>
     </div>
     <a class="btn" th:href="@{/mypage}">マイページへ戻る</a>
   </div>
@@ -65,7 +66,7 @@
 
   <section class="friends-card" aria-labelledby="friends-ranking-title">
     <h4 id="friends-ranking-title">ランキング</h4>
-    <p>カテゴリ・難易度・期間を指定して、回答数・正解数・正答率をあなたと友達で比較します(未選択は「すべて」)。</p>
+    <p>カテゴリ・難易度・期間を指定して、回答数・正解数・正答率をあなたと友達で比較します(未選択は「すべて」)。正答率は正解数÷回答数です。回答数（比較のサンプル数）も確認してください。</p>
     <form id="friends-ranking-form" class="friends-inline-form">
       <label for="friends-category">カテゴリ</label>
       <select id="friends-category" name="categoryId">
@@ -89,6 +90,11 @@
         <label for="friends-to">終了日</label>
         <input id="friends-to" name="to" type="date" required>
       </span>
+      <label for="friends-ranking-sort">並び順</label>
+      <select id="friends-ranking-sort" name="sort">
+        <option value="accuracy">正答率が高い順</option>
+        <option value="answerCount">回答数が多い順</option>
+      </select>
       <button type="submit">比較</button>
     </form>
     <div id="friends-leaderboard" class="friends-list">
@@ -208,19 +214,36 @@
       headers: { 'Accept': 'application/json' },
       ...options
     });
+    if (response.status === 401) {
+      throw new Error('ログインの有効期限が切れました。再度ログインしてください。');
+    }
+    const contentType = response.headers.get('Content-Type') || '';
+    const isJson = /^application\/(?:[\w.-]+\+)?json(?:\s*;|$)/i.test(contentType);
     if (!response.ok) {
-      const body = await response.text();
-      let detail = body;
-      try {
-        const problem = JSON.parse(body);
-        detail = problem.detail || problem.message || body;
-      } catch (error) {
-        if (!body) detail = '';
+      let detail = '';
+      if (isJson) {
+        const problem = await readJson(response);
+        if (problem && typeof problem === 'object') {
+          detail = typeof problem.detail === 'string' ? problem.detail
+            : typeof problem.message === 'string' ? problem.message : '';
+        }
       }
       throw new Error(detail || `リクエストに失敗しました (${response.status})`);
     }
     if (response.status === 204) return null;
-    return response.json();
+    if (!isJson) {
+      throw new Error('サーバーから正しいデータを取得できませんでした。画面を再読み込みしてください。');
+    }
+    return readJson(response);
+  }
+
+  async function readJson(response) {
+    try {
+      return await response.json();
+    } catch (error) {
+      if (!(error instanceof SyntaxError)) throw error;
+      throw new Error('サーバーの応答を読み込めませんでした。画面を再読み込みしてください。');
+    }
   }
 
   function makeElement(tag, className, text) {
@@ -370,10 +393,14 @@
       return;
     }
     const table = makeElement('table', 'friends-ranking-table');
+    table.append(makeElement('caption', '',
+      data.sort === 'answerCount' ? '回答数が多い順（回答0問は未学習）' : '正答率が高い順（回答0問は未学習）'));
     const head = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    ['順位', 'ユーザー', '回答数', '正解数', '正答率'].forEach((label) => {
-      headerRow.append(makeElement('th', '', label));
+    ['順位', 'ユーザー', '回答数（サンプル数）', '正解数', '正答率'].forEach((label) => {
+      const heading = makeElement('th', '', label);
+      heading.scope = 'col';
+      headerRow.append(heading);
     });
     head.append(headerRow);
     const body = document.createElement('tbody');
@@ -384,7 +411,7 @@
         entry.userName,
         `${entry.answerCount}`,
         `${entry.correctCount}`,
-        `${Number(entry.accuracy).toFixed(1)}%`
+        entry.answerCount > 0 ? `${Number(entry.accuracy).toFixed(1)}%` : '—（未学習）'
       ];
       values.forEach((value) => row.append(makeElement('td', '', value)));
       body.append(row);

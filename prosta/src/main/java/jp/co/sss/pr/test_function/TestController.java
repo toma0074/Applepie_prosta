@@ -31,10 +31,15 @@ import jp.co.sss.pr.form.QuestionForm;
 import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.CategoryRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
+import jp.co.sss.pr.repository.FavoriteRepository;
 import jp.co.sss.pr.repository.QuestionRepository;
 import jp.co.sss.pr.service.LevelService;
 import jp.co.sss.pr.service.WeakQuestionService;
 import jp.co.sss.pr.service.AfterCommit;
+import jp.co.sss.pr.service.AnswerGradingService;
+import jp.co.sss.pr.service.StudyReviewService;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class TestController {
@@ -58,6 +63,15 @@ public class TestController {
     WeakQuestionService weakQuestionService;
 
     @Autowired
+    FavoriteRepository favoriteRepository;
+
+    @Autowired
+    AnswerGradingService gradingService;
+
+    @Autowired
+    StudyReviewService studyReviewService;
+
+    @Autowired
     HttpSession session;
 
     // カテゴリー別問題選択画面
@@ -75,15 +89,22 @@ public class TestController {
 
     // カテゴリ別テスト解答画面
     @RequestMapping(path = "/test/category/start", method = RequestMethod.GET)
+    public String startCategoryCount(Model model, QuestionForm questionForm,
+            @RequestParam(defaultValue = "false") boolean timer,
+            @RequestParam(defaultValue = "15") int questionCount) {
+        session.setAttribute("questionCount", validCount(questionCount));
+        return startCategory(model, questionForm, timer);
+    }
+
     public String startCategory(Model model, QuestionForm questionForm,
-            @RequestParam(defaultValue = "false") boolean timer) {
+            boolean timer) {
         if (questionForm.getCategory() == null || questionForm.getDifficulty() == null) {
             return "redirect:/test/category";
         }
         Category category = categoryRepository.getReferenceById(questionForm.getCategory());
         List<Question> quesList = pickRandom(quesRpstry
                 .findAllByCategoryAndDifficulty(
-                        category, questionForm.getDifficulty()));
+                        category, questionForm.getDifficulty()), selectedCount());
 
         List<AnswerForm> ansList = buildAnswerFormList(quesList.size());
 
@@ -111,6 +132,14 @@ public class TestController {
 
     // 苦手範囲特定テスト解答画面
     @RequestMapping(path = "/test/diagnostic/start", method = RequestMethod.GET)
+    public String startDiagnosticCount(
+            @RequestParam(value = "categoryIds", required = false) List<Integer> categoryIds,
+            Integer difficulty, Model model, @RequestParam(defaultValue = "false") boolean timer,
+            @RequestParam(defaultValue = "15") int questionCount) {
+        session.setAttribute("questionCount", validCount(questionCount));
+        return startDiagnostic(categoryIds, difficulty, model, timer);
+    }
+
     public String startDiagnostic(
             @RequestParam(value = "categoryIds", required = false) List<Integer> categoryIds,
             Integer difficulty, Model model,
@@ -127,13 +156,14 @@ public class TestController {
 
         List<Question> quesList = pickBalanced(quesRpstry
                 .findAllByCategoryInAndDifficulty(
-                        categories, difficulty));
+                        categories, difficulty), selectedCount());
 
         List<AnswerForm> ansList = buildAnswerFormList(quesList.size());
 
         model.addAttribute("answerListForm", new AnswerListForm());
         session.setAttribute("ans", ansList);
         session.setAttribute("question", quesList);
+        session.removeAttribute("testFlag");
         startTimer(quesList.size(), timer);
         addTimer(model);
 
@@ -154,10 +184,16 @@ public class TestController {
 
     // 弱点問題テスト解答画面
     @RequestMapping(path = "/test/weak/start", method = RequestMethod.GET)
+    public String startWeakCount(Model model, @RequestParam(defaultValue = "false") boolean timer,
+            @RequestParam(defaultValue = "15") int questionCount) {
+        session.setAttribute("questionCount", validCount(questionCount));
+        return startWeak(model, timer);
+    }
+
     public String startWeak(Model model,
             @RequestParam(defaultValue = "false") boolean timer) {
         List<WeakQuestionService.WeakQuestion> weakList =
-                weakQuestionService.pick(currentUser(), WeakQuestionService.MAX_QUESTIONS);
+                weakQuestionService.pick(currentUser(), selectedCount());
         if (weakList.isEmpty()) {
             return "redirect:/test/weak";
         }
@@ -166,6 +202,7 @@ public class TestController {
         model.addAttribute("answerListForm", new AnswerListForm());
         session.setAttribute("ans", buildAnswerFormList(quesList.size()));
         session.setAttribute("question", quesList);
+        session.removeAttribute("testFlag");
         startTimer(quesList.size(), timer);
         addTimer(model);
         return "test/show_test";
@@ -185,8 +222,13 @@ public class TestController {
 
     // 復習問題テスト解答画面
     @RequestMapping(path = "/test/review/start", method = RequestMethod.GET)
+    public String startReviewCount(Model model, @RequestParam(defaultValue = "15") int questionCount) {
+        session.setAttribute("questionCount", validCount(questionCount));
+        return startReview(model);
+    }
+
     public String startReview(Model model) {
-        List<Question> quesList = weakQuestionService.pickRecentMistakes(currentUser(), MAX_QUESTIONS);
+        List<Question> quesList = weakQuestionService.pickRecentMistakes(currentUser(), selectedCount());
         if (quesList.isEmpty()) {
             return "redirect:/test/review";
         }
@@ -195,17 +237,84 @@ public class TestController {
         model.addAttribute("answerListForm", new AnswerListForm());
         session.setAttribute("ans", buildAnswerFormList(quesList.size()));
         session.setAttribute("question", quesList);
+        session.removeAttribute("testFlag");
         clearTimer();
         return "test/show_test";
     }
 
+    @RequestMapping(path = "/test/bookmarks/start", method = RequestMethod.GET)
+    public String startBookmarksSelected(Model model,
+            @RequestParam(defaultValue = "15") int questionCount,
+            @RequestParam(required = false) Integer category,
+            @RequestParam(required = false) Integer difficulty,
+            @RequestParam(required = false) List<Integer> questionIds) {
+        validCount(questionCount);
+        CustomerBean user = (CustomerBean) session.getAttribute("user");
+        if (user == null) return "redirect:/";
+        List<Question> allowed = favoriteRepository.findBookmarkedQuestions(user.getUserId());
+        if (questionIds != null && !allowed.stream().map(q -> q.getQuestionId()).toList().containsAll(questionIds)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "登録済みのブックマークを選択してください。");
+        }
+        List<Question> selected = allowed.stream()
+                .filter(q -> category == null || q.getCategory() != null && category.equals(q.getCategory().getCategoryId()))
+                .filter(q -> difficulty == null || difficulty.equals(q.getDifficulty()))
+                .filter(q -> questionIds == null || questionIds.contains(q.getQuestionId())).toList();
+        return beginBookmarks(model, pickRandom(selected, questionCount));
+    }
+
+    public String startBookmarks(Model model) {
+        CustomerBean user = (CustomerBean) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/";
+        }
+        List<Question> questions = pickRandom(
+                favoriteRepository.findBookmarkedQuestions(user.getUserId()));
+        return beginBookmarks(model, questions);
+    }
+
+    private String beginBookmarks(Model model, List<Question> questions) {
+        session.removeAttribute("question");
+        session.removeAttribute("ans");
+        session.removeAttribute("testFlag");
+        clearTimer();
+        if (questions.isEmpty()) {
+            return "redirect:/question/bookmarks";
+        }
+        model.addAttribute("answerListForm", new AnswerListForm());
+        session.setAttribute("ans", buildAnswerFormList(questions.size()));
+        session.setAttribute("question", questions);
+        return "test/show_test";
+    }
+
     // テスト解答確認画面
+    @RequestMapping(path = "/test/spaced", method = RequestMethod.GET)
+    public String selectSpaced(Model model) {
+        model.addAttribute("dueReviews", studyReviewService.due(currentUser(), LocalDate.now()));
+        model.addAttribute("reviewSchedule", studyReviewService.schedule(currentUser()));
+        return "test/select_spaced";
+    }
+
+    @RequestMapping(path = "/test/spaced/start", method = RequestMethod.GET)
+    public String startSpaced(Model model, @RequestParam(defaultValue = "15") int questionCount) {
+        validCount(questionCount);
+        List<Question> questions = studyReviewService.due(currentUser(), LocalDate.now()).stream()
+                .limit(questionCount).map(review -> review.question()).toList();
+        if (questions.isEmpty()) return "redirect:/test/spaced";
+        session.removeAttribute("testFlag");
+        clearTimer();
+        session.setAttribute("question", questions);
+        session.setAttribute("ans", buildAnswerFormList(questions.size()));
+        model.addAttribute("answerListForm", new AnswerListForm());
+        return "test/show_test";
+    }
+
     @RequestMapping(path = "/test/check", method = RequestMethod.POST)
     public String checkTest(@Valid @ModelAttribute AnswerListForm answerForm,
                             BindingResult result, Model model) {
         if (session.getAttribute("question") == null) {
             return "redirect:/mypage";
         }
+        gradingService.normalize(sessionQuestions(), answerForm.getResults(), false);
         session.setAttribute("ans", answerForm.getResults());
         addTimer(model);
 
@@ -235,11 +344,7 @@ public class TestController {
                 || results == null || results.size() != questions.size()) {
             return "redirect:/mypage";
         }
-        for (AnswerForm a : results) {
-            if (a.getAnsOption() == null || a.getAnsOption() < 1 || a.getAnsOption() > 4) {
-                a.setAnsOption(4);
-            }
-        }
+        gradingService.normalize(sessionQuestions(), results, true);
         session.setAttribute("ans", results);
         return resulttTest(model, new AnswerListForm());
     }
@@ -257,11 +362,16 @@ public class TestController {
 
         // 再計算前のレベル
         int previousLevel = user.getUserLevel();
+        LocalDate previousRewardDate = user.getQuestRewardDate();
         
         @SuppressWarnings("unchecked")
         List<AnswerForm> results = (List<AnswerForm>) session.getAttribute("ans");
         if (results == null || results.isEmpty() || session.getAttribute("question") == null) {
             return "redirect:/mypage";
+        }
+        gradingService.normalize(sessionQuestions(), results, false);
+        if (results.stream().anyMatch(answer -> answer.getAnsOption() == null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "すべての問題に解答してから採点してください。");
         }
 
         int qCount  = results.size();
@@ -271,12 +381,24 @@ public class TestController {
         LocalDate today = LocalDate.now();
 
         Map<Integer, String> explanations = new LinkedHashMap<>();
+        Map<Integer, Answer> previousAnswers = new LinkedHashMap<>();
+        for (Answer previous : ansRpstry.findAllByCustomerOrderByAnsIdDesc(user)) {
+            if (previous.getQuestion() != null) previousAnswers.putIfAbsent(previous.getQuestion().getQuestionId(), previous);
+        }
         for (Question q : quesRpstry.findAllById(
                 results.stream().map(answer -> answer.getQuestionId()).toList())) {
             explanations.put(q.getQuestionId(), q.getExplanation());
         }
 
         for (AnswerForm aForm : results) {
+            Answer previous = previousAnswers.get(aForm.getQuestionId());
+            if (previous != null) {
+                Integer chosen = previous.getAnsOption();
+                String label = chosen != null && chosen >= 1 && chosen <= 3
+                        ? List.of("A", "B", "C").get(chosen - 1) : "わからない";
+                aForm.setPreviousAnswer("前回：" + label + "（"
+                        + (Boolean.TRUE.equals(previous.getCorrectFlag()) ? "正解" : "不正解") + "）");
+            }
             aForm.setExplanation(explanations.get(aForm.getQuestionId()));
             boolean isCorrect = aForm.getAnsOption() != null
                     && aForm.getAnsOption().equals(aForm.getCorrectOption());
@@ -382,6 +504,7 @@ public class TestController {
         view.put("currentLevel",   currentLevel);
         // EXPバー表示用のデータ
         view.put("totalExp", totalExp);
+        view.put("questRewardEarned", !today.equals(previousRewardDate) && today.equals(updatedUser.getQuestRewardDate()));
         view.put("expInLevel", expInLevel);
         view.put("expRemaining", expRemaining);
         view.put("expProgressPercent", expProgressPercent);
@@ -420,6 +543,11 @@ public class TestController {
             return "redirect:/mypage";
         }
         model.addAllAttributes(view);
+        CustomerBean user = (CustomerBean) session.getAttribute("user");
+        if (user != null) {
+            model.addAttribute("favoriteIds", favoriteRepository.findBookmarkedQuestions(user.getUserId())
+                    .stream().map(q -> q.getQuestionId()).collect(java.util.stream.Collectors.toSet()));
+        }
         return "test/result_test";
     }
 
@@ -463,13 +591,21 @@ public class TestController {
 
     // 全件の中からランダムに最大15問を抽出（出題順もランダム）
     static List<Question> pickRandom(List<Question> all) {
+        return pickRandom(all, MAX_QUESTIONS);
+    }
+
+    static List<Question> pickRandom(List<Question> all, int count) {
         List<Question> shuffled = new ArrayList<>(all);
         Collections.shuffle(shuffled);
-        return shuffled.size() > MAX_QUESTIONS ? new ArrayList<>(shuffled.subList(0, MAX_QUESTIONS)) : shuffled;
+        return shuffled.size() > count ? new ArrayList<>(shuffled.subList(0, count)) : shuffled;
     }
 
     // カテゴリごとにシャッフルし、順番に1問ずつ取り出して偏りを防ぐ
     static List<Question> pickBalanced(List<Question> all) {
+        return pickBalanced(all, MAX_QUESTIONS);
+    }
+
+    static List<Question> pickBalanced(List<Question> all, int count) {
         Map<Integer, List<Question>> byCategory = new LinkedHashMap<>();
         for (Question q : all) {
             byCategory.computeIfAbsent(q.getCategory().getCategoryId(), k -> new ArrayList<>()).add(q);
@@ -478,10 +614,10 @@ public class TestController {
         groups.forEach(Collections::shuffle);
 
         List<Question> picked = new ArrayList<>();
-        for (int i = 0; picked.size() < MAX_QUESTIONS; i++) {
+        for (int i = 0; picked.size() < count; i++) {
             boolean added = false;
             for (List<Question> g : groups) {
-                if (i < g.size() && picked.size() < MAX_QUESTIONS) {
+                if (i < g.size() && picked.size() < count) {
                     picked.add(g.get(i));
                     added = true;
                 }
@@ -500,5 +636,22 @@ public class TestController {
             list.add(af);
         }
         return list;
+    }
+
+    private int selectedCount() {
+        Object count = session.getAttribute("questionCount");
+        return count instanceof Integer value ? validCount(value) : MAX_QUESTIONS;
+    }
+
+    static int validCount(int count) {
+        if (count != 5 && count != 10 && count != 15) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "出題数は5問・10問・15問から選択してください。");
+        }
+        return count;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Question> sessionQuestions() {
+        return (List<Question>) session.getAttribute("question");
     }
 }

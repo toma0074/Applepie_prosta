@@ -101,7 +101,12 @@ input[type="password"]:hover{
 	box-shadow:0 0 5px rgba(74, 144, 226, 0.5);
 }
 
+button.bg-card {
+    font-family: "MODI", sans-serif;
+}
+
 select.category,
+select.question-count-select,
 select.mypage_sort,
 select.mypage-sort,
 select.difficulty,
@@ -117,6 +122,7 @@ select.deleteFlag{
 }
 
 select.category:hover,
+select.question-count-select:hover,
 select.mypage_sort:hover,
 select.mypage-sort:hover,
 select.difficulty:hover,

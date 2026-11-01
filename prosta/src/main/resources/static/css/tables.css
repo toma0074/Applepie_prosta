@@ -52,6 +52,44 @@ article table.question_list th.questionText {
     width: auto;
 }
 
+.bookmark-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+}
+
+.bookmark-filters label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.bookmark-filters select {
+    max-width: 100%;
+    min-width: 5rem;
+}
+
+.btn.bookmark-start-button {
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0 16px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+article table.question_list th.question-selection {
+    width: 4rem;
+}
+
+article table.question_list .question-selection {
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
 /* ブックマーク列：共通の送信ボタン(stylesheet.css)の見た目のまま、★/☆を中央に揃える */
 article table.question_list th.bookmark {
     width: 7.5rem;
@@ -147,6 +185,10 @@ article table:not(.qcheck) input[type="password"] {
 
     article table.question_list th.bookmark {
         width: 22%;
+    }
+
+    article table.question_list th.question-selection {
+        width: 2.5rem;
     }
 
     article table.aq-table td.num {

@@ -75,7 +75,10 @@ class LearningStatusControllerTest {
                 .andExpect(model().attribute("totalCorrect", 1L))
                 .andExpect(model().attribute("totalIncorrect", 3L))
                 .andExpect(model().attribute("overallAccuracy", 25))
-                .andExpect(model().attributeExists("categoryProgress", "recentActivities"));
+                .andExpect(model().attributeExists("categoryProgress", "recentActivities", "weeklyTrend"));
+        java.time.LocalDate today = java.time.LocalDate.now();
+        verify(answerRepository).summarizeDailyStudy(customer,
+                jp.co.sss.pr.service.LearningTrendService.firstWeek(today), today);
     }
 
     @Test
@@ -86,6 +89,7 @@ class LearningStatusControllerTest {
 
         verify(answerRepository, never()).summarizeByCategory(any());
         verify(answerRepository, never()).findRecentActivities(any(), any());
+        verify(answerRepository, never()).summarizeDailyStudy(any(), any(), any());
     }
 
     private Category category(int id, String name) {

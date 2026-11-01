@@ -51,6 +51,10 @@ class TestControllerTimerTest {
     @Mock
     private LevelService levelService;
     @Mock
+    private jp.co.sss.pr.service.AnswerGradingService gradingService;
+    @Mock
+    private jp.co.sss.pr.repository.FavoriteRepository favoriteRepository;
+    @Mock
     private WeakQuestionService weakQuestionService;
     @Mock
     private HttpSession session;
@@ -121,6 +125,13 @@ class TestControllerTimerTest {
 
     @Test
     void timeUpScoresUnansweredQuestionsAsDontKnow() throws Exception {
+        org.mockito.Mockito.doAnswer(invocation -> {
+            List<AnswerForm> submitted = invocation.getArgument(1);
+            for (AnswerForm form : submitted) {
+                if (form.getAnsOption() == null) form.setAnsOption(4);
+            }
+            return null;
+        }).when(gradingService).normalize(any(), any(), eq(true));
         lenient().when(session.getAttribute(TestController.TIMER_START)).thenReturn(System.currentTimeMillis());
         lenient().when(session.getAttribute("question")).thenReturn(List.of(question(10), question(11)));
         AnswerForm answered = new AnswerForm();
@@ -139,6 +150,7 @@ class TestControllerTimerTest {
         verify(session).setAttribute(eq("ans"), saved.capture());
         assertEquals(1, saved.getValue().get(0).getAnsOption());
         assertEquals(4, saved.getValue().get(1).getAnsOption());
+        verify(gradingService).normalize(any(), any(), eq(true));
     }
 
     private Question question(int id) {

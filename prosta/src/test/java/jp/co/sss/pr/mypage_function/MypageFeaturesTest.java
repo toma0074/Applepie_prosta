@@ -110,6 +110,7 @@ class MypageFeaturesTest {
         assertEquals(5, model.get("loginCount"));
         assertEquals(30, model.get("totalCorrect"));
         assertEquals(2, model.get("perfectCount"));
+        assertFalse(model.containsAttribute("dueReviewCount"));
         assertEquals(1, ((List<?>) model.get("newAchievements")).size());
         assertNull(session.getAttribute("newAchievements"));
     }

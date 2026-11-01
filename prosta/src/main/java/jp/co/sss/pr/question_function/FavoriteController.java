@@ -42,6 +42,10 @@ public class FavoriteController {
     @PostMapping("/favorite/toggle")
     public String toggleFavorite(
             @RequestParam("questionId") Integer questionId,
+            @RequestParam(defaultValue = "false") boolean bookmarkList,
+            @RequestParam(defaultValue = "false") boolean resultPage,
+            @RequestParam(defaultValue = "false") boolean studyPage,
+            @RequestParam(required = false) String returnUrl,
             RedirectAttributes redirectAttributes) {
 
         CustomerBean userBean =
@@ -62,7 +66,10 @@ public class FavoriteController {
         if (customer == null || question == null) {
             redirectAttributes.addFlashAttribute(
                 "error", "対象の問題が見つかりません。");
-            return "redirect:/question";
+            if (studyPage) {
+                return "redirect:" + QuestionStudyController.resolveReturnUrl(returnUrl);
+            }
+            return resultPage ? "redirect:/test/result" : bookmarkList ? "redirect:/question/bookmarks" : "redirect:/question";
         }
 
         boolean exists = favoriteRepository
@@ -78,6 +85,10 @@ public class FavoriteController {
             favoriteRepository.save(favorite);
         }
 
-        return "redirect:/question";
+        if (studyPage) {
+            return "redirect:/question/" + questionId + "/study?returnUrl="
+                    + QuestionStudyController.resolveReturnUrl(returnUrl);
+        }
+        return resultPage ? "redirect:/test/result" : bookmarkList ? "redirect:/question/bookmarks" : "redirect:/question";
     }
 }

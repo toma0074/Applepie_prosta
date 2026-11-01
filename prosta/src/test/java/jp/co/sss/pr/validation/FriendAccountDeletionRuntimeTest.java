@@ -16,7 +16,7 @@ class FriendAccountDeletionRuntimeTest extends ValidationSupport {
     @Test
     void deletedFriendDisappearsAndRestorationPreservesRelationshipAndHistory() throws Exception {
         mvc.perform(get("/api/friends").session(browser).param("_tab", UUID.randomUUID().toString()))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().isUnauthorized());
         acceptFriendRequest();
         Answer answer = new Answer();
         answer.setCustomer(friend);
@@ -64,7 +64,7 @@ class FriendAccountDeletionRuntimeTest extends ValidationSupport {
 
         toggleFriendAccount(adminTab);
         mvc.perform(get("/api/friends/me").session(browser).param("_tab", friendTab))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().isUnauthorized());
         String newFriendTab = login(customers.findById(friend.getUserId()).orElseThrow());
         mvc.perform(get("/api/friends/me").session(browser).param("_tab", newFriendTab))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.userId").value(friend.getUserId()));
