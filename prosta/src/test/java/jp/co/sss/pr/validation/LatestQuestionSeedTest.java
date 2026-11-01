@@ -35,7 +35,7 @@ class LatestQuestionSeedTest {
             "Insert into PROSTA_USER\\.QUESTION \\([^)]*\\) values \\((\\d+),(\\d+),(\\d+),"
                     + QUOTED + "," + QUOTED + "," + QUOTED + "," + QUOTED + ",(\\d+),"
                     + QUOTED + "\\);");
-    private static final Set<Integer> CATEGORIES = Set.of(1, 2, 3, 4, 21);
+    private static final Set<Integer> CATEGORIES = Set.of(1, 2, 3, 4, 5);
 
     private record Seed(int id, int category, int difficulty, String text,
             List<String> options, int correct, String explanation, String insert) {
@@ -65,24 +65,20 @@ class LatestQuestionSeedTest {
     }
 
     @Test
-    void addsExactlyThreePerDifficultyAndKeepsExistingIds() throws Exception {
+    void addsExactlyThreePerDifficultyAndUsesContiguousIds() throws Exception {
         List<Seed> rows = seeds();
         assertEquals(113, rows.size());
         assertEquals(rows.size(), Pattern.compile("Insert into PROSTA_USER\\.QUESTION ")
                 .matcher(sql()).results().count());
         assertEquals(113, rows.stream().map(q -> q.id()).distinct().count());
-        Set<Integer> oldIds = new HashSet<>();
-        for (int id = 1; id <= 75; id++) {
-            if (id != 28 && (id <= 54 || id >= 61)) {
-                oldIds.add(id);
-            }
-        }
-        assertEquals(oldIds, new HashSet<>(rows.stream().filter(q -> q.id() < 81).map(q -> q.id()).toList()));
-        assertEquals(45, rows.stream().filter(q -> q.id() >= 81).count());
+        assertEquals(java.util.stream.IntStream.rangeClosed(1, 113).boxed().toList(),
+                rows.stream().map(Seed::id).sorted().toList());
+        assertEquals(68, rows.stream().filter(q -> q.id() <= 68).count());
+        assertEquals(45, rows.stream().filter(q -> q.id() >= 69).count());
         for (int category : CATEGORIES) {
             for (int difficulty = 1; difficulty <= 3; difficulty++) {
                 int level = difficulty;
-                assertEquals(3, rows.stream().filter(q -> q.id() >= 81
+                assertEquals(3, rows.stream().filter(q -> q.id() >= 69
                         && q.category() == category && q.difficulty() == level).count());
             }
         }
@@ -164,12 +160,12 @@ class LatestQuestionSeedTest {
             var stmt = db.createStatement();
             stmt.execute("CREATE TABLE answer(user_id INT, is_correct INT)");
             stmt.execute("INSERT INTO answer VALUES (1,1),(1,1),(1,0),(2,1),(NULL,1),(3,0)");
-            var correctUsers = stmt.executeQuery(byId.get(35).answer());
+            var correctUsers = stmt.executeQuery(byId.get(34).answer());
             assertTrue(correctUsers.next());
             assertEquals(1, correctUsers.getInt(1));
             assertFalse(correctUsers.next());
-            var count = stmt.executeQuery(byId.get(51).text()
-                    .substring(byId.get(51).text().indexOf("SELECT"), byId.get(51).text().indexOf(';') + 1));
+            var count = stmt.executeQuery(byId.get(50).text()
+                    .substring(byId.get(50).text().indexOf("SELECT"), byId.get(50).text().indexOf(';') + 1));
             assertTrue(count.next());
             assertEquals(6, count.getInt(1));
             assertFalse(count.next());
@@ -178,7 +174,7 @@ class LatestQuestionSeedTest {
             assertFalse(none.next());
             stmt.execute("CREATE TABLE question(question_text VARCHAR(100))");
             stmt.execute("INSERT INTO question VALUES ('50%です'),('%先頭'),('末尾%'),('%'),('percent'),('全角％')");
-            var escaped = stmt.executeQuery(byId.get(41).answer());
+            var escaped = stmt.executeQuery(byId.get(40).answer());
             int matches = 0;
             while (escaped.next()) {
                 assertTrue(escaped.getString(1).contains("%"));
@@ -189,7 +185,7 @@ class LatestQuestionSeedTest {
             stmt.execute("INSERT INTO customer VALUES (1,TIMESTAMP '2000-01-01 00:00:00'),"
                     + "(2,TIMESTAMP '2000-12-31 23:59:59'),(3,TIMESTAMP '2001-01-01 00:00:00'),"
                     + "(4,TIMESTAMP '1999-12-31 23:59:59')");
-            var dates = stmt.executeQuery(byId.get(45).answer());
+            var dates = stmt.executeQuery(byId.get(44).answer());
             Set<Integer> ids = new HashSet<>();
             while (dates.next()) {
                 ids.add(dates.getInt(1));
@@ -204,7 +200,7 @@ class LatestQuestionSeedTest {
     @Test
     void javaOutputQuestionsCompileAndMatchSelectedAnswer(@TempDir Path directory) throws Exception {
         Map<Integer, String> expected = Map.of(4, "7\n5", 5, "30", 7, "13", 8, "3",
-                84, "3", 85, "true", 86, "12", 87, "no", 88, "A\nB\nC");
+                72, "3", 73, "true", 74, "12", 75, "no", 76, "A\nB\nC");
         for (Seed q : seeds()) {
             if (!expected.containsKey(q.id())) {
                 continue;
@@ -232,7 +228,7 @@ class LatestQuestionSeedTest {
             assertEquals(expected.get(q.id()), actual, "Question " + q.id());
             if (q.id() == 4) {
                 assertEquals("7 と 5", q.answer());
-            } else if (q.id() == 88) {
+            } else if (q.id() == 76) {
                 assertEquals(actual.replace("\n", "、"), q.answer());
             } else {
                 assertTrue(q.answer().contains(actual), "Selected choice must match actual output");
@@ -263,14 +259,14 @@ class LatestQuestionSeedTest {
         Map<Integer, Seed> byId = new HashMap<>();
         seeds().forEach(q -> byId.put(q.id(), q));
         assertEquals(11, max);
-        assertEquals(max + "回", byId.get(66).answer());
-        assertEquals("99%", byId.get(73).answer());
+        assertEquals(max + "回", byId.get(59).answer());
+        assertEquals("99%", byId.get(66).answer());
         assertEquals(0.99, 1 - (1 - 0.9) * (1 - 0.9), 0.000001);
-        assertEquals("72%", byId.get(125).answer());
+        assertEquals("72%", byId.get(113).answer());
         assertEquals(0.72, 0.9 * 0.8, 0.000001);
-        assertEquals("62個", byId.get(123).answer());
+        assertEquals("62個", byId.get(111).answer());
         assertEquals(62, (1 << (32 - 26)) - 2);
-        assertEquals("80%", byId.get(122).answer());
+        assertEquals("80%", byId.get(110).answer());
         assertEquals(80, 100 * (15 + 9) / (20 + 10));
     }
 }

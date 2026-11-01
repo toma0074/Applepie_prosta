@@ -255,13 +255,13 @@ public class LevelService {
             tryUnlock(customer, 5, newlyUnlocked);
         }
 
-        // ID 6: レベル50
-        if (level >= 50) {
+        // ID 6: レベル25
+        if (level >= 25) {
             tryUnlock(customer, 6, newlyUnlocked);
         }
 
-        // ID 7: レベル25
-        if (level >= 25) {
+        // ID 7: レベル50
+        if (level >= 50) {
             tryUnlock(customer, 7, newlyUnlocked);
         }
 

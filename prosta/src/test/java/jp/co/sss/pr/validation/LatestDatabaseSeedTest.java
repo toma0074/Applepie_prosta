@@ -175,12 +175,12 @@ class LatestDatabaseSeedTest {
                 try (var result = statement.executeQuery("SELECT COALESCE(MAX(" + target[1]
                         + "), 0) FROM " + target[0])) {
                     assertTrue(result.next());
-                    assertTrue(start > result.getLong(1), entry.getKey() + " must exceed inserted IDs");
+                    assertEquals(result.getLong(1) + 1, start, entry.getKey() + " must follow inserted IDs");
                 }
             }
             assertThrows(SQLException.class, () -> statement.executeUpdate(
                     "INSERT INTO FAVORITE (FAVORITE_ID,USER_ID,QUESTION_ID)"
-                            + " SELECT 999,USER_ID,QUESTION_ID FROM FAVORITE WHERE FAVORITE_ID=42"));
+                            + " SELECT 999,USER_ID,QUESTION_ID FROM FAVORITE WHERE FAVORITE_ID=1"));
             assertThrows(SQLException.class, () -> statement.executeUpdate(
                     "INSERT INTO FAVORITE (FAVORITE_ID,USER_ID,QUESTION_ID) VALUES (999,99999,1)"));
             assertThrows(SQLException.class, () -> statement.executeUpdate(
@@ -206,7 +206,7 @@ class LatestDatabaseSeedTest {
     void preservesExistingIconsAndKeepsPasswordsHashed() throws Exception {
         List<String> expectedIcons = List.of(
                 "\uD83D\uDCC5", "\uD83C\uDFAF", "\uD83E\uDD49", "\uD83C\uDFC6", "\uD83C\uDF31",
-                "\uD83D\uDEE1", "\u2B50", "\uD83D\uDCAB", "\uD83D\uDC51", "\uD83D\uDCD8",
+                "\u2B50", "\uD83D\uDEE1", "\uD83D\uDCAB", "\uD83D\uDC51", "\uD83D\uDCD8",
                 "\uD83D\uDCDA", "\uD83D\uDC8E", "\uD83D\uDD25", "\uD83C\uDF93", "\uD83C\uDF31",
                 "\uD83E\uDD1D", "\uD83D\uDC65", "\uD83C\uDF1F", "\uD83D\uDC51", "\uD83D\uDCDA");
         var matcher = INSERT.matcher(sql());
@@ -239,5 +239,26 @@ class LatestDatabaseSeedTest {
         assertEquals(icon, new String(icon.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8));
         assertFalse(Charset.forName("MS932").newEncoder().canEncode(icon));
         assertTrue(sql().contains("'" + icon + "'"));
+    }
+
+    @Test
+    void levelAchievementIdsAndHistoryStayConsistent() throws Exception {
+        var matcher = INSERT.matcher(sql());
+        Map<Integer, String> names = new HashMap<>();
+        Map<Integer, List<String>> history = new HashMap<>();
+        while (matcher.find()) {
+            List<String> values = split(matcher.group(3));
+            if (matcher.group(1).equals("ACHIEVEMENT")) {
+                names.put(Integer.parseInt(values.get(0)), values.get(1));
+            } else if (matcher.group(1).equals("USER_ACHIEVEMENT")) {
+                history.put(Integer.parseInt(values.get(0)), values);
+            }
+        }
+        assertEquals("'レベル25到達'", names.get(6));
+        assertEquals("'レベル50到達'", names.get(7));
+        assertEquals("7", history.get(2).get(2));
+        assertEquals("to_date('26-10-23','RR-MM-DD')", history.get(2).get(3));
+        assertEquals("6", history.get(3).get(2));
+        assertEquals("to_date('26-10-30','RR-MM-DD')", history.get(3).get(3));
     }
 }

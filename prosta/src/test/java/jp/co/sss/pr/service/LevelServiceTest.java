@@ -6,15 +6,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import jp.co.sss.pr.entity.Customer;
+import jp.co.sss.pr.entity.Achievement;
+import jp.co.sss.pr.entity.UserAchievement;
 import jp.co.sss.pr.repository.AchievementRepository;
 import jp.co.sss.pr.repository.AnswerRepository;
 import jp.co.sss.pr.repository.CustomerRepository;
@@ -114,6 +120,31 @@ class LevelServiceTest {
         customer.setConsecutiveLoginDays(streak);
         customer.setUserLevel(1);
         return customer;
+    }
+
+    @ParameterizedTest
+    @CsvSource({"24, false, false", "25, true, false", "49, true, false", "50, true, true"})
+    void levelAchievementsUseSqlIdsAtThresholds(int level, boolean unlock25, boolean unlock50) {
+        Customer customer = customerWithLogin(LocalDate.now(), 1, 1);
+        customer.setTotalExp((level - 1) * 15L);
+        Achievement level25 = new Achievement();
+        level25.setAchievementId(6);
+        Achievement level50 = new Achievement();
+        level50.setAchievementId(7);
+        when(achievementRepository.findById(any())).thenAnswer(invocation -> {
+            int id = invocation.getArgument(0);
+            return id == 6 ? Optional.of(level25) : id == 7 ? Optional.of(level50) : Optional.empty();
+        });
+
+        List<Achievement> unlocked = levelService.processTestResult(customer, 0, 0);
+
+        assertEquals(unlock25, unlocked.contains(level25));
+        assertEquals(unlock50, unlocked.contains(level50));
+        var saved = org.mockito.ArgumentCaptor.forClass(UserAchievement.class);
+        verify(userAchievementRepository, org.mockito.Mockito.times(
+                (unlock25 ? 1 : 0) + (unlock50 ? 1 : 0))).save(saved.capture());
+        assertEquals(unlocked.stream().map(achievement -> achievement.getAchievementId()).toList(),
+                saved.getAllValues().stream().map(ua -> ua.getAchievement().getAchievementId()).toList());
     }
 
     @Test

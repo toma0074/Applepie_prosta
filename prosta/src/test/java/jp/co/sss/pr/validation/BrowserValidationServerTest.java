@@ -33,6 +33,9 @@ class BrowserValidationServerTest extends ValidationSupport {
         ua.setAchievement(a);
         ua.setUnlockedDate(LocalDate.now());
         unlocked.saveAndFlush(ua);
+        if (Boolean.getBoolean("browser.achievements.all")) {
+            seedAllAchievements();
+        }
         for (var c : java.util.List.of(user, friend)) {
             for (int i = 0; i < 12; i++) {
                 Answer answer = new Answer();
@@ -55,5 +58,30 @@ class BrowserValidationServerTest extends ValidationSupport {
             Thread.sleep(500);
         }
         if (!Files.exists(stop)) throw new AssertionError("Browser validation exceeded 25 minutes");
+    }
+
+    private void seedAllAchievements() throws Exception {
+        String sql = Files.readString(Path.of("docs", "db", "現状最新.sql"),
+                java.nio.charset.StandardCharsets.UTF_8);
+        var rows = java.util.regex.Pattern.compile(
+                "Insert into PROSTA_USER\\.ACHIEVEMENT \\([^)]*\\) values "
+                        + "\\((\\d+),'((?:[^']|'')*)','((?:[^']|'')*)','((?:[^']|'')*)'\\);")
+                .matcher(sql);
+        int count = 0;
+        while (rows.find()) {
+            Achievement achievement = new Achievement();
+            achievement.setAchievementId(Integer.parseInt(rows.group(1)));
+            achievement.setAchievementName(rows.group(2).replace("''", "'"));
+            achievement.setDescription(rows.group(3).replace("''", "'"));
+            achievement.setIcon(rows.group(4).replace("''", "'"));
+            achievement = achievements.saveAndFlush(achievement);
+            UserAchievement record = new UserAchievement();
+            record.setCustomer(user);
+            record.setAchievement(achievement);
+            record.setUnlockedDate(LocalDate.now());
+            unlocked.saveAndFlush(record);
+            count++;
+        }
+        org.junit.jupiter.api.Assertions.assertEquals(20, count);
     }
 }

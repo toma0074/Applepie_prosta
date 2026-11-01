@@ -1,6 +1,7 @@
 package jp.co.sss.pr.mypage_function;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ public class AchievementController {
 
         // 全実績マスター
         List<Achievement> allAchievements = achievementRepository.findAll();
+        allAchievements.sort(Comparator.comparingInt(achievement -> achievement.getAchievementId()));
 
         // 未確認の実績を控えてから確認済みにする（今回のページでNEW表示するため）
         List<UserAchievement> unseen = userAchievementRepository.findByCustomerAndSeenFalse(user);

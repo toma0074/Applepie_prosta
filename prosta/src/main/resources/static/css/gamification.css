@@ -1023,6 +1023,8 @@ table.friends-ranking-table {
 }
 
 .ach-card-desc {
+    flex: 1;
+    min-height: 3em;
     font-size: 11px;
     color: #57606a;
     line-height: 1.5;
